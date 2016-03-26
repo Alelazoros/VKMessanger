@@ -1,4 +1,14 @@
 <resources>
+    <!-- VK SDK API key-->
+    <integer name="com_vk_sdk_AppId">5379064</integer>
+
+    <!-- App name-->
     <string name="app_name">VKMessanger</string>
+
+    <!-- Activities-->
+    <string name="activity_main_label">VKMessanger</string>
+    <string name="vk_service_activity">ServiceActivity</string>
+
+    <!-- Menu-->
     <string name="action_settings">Settings</string>
 </resources>
