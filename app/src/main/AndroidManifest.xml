@@ -25,7 +25,7 @@
         <!-- VK SDK authorization activity-->
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
-            android:label="@string/vk_service_activity"
+            android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
 
     </application>
