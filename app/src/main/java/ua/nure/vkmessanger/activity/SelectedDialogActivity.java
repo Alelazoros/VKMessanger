@@ -1,4 +1,4 @@
-package ua.nure.vkmessanger;
+package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Message;
 
 public class SelectedDialogActivity extends AppCompatActivity {

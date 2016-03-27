@@ -1,4 +1,4 @@
-package ua.nure.vkmessanger;
+package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,6 +33,7 @@ import com.vk.sdk.api.model.VKList;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity {
