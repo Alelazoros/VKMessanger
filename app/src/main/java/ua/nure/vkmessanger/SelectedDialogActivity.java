@@ -101,6 +101,8 @@ public class SelectedDialogActivity extends AppCompatActivity {
     private void loadDialogWithSelectedUser(int userId){
         VKRequest currentRequest = new VKRequest("messages.getHistory",
                 VKParameters.from(VKApiConst.USER_ID, userId, VKApiConst.COUNT, DIALOG_MESSAGES_REQUEST_COUNT_BY_DEFAULT));
+        currentRequest.attempts = 10;
+
         currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {

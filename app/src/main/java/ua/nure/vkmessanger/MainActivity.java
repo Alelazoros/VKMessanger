@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadUserDialogs() {
         VKRequest currentRequest = VKApi.messages().getDialogs(VKParameters.from(VKApiConst.COUNT, USER_DIALOGS_REQUEST_COUNT));
+        currentRequest.attempts = 10;
+
         currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
