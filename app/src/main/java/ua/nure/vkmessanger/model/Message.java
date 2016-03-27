@@ -7,11 +7,13 @@ public class Message {
 
     private int messageId;
     private boolean fromMe;
+    private boolean read;
     private String messageBody;
 
-    public Message(int messageId, boolean fromMe, String messageBody) {
+    public Message(int messageId, boolean fromMe, boolean read, String messageBody) {
         this.messageId = messageId;
         this.fromMe = fromMe;
+        this.read = read;
         this.messageBody = messageBody;
     }
 
@@ -25,5 +27,9 @@ public class Message {
 
     public String getMessageBody() {
         return messageBody;
+    }
+
+    public boolean isRead() {
+        return read;
     }
 }
