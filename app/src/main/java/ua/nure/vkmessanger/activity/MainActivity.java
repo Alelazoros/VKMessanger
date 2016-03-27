@@ -124,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResult(VKAccessToken res) {
                 //Успешная авторизация.
+                Button loginButton = (Button) findViewById(R.id.login_button);
+                loginButton.setVisibility(View.INVISIBLE);
+
                 loadUserDialogs();
             }
 
