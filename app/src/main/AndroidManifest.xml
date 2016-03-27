@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/activity_main_label"
+            android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,12 +22,15 @@
             </intent-filter>
         </activity>
 
-        <!-- VK SDK authorization activity-->
+        <!-- VK SDK authorization activity -->
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
-
+        <activity
+            android:name=".SelectedDialogActivity"
+            android:label="@string/title_activity_selected_dialog"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

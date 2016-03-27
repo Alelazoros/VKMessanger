@@ -6,7 +6,8 @@
     <string name="app_name">VKMessanger</string>
 
     <!-- Activities-->
-    <string name="activity_main_label">VKMessanger</string>
+    <string name="title_activity_main">VKMessanger</string>
+    <string name="title_activity_selected_dialog">SelectedDialogActivity</string>
 
     <!-- Menu-->
     <string name="action_settings">Settings</string>
