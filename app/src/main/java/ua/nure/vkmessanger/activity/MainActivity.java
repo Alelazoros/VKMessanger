@@ -26,9 +26,10 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiDialog;
-import com.vk.sdk.api.model.VKApiGetDialogResponse;
-import com.vk.sdk.api.model.VKList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,9 +97,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, SelectedDialogActivity.class);
-                intent.putExtra(SelectedDialogActivity.SELECTED_DIALOG_USER_ID, adapter.getItem(position).getUserId());
-                //TODO: сделать обработку возврата из SelectedDialogActivity.
+
+                //Проверка на статус диалога (групповая беседа, или ЛС).
+                UserDialog dialog = adapter.getItem(position);
+
+                intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, getDialogId(dialog));
                 startActivity(intent);
+                //TODO: сделать обработку возврата из SelectedDialogActivity.
+            }
+
+            private int getDialogId(UserDialog selectedDialog){
+                int chatId = selectedDialog.getChatId();
+                return chatId != 0 ? UserDialog.CHAT_PREFIX + chatId : selectedDialog.getUserId();
             }
         });
     }
@@ -150,14 +160,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "onComplete " + response);
 
                 dialogs.clear();
+                try {
+                    JSONArray responseMessagesArrayJSON = response.json.getJSONObject("response").getJSONArray("items");
 
-                VKApiGetDialogResponse dialogResponse = (VKApiGetDialogResponse) response.parsedModel;
-                VKList<VKApiDialog> userDialogs = dialogResponse.items;
-
-                for (VKApiDialog vkApiDialog : userDialogs) {
-                    dialogs.add(new UserDialog(vkApiDialog.message.user_id, vkApiDialog.message.body));
+                    for (int i = 0; i < responseMessagesArrayJSON.length(); i++) {
+                        JSONObject messageJSON = responseMessagesArrayJSON.getJSONObject(i).getJSONObject("message");
+                        dialogs.add(new UserDialog(
+                                messageJSON.optInt("chat_id"),
+                                messageJSON.getInt("user_id"),
+                                messageJSON.getString("body")));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
                 Log.d(LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
                 adapter.notifyDataSetChanged();
             }

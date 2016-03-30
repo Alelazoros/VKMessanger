@@ -2,14 +2,11 @@ package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -30,11 +27,12 @@ import ua.nure.vkmessanger.model.Message;
 
 public class SelectedDialogActivity extends AppCompatActivity {
 
-    public static final String SELECTED_DIALOG_USER_ID = "SELECTED_DIALOG_USER_ID";
+    public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
     private static final String LOG_TAG = "LOG_TAG_DIALOGS";
 
     private static final int DIALOG_MESSAGES_REQUEST_COUNT_BY_DEFAULT = 50;
+
     private static final int MESSAGE_WAS_READ = 1;
 
     private List<Message> messages = new ArrayList<>();
@@ -55,7 +53,7 @@ public class SelectedDialogActivity extends AppCompatActivity {
     }
 
     private void getDataFromIntent(Intent intent) {
-        userId = intent.getIntExtra(SELECTED_DIALOG_USER_ID, -1);
+        userId = intent.getIntExtra(EXTRA_SELECTED_DIALOG_ID, -1);
     }
 
     private void initToolbar() {
