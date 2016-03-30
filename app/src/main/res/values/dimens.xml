@@ -3,4 +3,10 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!-- Messages-->
+    <dimen name="messageCardElevation">4dp</dimen>
+    <dimen name="messageCardCornerRadius">8dp</dimen>
+    <dimen name="messagePaddingLeftRight">16dp</dimen>
+    <dimen name="messagePaddingTopLeft">8dp</dimen>
 </resources>
