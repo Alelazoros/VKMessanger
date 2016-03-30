@@ -33,13 +33,15 @@ public class SelectedDialogActivity extends AppCompatActivity {
 
     private static final int DIALOG_MESSAGES_REQUEST_COUNT_BY_DEFAULT = 50;
 
+    private static final int MESSAGE_WAS_SEND_FROM_ME = 1;
+
     private static final int MESSAGE_WAS_READ = 1;
 
     private List<Message> messages = new ArrayList<>();
 
     private SelectedDialogRecyclerAdapter adapter;
 
-    private int userId;
+    private int dialogId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +51,11 @@ public class SelectedDialogActivity extends AppCompatActivity {
         getDataFromIntent(getIntent());
         initToolbar();
         initRecyclerView();
-        loadDialogWithSelectedUser(userId);
+        loadDialogWithSelectedUser(dialogId);
     }
 
     private void getDataFromIntent(Intent intent) {
-        userId = intent.getIntExtra(EXTRA_SELECTED_DIALOG_ID, -1);
+        dialogId = intent.getIntExtra(EXTRA_SELECTED_DIALOG_ID, -1);
     }
 
     private void initToolbar() {
@@ -69,9 +71,9 @@ public class SelectedDialogActivity extends AppCompatActivity {
     }
 
 
-    private void loadDialogWithSelectedUser(int userId){
+    private void loadDialogWithSelectedUser(int dialogId){
         VKRequest currentRequest = new VKRequest("messages.getHistory",
-                VKParameters.from(VKApiConst.USER_ID, userId, VKApiConst.COUNT, DIALOG_MESSAGES_REQUEST_COUNT_BY_DEFAULT));
+                VKParameters.from(VKApiConst.USER_ID, dialogId, VKApiConst.COUNT, DIALOG_MESSAGES_REQUEST_COUNT_BY_DEFAULT));
         currentRequest.attempts = 10;
 
         currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
@@ -82,14 +84,13 @@ public class SelectedDialogActivity extends AppCompatActivity {
 
                 messages.clear();
                 try {
-                    JSONArray jsonArray = (JSONArray)response.json.getJSONObject("response").get("items");
+                    JSONArray jsonMessagesArray = (JSONArray)response.json.getJSONObject("response").get("items");
 
-                    Log.d(LOG_TAG, " json array length = " + jsonArray.length());
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject object = jsonArray.getJSONObject(i);
+                    for (int i = 0; i < jsonMessagesArray.length(); i++) {
+                        JSONObject object = jsonMessagesArray.getJSONObject(i);
 
                         int messageId = object.getInt("id");
-                        boolean isMessageFromMe = object.getInt("from_id") != object.getInt("user_id");
+                        boolean isMessageFromMe = object.getInt("out") == MESSAGE_WAS_SEND_FROM_ME;
                         boolean isRead = object.getInt("read_state") == MESSAGE_WAS_READ;
                         String messageBody = object.getString("body");
 

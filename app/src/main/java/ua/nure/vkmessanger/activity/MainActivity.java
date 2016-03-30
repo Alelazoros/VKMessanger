@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
             private int getDialogId(UserDialog selectedDialog){
                 int chatId = selectedDialog.getChatId();
-                return chatId != 0 ? UserDialog.CHAT_PREFIX + chatId : selectedDialog.getUserId();
+                return chatId > 0 ? UserDialog.CHAT_PREFIX + chatId : selectedDialog.getUserId();
             }
         });
     }
