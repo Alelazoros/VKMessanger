@@ -5,23 +5,17 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiGetMessagesResponse;
-import com.vk.sdk.api.model.VKApiMessage;
-import com.vk.sdk.api.model.VKList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
+import ua.nure.vkmessanger.adapter.SelectedDialogRecyclerAdapter;
 import ua.nure.vkmessanger.model.Message;
 
 public class SelectedDialogActivity extends AppCompatActivity {
@@ -44,7 +39,7 @@ public class SelectedDialogActivity extends AppCompatActivity {
 
     private List<Message> messages = new ArrayList<>();
 
-    private ArrayAdapter<Message> adapter;
+    private SelectedDialogRecyclerAdapter adapter;
 
     private int userId;
 
@@ -56,7 +51,7 @@ public class SelectedDialogActivity extends AppCompatActivity {
         getDataFromIntent(getIntent());
         initToolbar();
         initFAB();
-        initListView();
+        initRecyclerView();
         loadDialogWithSelectedUser(userId);
     }
 
@@ -80,22 +75,11 @@ public class SelectedDialogActivity extends AppCompatActivity {
         });
     }
 
-    private void initListView() {
-        adapter = new ArrayAdapter<Message>(this, android.R.layout.simple_list_item_1, android.R.id.text1, messages) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                final Message message = getItem(position);
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(getContext())
-                            .inflate(android.R.layout.simple_list_item_1, null);
-                }
-                ((TextView) convertView.findViewById(android.R.id.text1)).setText(message.getMessageBody());
-
-                return convertView;
-            }
-        };
-        ListView listView = (ListView) findViewById(R.id.listViewDialog);
-        listView.setAdapter(adapter);
+    private void initRecyclerView() {
+        adapter = new SelectedDialogRecyclerAdapter(this, null);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
     }
 
 
@@ -129,6 +113,7 @@ public class SelectedDialogActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 Log.d(LOG_TAG, String.format("Messages loaded count == %d", messages.size()));
+                adapter.changeMessagesList(messages);
                 adapter.notifyDataSetChanged();
             }
 

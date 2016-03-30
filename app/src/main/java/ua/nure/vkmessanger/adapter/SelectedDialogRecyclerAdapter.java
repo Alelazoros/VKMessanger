@@ -31,6 +31,10 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         setHasStableIds(true);
     }
 
+    public void changeMessagesList(List<Message> messages) {
+        this.mMessageList = messages;
+    }
+
     @Override
     public int getItemViewType(int position) {
         return mMessageList.get(position).isFromMe() ? MESSAGE_FROM_USER_TYPE : MESSAGE_TO_USER_TYPE;
@@ -47,17 +51,19 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
     @Override
     public void onBindViewHolder(SelectedDialogViewHolder holder, int position) {
-        holder.messageTextView.setText(mMessageList.get(position).getMessageBody());
+        if (mMessageList != null) {
+            holder.messageTextView.setText(mMessageList.get(position).getMessageBody());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mMessageList.size();
+        return mMessageList == null ? 0 : mMessageList.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return mMessageList.get(position).getMessageId();
+        return mMessageList == null ? 0 : mMessageList.get(position).getMessageId();
     }
 
     static class SelectedDialogViewHolder extends RecyclerView.ViewHolder{
