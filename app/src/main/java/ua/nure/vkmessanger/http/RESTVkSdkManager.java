@@ -28,6 +28,12 @@ public class RESTVkSdkManager implements RESTInterface {
 
     private static final int USER_DIALOGS_DEFAULT_REQUEST_COUNT = 100;
 
+    private static final int DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT = 50;
+
+    private static final int MESSAGE_WAS_SEND_FROM_ME = 1;
+
+    private static final int MESSAGE_WAS_READ = 1;
+
     @Override
     public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
         VKRequest currentRequest = VKApi.messages().getDialogs(
@@ -80,7 +86,56 @@ public class RESTVkSdkManager implements RESTInterface {
     }
 
     @Override
-    public void loadSelectedDialog(int dialogId, ResponseCallback<Message> responseCallback) {
+    public void loadSelectedDialogById(int dialogId, final ResponseCallback<Message> responseCallback) {
+        VKRequest currentRequest = new VKRequest("messages.getHistory",
+                VKParameters.from(VKApiConst.USER_ID, dialogId, VKApiConst.COUNT, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT));
+        currentRequest.attempts = 10;
 
+        currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                Log.d(REST_MANAGER_LOG_TAG, "onComplete " + response);
+
+                List<Message> messages = new ArrayList<>();
+                try {
+                    JSONArray jsonMessagesArray = (JSONArray)response.json.getJSONObject("response").get("items");
+
+                    for (int i = 0; i < jsonMessagesArray.length(); i++) {
+                        JSONObject object = jsonMessagesArray.getJSONObject(i);
+
+                        int messageId = object.getInt("id");
+                        boolean isMessageFromMe = object.getInt("out") == MESSAGE_WAS_SEND_FROM_ME;
+                        boolean isRead = object.getInt("read_state") == MESSAGE_WAS_READ;
+                        String messageBody = object.getString("body");
+
+                        messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(REST_MANAGER_LOG_TAG, String.format("Messages loaded count == %d", messages.size()));
+
+                responseCallback.onResponse(messages);
+            }
+
+            @Override
+            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+                super.attemptFailed(request, attemptNumber, totalAttempts);
+                Log.d(REST_MANAGER_LOG_TAG, "attemptFailed " + request + " " + attemptNumber + " " + totalAttempts);
+            }
+
+            @Override
+            public void onError(VKError error) {
+                super.onError(error);
+                Log.d(REST_MANAGER_LOG_TAG, "onError: " + error);
+            }
+
+            @Override
+            public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
+                super.onProgress(progressType, bytesLoaded, bytesTotal);
+                Log.d(REST_MANAGER_LOG_TAG, "onProgress " + progressType + " " + bytesLoaded + " " + bytesTotal);
+            }
+        });
     }
 }

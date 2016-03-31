@@ -10,5 +10,5 @@ public interface RESTInterface {
 
     void loadUserDialogs(ResponseCallback<UserDialog> responseCallback);
 
-    void loadSelectedDialog(int dialogId, ResponseCallback<Message> responseCallback);
+    void loadSelectedDialogById(int dialogId, ResponseCallback<Message> responseCallback);
 }
