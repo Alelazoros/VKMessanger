@@ -6,7 +6,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,28 +19,20 @@ import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.VKResponse;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
+import ua.nure.vkmessanger.http.RESTInterface;
+import ua.nure.vkmessanger.http.RESTVkSdkManager;
+import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "APP_LOG_TAG";
-
-    private static final int USER_DIALOGS_REQUEST_COUNT = 100;
+    private RESTInterface restInterface = new RESTVkSdkManager();
 
     private final List<UserDialog> dialogs = new ArrayList<>();
 
@@ -150,49 +141,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadUserDialogs() {
-        VKRequest currentRequest = VKApi.messages().getDialogs(VKParameters.from(VKApiConst.COUNT, USER_DIALOGS_REQUEST_COUNT));
-        currentRequest.attempts = 10;
-
-        currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        restInterface.loadUserDialogs(new ResponseCallback<UserDialog>() {
             @Override
-            public void onComplete(VKResponse response) {
-                super.onComplete(response);
-                Log.d(LOG_TAG, "onComplete " + response);
-
+            public void onResponse(List<UserDialog> data) {
                 dialogs.clear();
-                try {
-                    JSONArray responseMessagesArrayJSON = response.json.getJSONObject("response").getJSONArray("items");
-
-                    for (int i = 0; i < responseMessagesArrayJSON.length(); i++) {
-                        JSONObject messageJSON = responseMessagesArrayJSON.getJSONObject(i).getJSONObject("message");
-                        dialogs.add(new UserDialog(
-                                messageJSON.optInt("chat_id"),
-                                messageJSON.getInt("user_id"),
-                                messageJSON.getString("body")));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.d(LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
+                dialogs.addAll(data);
                 adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
-                super.attemptFailed(request, attemptNumber, totalAttempts);
-                Log.d(LOG_TAG, "attemptFailed " + request + " " + attemptNumber + " " + totalAttempts);
-            }
-
-            @Override
-            public void onError(VKError error) {
-                super.onError(error);
-                Log.d(LOG_TAG, "onError: " + error);
-            }
-
-            @Override
-            public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
-                super.onProgress(progressType, bytesLoaded, bytesTotal);
-                Log.d(LOG_TAG, "onProgress " + progressType + " " + bytesLoaded + " " + bytesTotal);
             }
         });
     }
