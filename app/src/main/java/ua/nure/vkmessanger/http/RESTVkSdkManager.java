@@ -86,9 +86,11 @@ public class RESTVkSdkManager implements RESTInterface {
     }
 
     @Override
-    public void loadSelectedDialogById(int dialogId, final ResponseCallback<Message> responseCallback) {
+    public void loadSelectedDialogById(int dialogId, int offsetCount, final ResponseCallback<Message> responseCallback) {
         VKRequest currentRequest = new VKRequest("messages.getHistory",
-                VKParameters.from(VKApiConst.USER_ID, dialogId, VKApiConst.COUNT, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT));
+                VKParameters.from(VKApiConst.USER_ID, dialogId,
+                        VKApiConst.OFFSET, offsetCount,
+                        VKApiConst.COUNT, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT));
         currentRequest.attempts = 10;
 
         currentRequest.executeWithListener(new VKRequest.VKRequestListener() {

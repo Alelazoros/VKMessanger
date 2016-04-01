@@ -58,7 +58,7 @@ public class SelectedDialogActivity extends AppCompatActivity implements Selecte
 
 
     private void loadDialogWithSelectedUser(int dialogId){
-        restInterface.loadSelectedDialogById(dialogId, new ResponseCallback<Message>() {
+        restInterface.loadSelectedDialogById(dialogId, 0, new ResponseCallback<Message>() {
             @Override
             public void onResponse(List<Message> data) {
                 messages.clear();
