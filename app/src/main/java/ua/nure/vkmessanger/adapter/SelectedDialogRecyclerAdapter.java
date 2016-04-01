@@ -57,8 +57,8 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         if (mMessageList != null) {
             holder.messageTextView.setText(mMessageList.get(position).getMessageBody());
 
-            if (position == mMessageList.size() - 1) {
-                mDialogEndListener.requestMoreMessages();
+            if (position == getItemCount() - 1) {
+                mDialogEndListener.requestMoreMessages(getItemCount());
             }
         }
     }
@@ -88,6 +88,10 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
      * проскроллил все загруженные на данный момент сообщения.
      */
     public interface OnDialogEndListener {
-        void requestMoreMessages();
+        /**
+         * @param offsetCount равен количеству элементов, которые в данный момент
+         *                    уже есть в RecyclerView.
+         */
+        void requestMoreMessages(int offsetCount);
     }
 }

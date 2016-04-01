@@ -74,7 +74,7 @@ public class SelectedDialogActivity extends AppCompatActivity implements Selecte
      * Обеспечивает подгрузку большего количества сообщений.
      */
     @Override
-    public void requestMoreMessages() {
+    public void requestMoreMessages(int offsetCount) {
         //TODO: подгрузить новые сообщения.
     }
 }
