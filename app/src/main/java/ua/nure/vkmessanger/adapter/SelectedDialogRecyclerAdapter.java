@@ -58,6 +58,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
             holder.messageTextView.setText(mMessageList.get(position).getMessageBody());
 
             if (position == getItemCount() - 1) {
+                //Если пользователь доскроллил до конца RecyclerView, то надо подгрузить еще сообщения.
                 mDialogEndListener.requestMoreMessages(getItemCount());
             }
         }
@@ -73,6 +74,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         return mMessageList == null ? 0 : mMessageList.get(position).getMessageId();
     }
 
+
     static class SelectedDialogViewHolder extends RecyclerView.ViewHolder {
 
         private TextView messageTextView;
@@ -82,6 +84,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
             messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
         }
     }
+
 
     /**
      * Интерфейс для получения новых сообщений, когда пользователь

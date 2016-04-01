@@ -70,11 +70,17 @@ public class SelectedDialogActivity extends AppCompatActivity implements Selecte
     }
 
     /**
-     * Метод определен в интерфейсе SelectedDialogRecyclerAdapter.OnDialogEndListener.
-     * Обеспечивает подгрузку большего количества сообщений.
+     * Метод определен в интерфейсе SelectedDialogRecyclerAdapter.OnDialogEndListener и
+     * обеспечивает подгрузку большего количества сообщений.
      */
     @Override
     public void requestMoreMessages(int offsetCount) {
-        //TODO: подгрузить новые сообщения.
+        restInterface.loadSelectedDialogById(dialogId, offsetCount, new ResponseCallback<Message>() {
+            @Override
+            public void onResponse(List<Message> data) {
+                messages.addAll(data);
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 }
