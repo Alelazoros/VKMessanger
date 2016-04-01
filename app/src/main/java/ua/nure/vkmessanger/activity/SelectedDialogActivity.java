@@ -17,7 +17,7 @@ import ua.nure.vkmessanger.http.RESTVkSdkManager;
 import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.model.Message;
 
-public class SelectedDialogActivity extends AppCompatActivity {
+public class SelectedDialogActivity extends AppCompatActivity implements SelectedDialogRecyclerAdapter.OnDialogEndListener {
 
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
@@ -67,5 +67,14 @@ public class SelectedDialogActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    /**
+     * Метод определен в интерфейсе SelectedDialogRecyclerAdapter.OnDialogEndListener.
+     * Обеспечивает подгрузку большего количества сообщений.
+     */
+    @Override
+    public void requestMoreMessages() {
+        //TODO: подгрузить новые сообщения.
     }
 }

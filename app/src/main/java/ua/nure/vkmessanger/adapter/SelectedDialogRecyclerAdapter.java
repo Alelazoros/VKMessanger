@@ -24,10 +24,13 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
     private List<Message> mMessageList;
 
+    private OnDialogEndListener mDialogEndListener;
+
 
     public SelectedDialogRecyclerAdapter(Context context, List<Message> messageList) {
         this.mInflater = LayoutInflater.from(context);
         this.mMessageList = messageList;
+        this.mDialogEndListener = (OnDialogEndListener) context;
         setHasStableIds(true);
     }
 
@@ -53,6 +56,10 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     public void onBindViewHolder(SelectedDialogViewHolder holder, int position) {
         if (mMessageList != null) {
             holder.messageTextView.setText(mMessageList.get(position).getMessageBody());
+
+            if (position == mMessageList.size() - 1) {
+                mDialogEndListener.requestMoreMessages();
+            }
         }
     }
 
@@ -66,7 +73,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         return mMessageList == null ? 0 : mMessageList.get(position).getMessageId();
     }
 
-    static class SelectedDialogViewHolder extends RecyclerView.ViewHolder{
+    static class SelectedDialogViewHolder extends RecyclerView.ViewHolder {
 
         private TextView messageTextView;
 
@@ -76,4 +83,11 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         }
     }
 
+    /**
+     * Интерфейс для получения новых сообщений, когда пользователь
+     * проскроллил все загруженные на данный момент сообщения.
+     */
+    public interface OnDialogEndListener {
+        void requestMoreMessages();
+    }
 }
