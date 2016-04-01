@@ -10,5 +10,8 @@ public interface RESTInterface {
 
     void loadUserDialogs(ResponseCallback<UserDialog> responseCallback);
 
-    void loadSelectedDialogById(int dialogId, ResponseCallback<Message> responseCallback);
+    /**
+     * @param offsetCount используется для подгрузки сообщений из истории диалога.
+     */
+    void loadSelectedDialogById(int dialogId, int offsetCount, ResponseCallback<Message> responseCallback);
 }
