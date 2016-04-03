@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 /**
- * Created by Antony on 03.04.2016.
+ * Retrofit API interface.
  */
 public interface RetrofitAPI {
 
@@ -16,5 +16,10 @@ public interface RetrofitAPI {
                                   @Query("count") int count,
                                   @Query("access_token") String accessToken);
 
-
+    @GET("messages.getHistory")
+    Call<JsonElement> dialogHistory(@Query("v") double vkApiVersion,
+                                    @Query("user_id") int dialogId,
+                                    @Query("offset") int offsetCount,
+                                    @Query("count") int count,
+                                    @Query("access_token") String accessToken);
 }

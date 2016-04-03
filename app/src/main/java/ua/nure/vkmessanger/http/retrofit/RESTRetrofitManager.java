@@ -59,6 +59,11 @@ public class RESTRetrofitManager implements RESTInterface {
 
     private static final int USER_DIALOGS_DEFAULT_REQUEST_COUNT = 100;
 
+    private static final int DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT = 50;
+
+    private static final int MESSAGE_WAS_SEND_FROM_ME = 1;
+
+    private static final int MESSAGE_WAS_READ = 1;
 
     @Override
     public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
@@ -101,7 +106,39 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     @Override
-    public void loadSelectedDialogById(int dialogId, int offsetCount, ResponseCallback<Message> responseCallback) {
+    public void loadSelectedDialogById(int dialogId, int offsetCount, final ResponseCallback<Message> responseCallback) {
+        RetrofitAPI api = getRetrofit();
+        Call<JsonElement> retrofitCall = api.dialogHistory(VK_API_VERSION,
+                dialogId, offsetCount, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT, AccessTokenManager.getAccessToken(mContext));
 
+        retrofitCall.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                Log.d(RETROFIT_MANAGER_LOG_TAG, "request SUCCESSFUL");
+
+                List<Message> messages = new ArrayList<>();
+
+                JsonArray jsonItemsArray = response.body().getAsJsonObject().getAsJsonObject("response").getAsJsonArray("items");
+                for (int i = 0; i < jsonItemsArray.size(); i++) {
+                    JsonObject messageJSON = jsonItemsArray.get(i).getAsJsonObject();
+
+                    int messageId = messageJSON.get("id").getAsInt();
+                    boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
+                    boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
+                    String messageBody = messageJSON.get("body").getAsString();
+
+                    messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody));
+                }
+                Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Messages count == %d", messages.size()));
+
+                responseCallback.onResponse(messages);
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.d(RETROFIT_MANAGER_LOG_TAG, "request FAILED");
+                t.printStackTrace();
+            }
+        });
     }
 }

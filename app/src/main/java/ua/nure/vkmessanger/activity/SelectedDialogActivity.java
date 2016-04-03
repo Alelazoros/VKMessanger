@@ -15,13 +15,14 @@ import ua.nure.vkmessanger.adapter.SelectedDialogRecyclerAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.RESTVkSdkManager;
 import ua.nure.vkmessanger.http.ResponseCallback;
+import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Message;
 
 public class SelectedDialogActivity extends AppCompatActivity implements SelectedDialogRecyclerAdapter.OnDialogEndListener {
 
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
-    private RESTInterface restInterface = new RESTVkSdkManager();
+    private RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private List<Message> messages = new ArrayList<>();
 
