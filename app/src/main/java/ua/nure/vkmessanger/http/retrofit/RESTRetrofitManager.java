@@ -7,17 +7,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,6 +29,8 @@ import ua.nure.vkmessanger.model.UserDialog;
 public class RESTRetrofitManager implements RESTInterface {
 
     private static final String RETROFIT_MANAGER_LOG_TAG = "RETROFIT_MANAGER_LOG";
+
+    private static final double VK_API_VERSION = 5.5;
 
     private static final int CONNECT_TIMEOUT = 2000;
     private static final int WRITE_TIMEOUT = 2000;
@@ -67,7 +63,8 @@ public class RESTRetrofitManager implements RESTInterface {
     @Override
     public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
         RetrofitAPI api = getRetrofit();
-        Call<JsonElement> retrofitCall = api.userDialogs(USER_DIALOGS_DEFAULT_REQUEST_COUNT,
+        Call<JsonElement> retrofitCall = api.userDialogs(VK_API_VERSION,
+                USER_DIALOGS_DEFAULT_REQUEST_COUNT,
                 AccessTokenManager.getAccessToken(mContext));
 
         retrofitCall.enqueue(new Callback<JsonElement>() {
@@ -77,9 +74,8 @@ public class RESTRetrofitManager implements RESTInterface {
 
                 List<UserDialog> dialogs = new ArrayList<>();
 
-                JsonElement jsonElement = response.body();
-                JsonArray jsonItemsArray = jsonElement.getAsJsonObject().getAsJsonArray("response");
-                for (int i = 1; i < jsonItemsArray.size(); i++) {
+                JsonArray jsonItemsArray = response.body().getAsJsonObject().getAsJsonObject("response").getAsJsonArray("items");
+                for (int i = 0; i < jsonItemsArray.size(); i++) {
                     JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject();
 
                     JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
@@ -87,7 +83,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
                     dialogs.add(new UserDialog(
                             chatId,
-                            dialogJSON.get("uid").getAsInt(),
+                            dialogJSON.get("user_id").getAsInt(),
                             dialogJSON.get("body").getAsString()
                     ));
                 }

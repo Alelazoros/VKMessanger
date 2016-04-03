@@ -12,5 +12,9 @@ import retrofit2.http.Query;
 public interface RetrofitAPI {
 
     @GET("messages.getDialogs")
-    Call<JsonElement> userDialogs(@Query("count") int count, @Query("access_token") String accessToken);
+    Call<JsonElement> userDialogs(@Query("v") double vkApiVersion,
+                                  @Query("count") int count,
+                                  @Query("access_token") String accessToken);
+
+
 }
