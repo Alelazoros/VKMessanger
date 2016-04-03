@@ -1,4 +1,4 @@
-package ua.nure.vkmessanger.http;
+package ua.nure.vkmessanger.http.sdk;
 
 import android.util.Log;
 
@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.nure.vkmessanger.http.RESTInterface;
+import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.UserDialog;
 

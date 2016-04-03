@@ -26,7 +26,6 @@ import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.http.RESTInterface;
-import ua.nure.vkmessanger.http.RESTVkSdkManager;
 import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.UserDialog;
