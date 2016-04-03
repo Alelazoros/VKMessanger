@@ -57,14 +57,6 @@ public class RESTRetrofitManager implements RESTInterface {
         this.mContext = context;
     }
 
-    private static final int USER_DIALOGS_DEFAULT_REQUEST_COUNT = 100;
-
-    private static final int DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT = 50;
-
-    private static final int MESSAGE_WAS_SEND_FROM_ME = 1;
-
-    private static final int MESSAGE_WAS_READ = 1;
-
     @Override
     public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
         RetrofitAPI api = getRetrofit();
