@@ -20,8 +20,8 @@
             android:layout_gravity="end"
             android:paddingStart="@dimen/messagePaddingLeftRight"
             android:paddingEnd="@dimen/messagePaddingLeftRight"
-            android:paddingTop="@dimen/messagePaddingTopLeft"
-            android:paddingBottom="@dimen/messagePaddingTopLeft"
+            android:paddingTop="@dimen/messagePaddingTopBottom"
+            android:paddingBottom="@dimen/messagePaddingTopBottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

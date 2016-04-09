@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.http.RESTInterface;
-import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Message;
