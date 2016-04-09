@@ -19,7 +19,6 @@ import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
-import ua.nure.vkmessanger.http.sdk.RESTVkSdkManager;
 import ua.nure.vkmessanger.model.Message;
 
 public class SelectedDialogActivity extends AppCompatActivity
@@ -27,11 +26,17 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
+    /**
+     * Константа, передаваемая в Loader при подгрузке истории сообщений.
+     */
+    public static final String OFFSET_LOADER_BUNDLE_ARGUMENT = "OFFSET_LOADER_BUNDLE_ARGUMENT";
+
+    /**
+     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
+     */
     public static final int LOAD_FIRST_MESSAGES = 1;
 
     public static final int LOAD_MORE_MESSAGES = 2;
-
-    public static final String OFFSET_LOADER_BUNDLE_ARGUMENT = "OFFSET_LOADER_BUNDLE_ARGUMENT";
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -62,7 +67,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void initRecyclerView() {
-        adapter = new SelectedDialogRecyclerAdapter(this, null);
+        adapter = new SelectedDialogRecyclerAdapter(this, messages);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);
@@ -83,7 +88,6 @@ public class SelectedDialogActivity extends AppCompatActivity
 
 
 
-
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
     @Override
@@ -91,7 +95,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         return new BaseLoader(this) {
             @Override
             public CustomResponse apiCall() throws IOException {
-                switch (id){
+                switch (id) {
                     case LOAD_FIRST_MESSAGES:
                         return restInterface.loadSelectedDialogById(dialogId, 0);
                     case LOAD_MORE_MESSAGES:
@@ -106,11 +110,10 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        switch (loader.getId()){
+        switch (loader.getId()) {
             case LOAD_FIRST_MESSAGES:
                 messages.clear();
                 messages.addAll(data.<List<Message>>getTypedAnswer());
-                adapter.changeMessagesList(messages);
                 adapter.notifyDataSetChanged();
                 break;
             case LOAD_MORE_MESSAGES:

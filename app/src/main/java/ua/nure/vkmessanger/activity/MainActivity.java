@@ -29,10 +29,10 @@ import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.http.RESTInterface;
-import ua.nure.vkmessanger.http.ResponseCallback;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
+import ua.nure.vkmessanger.http.sdk.RESTVkSdkManager;
 import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
