@@ -5,13 +5,13 @@ import android.content.Context;
 /**
  * Универсальный тип для хранения данных ответа от запроса к VK API.
  */
-public class Response {
+public class CustomResponse {
 
     private Object mAnswer;
 
     private RequestResult mRequestResult;
 
-    public Response() {
+    public CustomResponse() {
         mRequestResult = RequestResult.ERROR;
     }
 
@@ -19,12 +19,12 @@ public class Response {
         return mRequestResult;
     }
 
-    public Response setRequestResult(RequestResult requestResult) {
+    public CustomResponse setRequestResult(RequestResult requestResult) {
         this.mRequestResult = requestResult;
         return this;
     }
 
-    public Response setAnswer(Object answer) {
+    public CustomResponse setAnswer(Object answer) {
         this.mAnswer = answer;
         return this;
     }

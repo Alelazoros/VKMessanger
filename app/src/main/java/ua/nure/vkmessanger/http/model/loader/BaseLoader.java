@@ -1,17 +1,17 @@
 package ua.nure.vkmessanger.http.model.loader;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
 
 import java.io.IOException;
 
+import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
-import ua.nure.vkmessanger.http.model.Response;
 
 /**
  * Базовый класс для всех лоадеров в приложении.
  */
-public abstract class BaseLoader extends AsyncTaskLoader<Response> {
+public abstract class BaseLoader extends AsyncTaskLoader<CustomResponse> {
 
     public BaseLoader(Context context) {
         super(context);
@@ -24,9 +24,9 @@ public abstract class BaseLoader extends AsyncTaskLoader<Response> {
     }
 
     @Override
-    public Response loadInBackground() {
+    public CustomResponse loadInBackground() {
         try {
-            Response response = apiCall();
+            CustomResponse response = apiCall();
             if (response.getRequestResult() == RequestResult.SUCCESS){
                 response.save(getContext());
                 onSuccess();
@@ -38,7 +38,7 @@ public abstract class BaseLoader extends AsyncTaskLoader<Response> {
         }
         catch (IOException ex){
             onError();
-            return new Response();
+            return new CustomResponse();
         }
     }
 
@@ -46,5 +46,5 @@ public abstract class BaseLoader extends AsyncTaskLoader<Response> {
 
     protected void onError(){ }
 
-    public abstract Response apiCall() throws IOException;
+    public abstract CustomResponse apiCall() throws IOException;
 }
