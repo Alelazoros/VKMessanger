@@ -2,24 +2,36 @@ package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.adapter.SelectedDialogRecyclerAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
-import ua.nure.vkmessanger.http.ResponseCallback;
+import ua.nure.vkmessanger.http.model.CustomResponse;
+import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
+import ua.nure.vkmessanger.http.sdk.RESTVkSdkManager;
 import ua.nure.vkmessanger.model.Message;
 
-public class SelectedDialogActivity extends AppCompatActivity implements SelectedDialogRecyclerAdapter.OnDialogEndListener {
+public class SelectedDialogActivity extends AppCompatActivity
+        implements SelectedDialogRecyclerAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
 
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
+
+    public static final int LOAD_FIRST_MESSAGES = 1;
+
+    public static final int LOAD_MORE_MESSAGES = 2;
+
+    public static final String OFFSET_LOADER_BUNDLE_ARGUMENT = "OFFSET_LOADER_BUNDLE_ARGUMENT";
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -37,7 +49,7 @@ public class SelectedDialogActivity extends AppCompatActivity implements Selecte
         getDataFromIntent(getIntent());
         initToolbar();
         initRecyclerView();
-        loadDialogWithSelectedUser(dialogId);
+        getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
     }
 
     private void getDataFromIntent(Intent intent) {
@@ -57,30 +69,57 @@ public class SelectedDialogActivity extends AppCompatActivity implements Selecte
     }
 
 
-    private void loadDialogWithSelectedUser(int dialogId){
-        restInterface.loadSelectedDialogById(dialogId, 0, new ResponseCallback<Message>() {
-            @Override
-            public void onResponse(List<Message> data) {
-                messages.clear();
-                messages.addAll(data);
-                adapter.changeMessagesList(messages);
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-
     /**
      * Метод определен в интерфейсе SelectedDialogRecyclerAdapter.OnDialogEndListener и
      * обеспечивает подгрузку большего количества сообщений.
      */
     @Override
     public void requestMoreMessages(int offsetCount) {
-        restInterface.loadSelectedDialogById(dialogId, offsetCount, new ResponseCallback<Message>() {
-            @Override
-            public void onResponse(List<Message> data) {
-                messages.addAll(data);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        Bundle bundle = new Bundle();
+        bundle.putInt(OFFSET_LOADER_BUNDLE_ARGUMENT, offsetCount);
+
+        getSupportLoaderManager().restartLoader(LOAD_MORE_MESSAGES, bundle, this);
     }
+
+
+
+
+    //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
+
+    @Override
+    public Loader<CustomResponse> onCreateLoader(final int id, final Bundle args) {
+        return new BaseLoader(this) {
+            @Override
+            public CustomResponse apiCall() throws IOException {
+                switch (id){
+                    case LOAD_FIRST_MESSAGES:
+                        return restInterface.loadSelectedDialogById(dialogId, 0);
+                    case LOAD_MORE_MESSAGES:
+                        int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
+                        return restInterface.loadSelectedDialogById(dialogId, offset);
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
+        switch (loader.getId()){
+            case LOAD_FIRST_MESSAGES:
+                messages.clear();
+                messages.addAll(data.<List<Message>>getTypedAnswer());
+                adapter.changeMessagesList(messages);
+                adapter.notifyDataSetChanged();
+                break;
+            case LOAD_MORE_MESSAGES:
+                messages.addAll(data.<List<Message>>getTypedAnswer());
+                adapter.notifyDataSetChanged();
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<CustomResponse> loader) { }
 }

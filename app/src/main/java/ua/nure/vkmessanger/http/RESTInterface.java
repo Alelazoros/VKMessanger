@@ -1,5 +1,6 @@
 package ua.nure.vkmessanger.http;
 
+import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.UserDialog;
 
@@ -34,5 +35,5 @@ public interface RESTInterface {
     /**
      * @param offsetCount используется для подгрузки сообщений из истории диалога.
      */
-    void loadSelectedDialogById(int dialogId, int offsetCount, ResponseCallback<Message> responseCallback);
+    CustomResponse loadSelectedDialogById(int dialogId, int offsetCount);
 }
