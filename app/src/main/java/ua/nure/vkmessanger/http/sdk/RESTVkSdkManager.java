@@ -32,12 +32,14 @@ public class RESTVkSdkManager implements RESTInterface {
 
 
     @Override
-    public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
+    public CustomResponse loadUserDialogs() {
         VKRequest currentRequest = VKApi.messages().getDialogs(
                 VKParameters.from(VKApiConst.COUNT, USER_DIALOGS_DEFAULT_REQUEST_COUNT));
         currentRequest.attempts = 10;
 
-        currentRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        final CustomResponse customResponseResult = new CustomResponse();
+        //sync request.
+        currentRequest.executeSyncWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
@@ -58,28 +60,26 @@ public class RESTVkSdkManager implements RESTInterface {
                 }
                 Log.d(REST_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
 
-                //И передаю результат на callback в активити или фрагмент.
-                responseCallback.onResponse(dialogs);
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                        .setAnswer(dialogs);
             }
 
             @Override
             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                 super.attemptFailed(request, attemptNumber, totalAttempts);
                 Log.d(REST_MANAGER_LOG_TAG, "attemptFailed " + request + " " + attemptNumber + " " + totalAttempts);
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
 
             @Override
             public void onError(VKError error) {
                 super.onError(error);
                 Log.d(REST_MANAGER_LOG_TAG, "onError: " + error);
-            }
-
-            @Override
-            public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
-                super.onProgress(progressType, bytesLoaded, bytesTotal);
-                Log.d(REST_MANAGER_LOG_TAG, "onProgress " + progressType + " " + bytesLoaded + " " + bytesTotal);
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
         });
+
+        return customResponseResult;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class RESTVkSdkManager implements RESTInterface {
                         VKApiConst.COUNT, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT));
         currentRequest.attempts = 10;
 
-        final CustomResponse customResponse = new CustomResponse();
+        final CustomResponse customResponseResult = new CustomResponse();
         //Sync request.
         currentRequest.executeSyncWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -101,7 +101,7 @@ public class RESTVkSdkManager implements RESTInterface {
 
                 List<Message> messages = new ArrayList<>();
                 try {
-                    JSONArray jsonMessagesArray = (JSONArray)response.json.getJSONObject("response").get("items");
+                    JSONArray jsonMessagesArray = (JSONArray) response.json.getJSONObject("response").get("items");
 
                     for (int i = 0; i < jsonMessagesArray.length(); i++) {
                         JSONObject object = jsonMessagesArray.getJSONObject(i);
@@ -118,7 +118,7 @@ public class RESTVkSdkManager implements RESTInterface {
                 }
                 Log.d(REST_MANAGER_LOG_TAG, String.format("Messages loaded count == %d", messages.size()));
 
-                customResponse.setRequestResult(RequestResult.SUCCESS)
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(messages);
             }
 
@@ -126,17 +126,17 @@ public class RESTVkSdkManager implements RESTInterface {
             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                 super.attemptFailed(request, attemptNumber, totalAttempts);
                 Log.d(REST_MANAGER_LOG_TAG, "attemptFailed " + request + " " + attemptNumber + " " + totalAttempts);
-                customResponse.setAnswer(RequestResult.ERROR);
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
 
             @Override
             public void onError(VKError error) {
                 super.onError(error);
                 Log.d(REST_MANAGER_LOG_TAG, "onError: " + error);
-                customResponse.setAnswer(RequestResult.ERROR);
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
         });
 
-        return customResponse;
+        return customResponseResult;
     }
 }

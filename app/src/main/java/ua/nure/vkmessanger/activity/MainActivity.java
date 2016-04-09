@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -21,22 +23,30 @@ import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.ResponseCallback;
+import ua.nure.vkmessanger.http.model.CustomResponse;
+import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.UserDialog;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private final List<UserDialog> dialogs = new ArrayList<>();
 
     private ArrayAdapter<UserDialog> adapter;
+
+    /**
+     * Константа, используемая в LoaderCallbacks для идентификации Loader-а.
+     */
+    private static final int LOAD_USER_DIALOGS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,13 +151,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadUserDialogs() {
-        restInterface.loadUserDialogs(new ResponseCallback<UserDialog>() {
-            @Override
-            public void onResponse(List<UserDialog> data) {
-                dialogs.clear();
-                dialogs.addAll(data);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        getSupportLoaderManager().restartLoader(LOAD_USER_DIALOGS, null, this);
     }
+
+
+
+    //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
+
+    @Override
+    public Loader<CustomResponse> onCreateLoader(final int id, Bundle args) {
+        return new BaseLoader(this) {
+            @Override
+            public CustomResponse apiCall() throws IOException {
+                switch (id){
+                    case LOAD_USER_DIALOGS:
+                        return restInterface.loadUserDialogs();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
+        switch (loader.getId()){
+            case LOAD_USER_DIALOGS:
+                dialogs.clear();
+                dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
+                adapter.notifyDataSetChanged();
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<CustomResponse> loader) { }
 }

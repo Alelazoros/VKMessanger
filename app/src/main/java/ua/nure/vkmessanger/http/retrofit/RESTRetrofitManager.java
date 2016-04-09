@@ -40,12 +40,12 @@ public class RESTRetrofitManager implements RESTInterface {
     private static final int READ_TIMEOUT = 2000;
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
-                .writeTimeout(WRITE_TIMEOUT, TimeUnit.MILLISECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS)
-                .build();
+            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+            .writeTimeout(WRITE_TIMEOUT, TimeUnit.MILLISECONDS)
+            .readTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS)
+            .build();
 
-    public static RetrofitAPI getRetrofit(){
+    public static RetrofitAPI getRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.vk.com/method/")
                 .client(CLIENT)
@@ -61,20 +61,24 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     @Override
-    public void loadUserDialogs(final ResponseCallback<UserDialog> responseCallback) {
+    public CustomResponse loadUserDialogs() {
         RetrofitAPI api = getRetrofit();
         Call<JsonElement> retrofitCall = api.userDialogs(VK_API_VERSION,
                 USER_DIALOGS_DEFAULT_REQUEST_COUNT,
                 AccessTokenManager.getAccessToken(mContext));
 
-        retrofitCall.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+        CustomResponse customResponseResult = new CustomResponse();
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
                 Log.d(RETROFIT_MANAGER_LOG_TAG, "request SUCCESSFUL");
 
                 List<UserDialog> dialogs = new ArrayList<>();
 
-                JsonArray jsonItemsArray = response.body().getAsJsonObject().getAsJsonObject("response").getAsJsonArray("items");
+                JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject()
+                        .getAsJsonObject("response")
+                        .getAsJsonArray("items");
+
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
                     JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject();
 
@@ -89,15 +93,16 @@ public class RESTRetrofitManager implements RESTInterface {
                 }
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
 
-                responseCallback.onResponse(dialogs);
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                        .setAnswer(dialogs);
+            } else {
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
-
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.d(RETROFIT_MANAGER_LOG_TAG, "request FAILED");
-                t.printStackTrace();
-            }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+            customResponseResult.setRequestResult(RequestResult.ERROR);
+        }
+        return customResponseResult;
     }
 
     @Override
@@ -106,12 +111,12 @@ public class RESTRetrofitManager implements RESTInterface {
         Call<JsonElement> retrofitCall = api.dialogHistory(VK_API_VERSION,
                 dialogId, offsetCount, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT, AccessTokenManager.getAccessToken(mContext));
 
-        CustomResponse customResponse;
+        CustomResponse customResponseResult = new CustomResponse();
         try {
             //Sync request.
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
 
-            if (retrofitResponse.isSuccessful()){
+            if (retrofitResponse.isSuccessful()) {
                 List<Message> messages = new ArrayList<>();
 
                 JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject().getAsJsonObject("response").getAsJsonArray("items");
@@ -128,17 +133,15 @@ public class RESTRetrofitManager implements RESTInterface {
 
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Messages count == %d", messages.size()));
 
-                customResponse = new CustomResponse()
-                        .setRequestResult(RequestResult.SUCCESS)
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(messages);
-            }
-            else {
-                customResponse = new CustomResponse().setRequestResult(RequestResult.ERROR);
+            } else {
+                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            customResponse = new CustomResponse().setRequestResult(RequestResult.ERROR);
+            customResponseResult.setRequestResult(RequestResult.ERROR);
         }
-        return customResponse;
+        return customResponseResult;
     }
 }
