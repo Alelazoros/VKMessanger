@@ -1,15 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recyclerViewSelectedDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:paddingLeft="@dimen/dialog_recycler_view_margin_left"
-    android:paddingStart="@dimen/dialog_recycler_view_margin_left"
-    android:paddingRight="@dimen/dialog_recycler_view_margin_right"
-    android:paddingEnd="@dimen/dialog_recycler_view_margin_right"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.SelectedDialogActivity"
-    tools:showIn="@layout/activity_selected_dialog" />
+    tools:showIn="@layout/activity_selected_dialog">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewSelectedDialog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:paddingLeft="@dimen/dialog_recycler_view_margin_left"
+        android:paddingStart="@dimen/dialog_recycler_view_margin_left"
+        android:paddingRight="@dimen/dialog_recycler_view_margin_right"
+        android:paddingEnd="@dimen/dialog_recycler_view_margin_right" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/editTextSendMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/send_message_hint"
+            android:layout_margin="@dimen/send_message_edit_text_margin" />
+
+        <Button android:id="@+id/btSendMessage"
+            android:text="@string/button_send_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</LinearLayout>

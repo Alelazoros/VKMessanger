@@ -14,4 +14,6 @@
 
     <!-- Other-->
     <string name="title_login">Войти</string>
+    <string name="send_message_hint">Message text …</string>
+    <string name="button_send_message_text">Send</string>
 </resources>
