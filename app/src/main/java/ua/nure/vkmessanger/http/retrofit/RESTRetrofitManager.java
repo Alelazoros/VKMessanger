@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +22,10 @@ import ua.nure.vkmessanger.AccessTokenManager;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
+import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.UserDialog;
+import ua.nure.vkmessanger.model.WallPost;
 
 /**
  * Класс-обертка для выполнения Http-запросов с помощью Retrofit.
@@ -93,12 +96,10 @@ public class RESTRetrofitManager implements RESTInterface {
 
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(dialogs);
-            } else {
-                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
-            customResponseResult.setRequestResult(RequestResult.ERROR);
         }
         return customResponseResult;
     }
@@ -121,24 +122,58 @@ public class RESTRetrofitManager implements RESTInterface {
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
                     JsonObject messageJSON = jsonItemsArray.get(i).getAsJsonObject();
 
+                    //Читаю данные о сообщении.
                     int messageId = messageJSON.get("id").getAsInt();
                     boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
                     boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
                     String messageBody = messageJSON.get("body").getAsString();
+                    Date date = new Date(messageJSON.get("date").getAsLong());
 
-                    messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody));
+                    //Читаю данные о вложениях сообщений.
+                    Attachment[] attachments = null;
+                    if (messageJSON.has("attachments")){
+
+                        JsonArray attachmentsJSONArray = messageJSON.get("attachments").getAsJsonArray();
+                        attachments = new Attachment[attachmentsJSONArray.size()];
+
+                        for (int j = 0; j < attachmentsJSONArray.size(); j++) {
+                            JsonObject attachmentItemJson = attachmentsJSONArray.get(j).getAsJsonObject();
+
+                            String attachmentItemType = attachmentItemJson.get("type").getAsString();
+                            //TODO: пока что добавляю только записи на стене, но потом сделать и другое.
+                            if (attachmentItemType.equals(Attachment.TYPE_WALL_POST)){
+
+                                JsonObject wallPostJSONObject = attachmentItemJson.get("wall").getAsJsonObject();
+
+                                int postId = wallPostJSONObject.get("id").getAsInt();
+                                int authorId = wallPostJSONObject.get("from_id").getAsInt();
+                                int wallOwnerId = wallPostJSONObject.get("to_id").getAsInt();
+                                Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong());
+                                String postText = wallPostJSONObject.get("text").getAsString();
+                                String postType = wallPostJSONObject.get("post_type").getAsString();
+
+                                attachments[j] = new Attachment(
+                                        attachmentItemType,
+                                        new WallPost(
+                                                postId,
+                                                authorId,
+                                                wallOwnerId,
+                                                postCreatedDate,
+                                                postText,
+                                                postType));
+                            }
+                        }
+
+                    }
+                    messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments));
                 }
-
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Messages count == %d", messages.size()));
 
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(messages);
-            } else {
-                customResponseResult.setRequestResult(RequestResult.ERROR);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            customResponseResult.setRequestResult(RequestResult.ERROR);
         }
         return customResponseResult;
     }
