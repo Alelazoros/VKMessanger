@@ -68,14 +68,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     @Override
     public void onBindViewHolder(SelectedDialogViewHolder holder, int position) {
         if (mMessageList != null) {
-            holder.messageTV.setText(mMessageList.get(position).getMessageBody());
-
-            Attachment[] attachments = mMessageList.get(position).getAttachments();
-
-            //TODO: пока что обрабатываю только записи на стене.
-            if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)){
-                holder.attachmentWallPostTitleTV.setText(((WallPost)attachments[0].getBody()).getText());
-            }
+            holder.bind(mMessageList.get(position));
 
             if (position == getItemCount() - 1) {
                 //Если пользователь доскроллил до конца RecyclerView, то надо подгрузить еще сообщения.
@@ -105,6 +98,16 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
             super(itemView);
             messageTV = (TextView) itemView.findViewById(R.id.messageTextView);
             attachmentWallPostTitleTV = (TextView) itemView.findViewById(R.id.messageAttachmentWallPostTV);
+        }
+
+        public void bind(Message message) {
+            messageTV.setText(message.getMessageBody());
+            Attachment[] attachments = message.getAttachments();
+
+            //TODO: пока что обрабатываю только записи на стене.
+            if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)){
+                attachmentWallPostTitleTV.setText(((WallPost)attachments[0].getBody()).getText());
+            }
         }
     }
 
