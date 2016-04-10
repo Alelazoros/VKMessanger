@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +57,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         getDataFromIntent(getIntent());
         initToolbar();
         initRecyclerView();
+        initSendMessageButton();
         getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
     }
 
@@ -73,6 +77,16 @@ public class SelectedDialogActivity extends AppCompatActivity
         recyclerView.setAdapter(adapter);
     }
 
+    private void initSendMessageButton() {
+        Button sendButton = (Button) findViewById(R.id.btSendMessage);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
+    }
+
 
     /**
      * Метод определен в интерфейсе SelectedDialogRecyclerAdapter.OnDialogEndListener и
@@ -86,7 +100,13 @@ public class SelectedDialogActivity extends AppCompatActivity
         getSupportLoaderManager().restartLoader(LOAD_MORE_MESSAGES, bundle, this);
     }
 
-
+    public void sendMessage() {
+        EditText editText = (EditText) findViewById(R.id.editTextSendMessage);
+        String messageText = editText.getText().toString();
+        if (messageText != null) {
+            //TODO: отправить сообщение, используя объект restInterface.
+        }
+    }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
