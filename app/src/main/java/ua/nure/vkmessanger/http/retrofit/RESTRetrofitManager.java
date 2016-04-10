@@ -1,6 +1,7 @@
 package ua.nure.vkmessanger.http.retrofit;
 
 import android.content.Context;
+import android.provider.Telephony;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -31,11 +33,11 @@ public class RESTRetrofitManager implements RESTInterface {
 
     private static final String RETROFIT_MANAGER_LOG_TAG = "RETROFIT_MANAGER_LOG";
 
-    private static final double VK_API_VERSION = 5.5;
+    private static final String VK_API_VERSION = "5.38";
 
-    private static final int CONNECT_TIMEOUT = 2000;
-    private static final int WRITE_TIMEOUT = 2000;
-    private static final int READ_TIMEOUT = 2000;
+    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int WRITE_TIMEOUT = 5000;
+    private static final int READ_TIMEOUT = 5000;
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
@@ -78,8 +80,7 @@ public class RESTRetrofitManager implements RESTInterface {
                         .getAsJsonArray("items");
 
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
-                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject();
-
+                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().get("message").getAsJsonObject();
                     JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
                     int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
 
@@ -137,6 +138,39 @@ public class RESTRetrofitManager implements RESTInterface {
                 customResponseResult.setRequestResult(RequestResult.ERROR);
             }
         } catch (IOException e) {
+            e.printStackTrace();
+            customResponseResult.setRequestResult(RequestResult.ERROR);
+        }
+        return customResponseResult;
+    }
+    @Override
+    public CustomResponse sendMessageTo(String message, int peerId)
+    {
+        RetrofitAPI api = getRetrofit();
+        Call<JsonElement> retrofitCall = api.sendMessage(VK_API_VERSION, peerId, message, AccessTokenManager.getAccessToken(mContext));
+        CustomResponse customResponseResult = new CustomResponse();
+        try
+        {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            JsonObject responseObject =  retrofitResponse.body().getAsJsonObject();
+            if (responseObject.has("response"))
+            {
+                int messageId = responseObject.get("response").getAsInt();
+
+                customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(new Message(messageId,true,true,message));
+            }
+            else
+            {
+                customResponseResult.setRequestResult(RequestResult.ERROR);
+                if (responseObject.has("error"))
+                {
+                    JsonElement errorObject = responseObject.get("error");
+                    customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
+                }
+            }
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
             customResponseResult.setRequestResult(RequestResult.ERROR);
         }

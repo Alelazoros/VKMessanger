@@ -34,4 +34,12 @@ public interface RESTInterface {
      * @param offsetCount используется для подгрузки сообщений из истории диалога.
      */
     CustomResponse loadSelectedDialogById(int dialogId, int offsetCount);
+
+    /**
+     *
+     * @param message сообщение для отправления
+     * @param peerId id группы (2000000 + ID) или ID юзера
+     * @return возвращает ERROR + по возможности error_code
+     */
+    CustomResponse sendMessageTo(String message, int peerId);
 }

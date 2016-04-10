@@ -20,6 +20,7 @@ import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.adapter.SelectedDialogRecyclerAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
+import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Message;
@@ -40,6 +41,8 @@ public class SelectedDialogActivity extends AppCompatActivity
     public static final int LOAD_FIRST_MESSAGES = 1;
 
     public static final int LOAD_MORE_MESSAGES = 2;
+
+    public  static final int SEND_MESSAGE = 3;
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -104,6 +107,10 @@ public class SelectedDialogActivity extends AppCompatActivity
         EditText editText = (EditText) findViewById(R.id.editTextSendMessage);
         String messageText = editText.getText().toString();
         if (messageText != null) {
+            Bundle args = new Bundle();
+            args.putString(OFFSET_LOADER_BUNDLE_ARGUMENT, messageText);
+            editText.setText("");
+            getSupportLoaderManager().restartLoader(SEND_MESSAGE, args, this);
             //TODO: отправить сообщение, используя объект restInterface.
         }
     }
@@ -121,6 +128,9 @@ public class SelectedDialogActivity extends AppCompatActivity
                     case LOAD_MORE_MESSAGES:
                         int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.loadSelectedDialogById(dialogId, offset);
+                    case SEND_MESSAGE:
+                        String Message = args.getString(OFFSET_LOADER_BUNDLE_ARGUMENT);
+                        return restInterface.sendMessageTo(Message,dialogId);
                     default:
                         return null;
                 }
@@ -130,16 +140,24 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        switch (loader.getId()) {
-            case LOAD_FIRST_MESSAGES:
-                messages.clear();
-                messages.addAll(data.<List<Message>>getTypedAnswer());
-                adapter.notifyDataSetChanged();
-                break;
-            case LOAD_MORE_MESSAGES:
-                messages.addAll(data.<List<Message>>getTypedAnswer());
-                adapter.notifyDataSetChanged();
-                break;
+
+            if (data.getRequestResult() == RequestResult.SUCCESS) {
+                switch (loader.getId()) {
+                case LOAD_FIRST_MESSAGES:
+                    messages.clear();
+                    messages.addAll(data.<List<Message>>getTypedAnswer());
+                    adapter.notifyDataSetChanged();
+                    break;
+                case LOAD_MORE_MESSAGES:
+                    messages.addAll(data.<List<Message>>getTypedAnswer());
+                    adapter.notifyDataSetChanged();
+                    break;
+                case SEND_MESSAGE:
+                    messages.add(0,data.<Message>getTypedAnswer());
+                    adapter.notifyDataSetChanged();
+                    break;
+            }
+
         }
     }
 

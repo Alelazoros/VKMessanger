@@ -138,4 +138,9 @@ public class RESTVkSdkManager implements RESTInterface {
 
         return customResponseResult;
     }
+    public CustomResponse sendMessageTo(String message, int peerId)
+    {
+        //Nothing
+        return new CustomResponse().setRequestResult(RequestResult.ERROR);
+    }
 }
