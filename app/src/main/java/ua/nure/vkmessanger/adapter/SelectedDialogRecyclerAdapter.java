@@ -21,6 +21,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
     private static final int MESSAGE_FROM_USER_TYPE = R.layout.dialog_message_from_user_layout;
     private static final int MESSAGE_TO_USER_TYPE = R.layout.dialog_message_to_user_layout;
+
     private static final int WALL_POST_FROM_USER_TYPE = R.layout.dialog_message_wall_post_from_user;
     private static final int WALL_POST_TO_USER_TYPE = R.layout.dialog_message_wall_post_to_user;
 
@@ -101,6 +102,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         }
 
         public void bind(Message message) {
+            messageTV.setVisibility(message.getMessageBody().equals("") ? View.GONE: View.VISIBLE);
             messageTV.setText(message.getMessageBody());
             Attachment[] attachments = message.getAttachments();
 
