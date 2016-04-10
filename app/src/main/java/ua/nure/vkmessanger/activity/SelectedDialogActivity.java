@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
@@ -120,16 +119,13 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        switch (loader.getId()) {
-            case LOAD_FIRST_MESSAGES:
-                messages.clear();
-                messages.addAll(data.<List<Message>>getTypedAnswer());
-                adapter.notifyDataSetChanged();
-                break;
-            case LOAD_MORE_MESSAGES:
-                messages.addAll(data.<List<Message>>getTypedAnswer());
-                adapter.notifyDataSetChanged();
-                break;
+        if (loader.getId() == LOAD_FIRST_MESSAGES){
+            messages.clear();
+        }
+        List<Message> answer = data.getTypedAnswer();
+        if (answer != null) {
+            messages.addAll(answer);
+            adapter.notifyDataSetChanged();
         }
     }
 

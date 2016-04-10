@@ -116,9 +116,16 @@ public class RESTRetrofitManager implements RESTInterface {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
 
             if (retrofitResponse.isSuccessful()) {
+                JsonObject responseBody = retrofitResponse.body().getAsJsonObject();
+                try {
+                    if (!responseBody.has("response")) {
+                        return new CustomResponse();    //ResultResponse.ERROR by default.
+                    }
+                }catch (NullPointerException ex) { }    //Не понимаю, как, но иногда вылетает.
+
                 List<Message> messages = new ArrayList<>();
 
-                JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject().getAsJsonObject("response").getAsJsonArray("items");
+                JsonArray jsonItemsArray = responseBody.getAsJsonObject("response").getAsJsonArray("items");
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
                     JsonObject messageJSON = jsonItemsArray.get(i).getAsJsonObject();
 
