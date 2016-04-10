@@ -1,7 +1,6 @@
 package ua.nure.vkmessanger.http.retrofit;
 
 import android.content.Context;
-import android.provider.Telephony;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -15,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
-import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -143,36 +141,32 @@ public class RESTRetrofitManager implements RESTInterface {
         }
         return customResponseResult;
     }
+
     @Override
-    public CustomResponse sendMessageTo(String message, int peerId)
-    {
+    public CustomResponse sendMessageTo(String message, int peerId) {
         RetrofitAPI api = getRetrofit();
         Call<JsonElement> retrofitCall = api.sendMessage(VK_API_VERSION, peerId, message, AccessTokenManager.getAccessToken(mContext));
+
         CustomResponse customResponseResult = new CustomResponse();
-        try
-        {
+        try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
-            JsonObject responseObject =  retrofitResponse.body().getAsJsonObject();
-            if (responseObject.has("response"))
-            {
+            JsonObject responseObject = retrofitResponse.body().getAsJsonObject();
+
+            if (responseObject.has("response")) {
                 int messageId = responseObject.get("response").getAsInt();
 
-                customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(new Message(messageId,true,true,message));
+                //TODO: 3-й параметр true - под вопросом.
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                        .setAnswer(new Message(messageId, true, true, message));
             }
-            else
-            {
-                customResponseResult.setRequestResult(RequestResult.ERROR);
-                if (responseObject.has("error"))
-                {
+            else {
+                if (responseObject.has("error")) {
                     JsonElement errorObject = responseObject.get("error");
                     customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
                 }
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
-            customResponseResult.setRequestResult(RequestResult.ERROR);
         }
         return customResponseResult;
     }

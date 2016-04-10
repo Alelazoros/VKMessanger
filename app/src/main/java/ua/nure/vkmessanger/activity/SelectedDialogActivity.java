@@ -31,18 +31,22 @@ public class SelectedDialogActivity extends AppCompatActivity
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
     /**
-     * Константа, передаваемая в Loader при подгрузке истории сообщений.
+     * Константа, передаваемая в Bundle Loader-а при подгрузке истории сообщений.
      */
     public static final String OFFSET_LOADER_BUNDLE_ARGUMENT = "OFFSET_LOADER_BUNDLE_ARGUMENT";
+    /**
+     * Константа, передаваемая в Bundle Loader-а при отправке сообщения.
+     */
+    public static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
 
     /**
-     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
+     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
      */
     public static final int LOAD_FIRST_MESSAGES = 1;
 
     public static final int LOAD_MORE_MESSAGES = 2;
 
-    public  static final int SEND_MESSAGE = 3;
+    public static final int SEND_MESSAGE = 3;
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -108,10 +112,9 @@ public class SelectedDialogActivity extends AppCompatActivity
         String messageText = editText.getText().toString();
         if (messageText != null) {
             Bundle args = new Bundle();
-            args.putString(OFFSET_LOADER_BUNDLE_ARGUMENT, messageText);
+            args.putString(MESSAGE_LOADER_BUNDLE_ARGUMENT, messageText);
             editText.setText("");
             getSupportLoaderManager().restartLoader(SEND_MESSAGE, args, this);
-            //TODO: отправить сообщение, используя объект restInterface.
         }
     }
 
@@ -129,8 +132,8 @@ public class SelectedDialogActivity extends AppCompatActivity
                         int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.loadSelectedDialogById(dialogId, offset);
                     case SEND_MESSAGE:
-                        String Message = args.getString(OFFSET_LOADER_BUNDLE_ARGUMENT);
-                        return restInterface.sendMessageTo(Message,dialogId);
+                        String Message = args.getString(MESSAGE_LOADER_BUNDLE_ARGUMENT);
+                        return restInterface.sendMessageTo(Message, dialogId);
                     default:
                         return null;
                 }
@@ -141,8 +144,8 @@ public class SelectedDialogActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
 
-            if (data.getRequestResult() == RequestResult.SUCCESS) {
-                switch (loader.getId()) {
+        if (data.getRequestResult() == RequestResult.SUCCESS) {
+            switch (loader.getId()) {
                 case LOAD_FIRST_MESSAGES:
                     messages.clear();
                     messages.addAll(data.<List<Message>>getTypedAnswer());
@@ -153,11 +156,10 @@ public class SelectedDialogActivity extends AppCompatActivity
                     adapter.notifyDataSetChanged();
                     break;
                 case SEND_MESSAGE:
-                    messages.add(0,data.<Message>getTypedAnswer());
+                    messages.add(0, data.<Message>getTypedAnswer());
                     adapter.notifyDataSetChanged();
                     break;
             }
-
         }
     }
 
