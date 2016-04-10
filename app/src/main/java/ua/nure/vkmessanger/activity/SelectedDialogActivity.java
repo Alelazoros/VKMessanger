@@ -9,8 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +18,6 @@ import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.adapter.SelectedDialogRecyclerAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
-import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Message;
@@ -31,22 +28,16 @@ public class SelectedDialogActivity extends AppCompatActivity
     public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
     /**
-     * Константа, передаваемая в Bundle Loader-а при подгрузке истории сообщений.
+     * Константа, передаваемая в Loader при подгрузке истории сообщений.
      */
     public static final String OFFSET_LOADER_BUNDLE_ARGUMENT = "OFFSET_LOADER_BUNDLE_ARGUMENT";
-    /**
-     * Константа, передаваемая в Bundle Loader-а при отправке сообщения.
-     */
-    public static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
 
     /**
-     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
+     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
      */
     public static final int LOAD_FIRST_MESSAGES = 1;
 
     public static final int LOAD_MORE_MESSAGES = 2;
-
-    public static final int SEND_MESSAGE = 3;
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -64,7 +55,6 @@ public class SelectedDialogActivity extends AppCompatActivity
         getDataFromIntent(getIntent());
         initToolbar();
         initRecyclerView();
-        initSendMessageButton();
         getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
     }
 
@@ -74,7 +64,15 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //TODO: сделать заголовком имя собеседника.
+        toolbar.setTitle("Selected dialog");
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_backspace);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void initRecyclerView() {
@@ -82,16 +80,6 @@ public class SelectedDialogActivity extends AppCompatActivity
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);
-    }
-
-    private void initSendMessageButton() {
-        Button sendButton = (Button) findViewById(R.id.btSendMessage);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage();
-            }
-        });
     }
 
 
@@ -107,16 +95,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         getSupportLoaderManager().restartLoader(LOAD_MORE_MESSAGES, bundle, this);
     }
 
-    public void sendMessage() {
-        EditText editText = (EditText) findViewById(R.id.editTextSendMessage);
-        String messageText = editText.getText().toString();
-        if (messageText != null) {
-            Bundle args = new Bundle();
-            args.putString(MESSAGE_LOADER_BUNDLE_ARGUMENT, messageText);
-            editText.setText("");
-            getSupportLoaderManager().restartLoader(SEND_MESSAGE, args, this);
-        }
-    }
+
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
@@ -131,9 +110,6 @@ public class SelectedDialogActivity extends AppCompatActivity
                     case LOAD_MORE_MESSAGES:
                         int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.loadSelectedDialogById(dialogId, offset);
-                    case SEND_MESSAGE:
-                        String Message = args.getString(MESSAGE_LOADER_BUNDLE_ARGUMENT);
-                        return restInterface.sendMessageTo(Message, dialogId);
                     default:
                         return null;
                 }
@@ -143,23 +119,13 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-
-        if (data.getRequestResult() == RequestResult.SUCCESS) {
-            switch (loader.getId()) {
-                case LOAD_FIRST_MESSAGES:
-                    messages.clear();
-                    messages.addAll(data.<List<Message>>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
-                    break;
-                case LOAD_MORE_MESSAGES:
-                    messages.addAll(data.<List<Message>>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
-                    break;
-                case SEND_MESSAGE:
-                    messages.add(0, data.<Message>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
+        if (loader.getId() == LOAD_FIRST_MESSAGES){
+            messages.clear();
+        }
+        List<Message> answer = data.getTypedAnswer();
+        if (answer != null) {
+            messages.addAll(answer);
+            adapter.notifyDataSetChanged();
         }
     }
 
