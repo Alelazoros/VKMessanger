@@ -44,10 +44,18 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
     @Override
     public int getItemViewType(int position) {
-        if (mMessageList.get(position).isFromMe()){
-            return mMessageList.get(position).getAttachments() == null ? MESSAGE_FROM_USER_TYPE : WALL_POST_FROM_USER_TYPE;
-        }else {
-            return mMessageList.get(position).getAttachments() == null ? MESSAGE_TO_USER_TYPE : WALL_POST_TO_USER_TYPE;
+        Message message = mMessageList.get(position);
+        Attachment[] attachments = message.getAttachments();
+
+        boolean isWallPost = false;
+        if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)) {
+            isWallPost = true;
+        }
+
+        if (message.isFromMe()) {
+            return attachments != null && isWallPost ? WALL_POST_FROM_USER_TYPE : MESSAGE_FROM_USER_TYPE;
+        } else {
+            return attachments != null && isWallPost ? WALL_POST_TO_USER_TYPE : MESSAGE_TO_USER_TYPE;
         }
     }
 
