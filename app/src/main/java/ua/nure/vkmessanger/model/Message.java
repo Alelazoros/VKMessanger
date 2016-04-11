@@ -19,13 +19,6 @@ public class Message {
 
     private Attachment[] mAttachments;
 
-    //TODO: удалить этот конструктор.
-    public Message(int messageId, boolean fromMe, boolean read, String messageBody) {
-        mMessageId = messageId;
-        mFromMe = fromMe;
-        mRead = read;
-        mMessageBody = messageBody;
-    }
 
     public Message(int messageId, boolean fromMe, boolean read, String messageBody, Date date, Attachment[] attachments) {
         this.mMessageId = messageId;

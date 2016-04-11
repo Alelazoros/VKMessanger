@@ -167,6 +167,8 @@ public class RESTRetrofitManager implements RESTInterface {
                                                 postCreatedDate,
                                                 postText,
                                                 postType));
+
+                                //TODO: сделать еще парсинг вложенных в запись на стене Attachments.
                             }
                         }
 
@@ -196,10 +198,12 @@ public class RESTRetrofitManager implements RESTInterface {
 
             if (responseObject.has("response")) {
                 int messageId = responseObject.get("response").getAsInt();
+                Date date = new Date();
+                Attachment[] attachments = null;
 
-                //TODO: 3-й параметр true - под вопросом.
+                //TODO: 3-й параметр(isRead) false - под вопросом.
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
-                        .setAnswer(new Message(messageId, true, true, message));
+                        .setAnswer(new Message(messageId, true, false, message, date, attachments));
             }
             else {
                 if (responseObject.has("error")) {

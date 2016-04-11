@@ -14,11 +14,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
+import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.UserDialog;
 
@@ -109,8 +111,12 @@ public class RESTVkSdkManager implements RESTInterface {
                         boolean isMessageFromMe = object.getInt("out") == MESSAGE_WAS_SEND_FROM_ME;
                         boolean isRead = object.getInt("read_state") == MESSAGE_WAS_READ;
                         String messageBody = object.getString("body");
+                        Date date = new Date(object.getLong("date"));
+                        Attachment[] attachments = null;
 
-                        messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody));
+                        //TODO: сделать парсинг вложений (attachments).
+
+                        messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -138,8 +144,7 @@ public class RESTVkSdkManager implements RESTInterface {
 
         return customResponseResult;
     }
-    public CustomResponse sendMessageTo(String message, int peerId)
-    {
+    public CustomResponse sendMessageTo(String message, int peerId) {
         //Nothing
         return new CustomResponse().setRequestResult(RequestResult.ERROR);
     }
