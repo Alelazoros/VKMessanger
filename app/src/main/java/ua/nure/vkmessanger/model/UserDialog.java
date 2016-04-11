@@ -8,7 +8,7 @@ public class UserDialog {
     /**
      * Префикс нужен для передачи аргумента в метод messages.getHistory из VK API.
      */
-    public static final int CHAT_PREFIX = 2_000_000_000;
+    private static final int CHAT_PREFIX = 2_000_000_000;
 
     /**
      * Если данный диалог - это не групповая беседа, то chat_id == 0.
@@ -25,12 +25,15 @@ public class UserDialog {
         this.lastMessage = lastMessage;
     }
 
-    public int getChatId() {
-        return chatId;
-    }
-
     public int getUserId() {
         return userId;
+    }
+
+    /**
+     * @return id пользователя, если это ЛС, или id общего чата, если это групповой диалог.
+     */
+    public int getDialogId(){
+        return chatId > 0 ? CHAT_PREFIX + chatId : userId;
     }
 
     public String getLastMessage() {
@@ -40,7 +43,8 @@ public class UserDialog {
     @Override
     public String toString() {
         return "UserDialog{" +
-                "userId=" + userId +
+                "chatId=" + chatId +
+                ", userId=" + userId +
                 ", lastMessage='" + lastMessage + '\'' +
                 '}';
     }

@@ -32,7 +32,6 @@ import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
-import ua.nure.vkmessanger.http.sdk.RESTVkSdkManager;
 import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
@@ -99,17 +98,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, SelectedDialogActivity.class);
 
-                //Проверка на статус диалога (групповая беседа, или ЛС).
+                //Проверка на статус диалога (групповая беседа, или ЛС) в методе dialog.getDialogId().
                 UserDialog dialog = adapter.getItem(position);
 
-                intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, getDialogId(dialog));
+                intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, dialog.getDialogId());
                 startActivity(intent);
                 //TODO: сделать обработку возврата из SelectedDialogActivity.
-            }
-
-            private int getDialogId(UserDialog selectedDialog){
-                int chatId = selectedDialog.getChatId();
-                return chatId > 0 ? UserDialog.CHAT_PREFIX + chatId : selectedDialog.getUserId();
             }
         });
     }
