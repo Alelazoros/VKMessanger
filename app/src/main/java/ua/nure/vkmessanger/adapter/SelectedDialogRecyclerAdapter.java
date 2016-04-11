@@ -52,7 +52,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         Attachment[] attachments = message.getAttachments();
 
         boolean isWallPost = false;
-        if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)) {
+        if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
             isWallPost = true;
         }
 
@@ -117,7 +117,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
             Attachment[] attachments = message.getAttachments();
 
             //TODO: пока что обрабатываю только записи на стене.
-            if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)) {
+            if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
                 attachmentWallPostTitleTV.setText(((WallPost) attachments[0].getBody()).getText());
             }
         }

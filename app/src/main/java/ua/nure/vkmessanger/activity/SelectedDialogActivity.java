@@ -24,7 +24,9 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
+import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.WallPost;
 
 public class SelectedDialogActivity extends AppCompatActivity
         implements SelectedDialogRecyclerAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
@@ -97,12 +99,20 @@ public class SelectedDialogActivity extends AppCompatActivity
 
         @Override
         public void onItemClick(int position) {
-            Log.d("SELECTED_DIALOG", String.format("CLICK %d", position));
+            Message clickedMessage = messages.get(position);
+            Attachment[] attachments = clickedMessage.getAttachments();
+
+            if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
+                WallPost clickedPost = (WallPost) attachments[0].getBody();
+
+                Intent intent = new Intent(SelectedDialogActivity.this, WallPostActivity.class);
+                intent.putExtra(WallPostActivity.EXTRA_WALL_POST, clickedPost);
+                startActivity(intent);
+            }
         }
 
         @Override
         public boolean onItemLongClick(int position) {
-            Log.d("SELECTED_DIALOG", String.format("LONG CLICK %d", position));
             return true;
         }
     };
@@ -172,17 +182,15 @@ public class SelectedDialogActivity extends AppCompatActivity
                 case LOAD_FIRST_MESSAGES:
                     messages.clear();
                     messages.addAll(data.<List<Message>>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
                     break;
                 case LOAD_MORE_MESSAGES:
                     messages.addAll(data.<List<Message>>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
                     break;
                 case SEND_MESSAGE:
                     messages.add(0, data.<Message>getTypedAnswer());
-                    adapter.notifyDataSetChanged();
                     break;
             }
+            adapter.notifyDataSetChanged();
         }
     }
 

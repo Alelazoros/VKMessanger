@@ -23,4 +23,8 @@ public class Attachment<T> {
     public T getBody() {
         return body;
     }
+
+    public boolean isWallPost() {
+        return type.equals(TYPE_WALL_POST);
+    }
 }

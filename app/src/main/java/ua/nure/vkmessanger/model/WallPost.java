@@ -1,11 +1,12 @@
 package ua.nure.vkmessanger.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Объект записи на стене.
  */
-public class WallPost {
+public class WallPost implements Serializable {
 
     private int id;
     //to_id
@@ -19,7 +20,7 @@ public class WallPost {
 
     private String mPostType;
 
-//    private Attachment mAttachment;
+//    private Attachment[] mAttachment;
 
 
     public WallPost(int id, int wallOwnerId, int wallAuthorId, Date date, String text, String postType) {
@@ -53,5 +54,17 @@ public class WallPost {
 
     public String getPostType() {
         return mPostType;
+    }
+
+    @Override
+    public String toString() {
+        return "WallPost{" +
+                "id=" + id +
+                ", mWallOwnerId=" + mWallOwnerId +
+                ", mWallAuthorId=" + mWallAuthorId +
+                ", mDate=" + mDate +
+                ", mText='" + mText + '\'' +
+                ", mPostType='" + mPostType + '\'' +
+                '}';
     }
 }
