@@ -31,11 +31,14 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
     private OnDialogEndListener mDialogEndListener;
 
+    private OnMessageClickListener mClickListener;
 
-    public SelectedDialogRecyclerAdapter(Context context, List<Message> messageList) {
+
+    public SelectedDialogRecyclerAdapter(Context context, List<Message> messageList, OnMessageClickListener listener) {
         this.mInflater = LayoutInflater.from(context);
         this.mMessageList = messageList;
         this.mDialogEndListener = (OnDialogEndListener) context;
+        this.mClickListener = listener;
         setHasStableIds(true);
     }
 
@@ -63,7 +66,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     @Override
     public SelectedDialogViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(viewType, parent, false);
-        return new SelectedDialogViewHolder(view);
+        return new SelectedDialogViewHolder(view, mClickListener);
     }
 
     @Override
@@ -89,27 +92,46 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     }
 
 
-    static class SelectedDialogViewHolder extends RecyclerView.ViewHolder {
+    static class SelectedDialogViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
 
         private TextView messageTV;
 
         private TextView attachmentWallPostTitleTV;
 
-        public SelectedDialogViewHolder(View itemView) {
+        private OnMessageClickListener mClickListener;
+
+        public SelectedDialogViewHolder(View itemView, OnMessageClickListener listener) {
             super(itemView);
             messageTV = (TextView) itemView.findViewById(R.id.messageTextView);
             attachmentWallPostTitleTV = (TextView) itemView.findViewById(R.id.messageAttachmentWallPostTV);
+            mClickListener = listener;
+
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void bind(Message message) {
-            messageTV.setVisibility(message.getMessageBody().equals("") ? View.GONE: View.VISIBLE);
+            messageTV.setVisibility(message.getMessageBody().equals("") ? View.GONE : View.VISIBLE);
             messageTV.setText(message.getMessageBody());
             Attachment[] attachments = message.getAttachments();
 
             //TODO: пока что обрабатываю только записи на стене.
-            if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)){
-                attachmentWallPostTitleTV.setText(((WallPost)attachments[0].getBody()).getText());
+            if (attachments != null && attachments[0] != null && attachments[0].getType().equals(Attachment.TYPE_WALL_POST)) {
+                attachmentWallPostTitleTV.setText(((WallPost) attachments[0].getBody()).getText());
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mClickListener != null) {
+                mClickListener.onItemClick(getLayoutPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            return mClickListener != null && mClickListener.onItemLongClick(getLayoutPosition());
         }
     }
 
@@ -124,5 +146,15 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
          *                    уже есть в RecyclerView.
          */
         void requestMoreMessages(int offsetCount);
+    }
+
+    public interface OnMessageClickListener {
+
+        void onItemClick(int position);
+
+        /**
+         * Длительный клик должен использоваться для того, чтобы переслать или удалить сообщения.
+         */
+        boolean onItemLongClick(int position);
     }
 }

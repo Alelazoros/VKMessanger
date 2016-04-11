@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,11 +86,26 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void initRecyclerView() {
-        adapter = new SelectedDialogRecyclerAdapter(this, messages);
+        adapter = new SelectedDialogRecyclerAdapter(this, messages, mMessageClickListener);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);
     }
+
+    private SelectedDialogRecyclerAdapter.OnMessageClickListener mMessageClickListener =
+            new SelectedDialogRecyclerAdapter.OnMessageClickListener() {
+
+        @Override
+        public void onItemClick(int position) {
+            Log.d("SELECTED_DIALOG", String.format("CLICK %d", position));
+        }
+
+        @Override
+        public boolean onItemLongClick(int position) {
+            Log.d("SELECTED_DIALOG", String.format("LONG CLICK %d", position));
+            return true;
+        }
+    };
 
     private void initSendMessageButton() {
         Button sendButton = (Button) findViewById(R.id.btSendMessage);
