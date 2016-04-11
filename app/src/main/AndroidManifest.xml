@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ua.nure.vkmessanger">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".Application"
@@ -16,9 +16,9 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
@@ -27,12 +27,14 @@
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
-
         <activity
             android:name=".activity.SelectedDialogActivity"
             android:label="@string/title_activity_selected_dialog"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity
+            android:name=".activity.WallPostActivity"
+            android:label="@string/title_activity_wall_post"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

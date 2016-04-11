@@ -9,7 +9,7 @@
     <dimen name="messageCardCornerRadius">8dp</dimen>
     <dimen name="messagePaddingLeftRight">16dp</dimen>
     <dimen name="messagePaddingTopBottom">8dp</dimen>
-    
+
     <!--Dialogs-->
     <dimen name="dialog_recycler_view_margin_left">8dp</dimen>
     <dimen name="dialog_recycler_view_margin_right">8dp</dimen>

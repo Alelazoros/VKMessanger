@@ -8,6 +8,7 @@
     <!-- Activities-->
     <string name="title_activity_main">VKMessanger</string>
     <string name="title_activity_selected_dialog">SelectedDialogActivity</string>
+    <string name="title_activity_wall_post">WallPostActivity</string>
 
     <!-- Menu-->
     <string name="action_settings">Settings</string>

@@ -120,7 +120,7 @@ public class RESTRetrofitManager implements RESTInterface {
                     if (!responseBody.has("response")) {
                         return new CustomResponse();    //ResultResponse.ERROR by default.
                     }
-                }catch (NullPointerException ex) { }    //Не понимаю, как, но иногда вылетает.
+                }catch (NullPointerException ignored) { }    //Не понимаю, как, но иногда вылетает.
 
                 List<Message> messages = new ArrayList<>();
 
