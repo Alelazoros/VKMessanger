@@ -24,6 +24,7 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.WallPost;
 
@@ -159,12 +160,12 @@ public class RESTRetrofitManager implements RESTInterface {
         Attachment[] attachments = null;
         if (messageJSON.has("attachments")){
             JsonArray attachmentsJSONArray = messageJSON.get("attachments").getAsJsonArray();
-            attachments = parseMessageAttachments(attachmentsJSONArray);
+            attachments = parseAttachments(attachmentsJSONArray);
         }
         return new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments);
     }
 
-    private Attachment[] parseMessageAttachments(JsonArray attachmentsJSONArray) {
+    private Attachment[] parseAttachments(JsonArray attachmentsJSONArray) {
 
         Attachment[] attachments = new Attachment[attachmentsJSONArray.size()];
 
@@ -178,12 +179,24 @@ public class RESTRetrofitManager implements RESTInterface {
                 WallPost wallPost = parseWallPost(wallPostJSONObject);
                 attachments[j] = new Attachment(attachmentItemType, wallPost);
             }
-            //TODO: сделать парсинг не только записен на стене.
+            else if (attachmentItemType.equals(Attachment.TYPE_PHOTO)){
+                JsonObject photoJSONObject = attachmentItemJson.get("photo").getAsJsonObject();
+
+                Photo photo = parsePhoto(photoJSONObject);
+                attachments[j] = new Attachment(attachmentItemType, photo);
+            }
+            //TODO: сделать парсинг не только записей на стене.
         }
         return attachments;
     }
 
+    private Photo parsePhoto(JsonObject photoJSONObject) {
+        //TODO: парсинг фото.
+        return null;
+    }
+
     private WallPost parseWallPost(JsonObject wallPostJSONObject) {
+
         int postId = wallPostJSONObject.get("id").getAsInt();
         int authorId = wallPostJSONObject.get("from_id").getAsInt();
         int wallOwnerId = wallPostJSONObject.get("to_id").getAsInt();
@@ -191,13 +204,19 @@ public class RESTRetrofitManager implements RESTInterface {
         String postText = wallPostJSONObject.get("text").getAsString();
         String postType = wallPostJSONObject.get("post_type").getAsString();
 
+
+        Attachment[] attachments = null;
+        if (wallPostJSONObject.has("attachments")){
+            attachments = parseAttachments(wallPostJSONObject.get("attachments").getAsJsonArray());
+        }
+
         return new WallPost(
                 postId,
                 authorId,
                 wallOwnerId,
                 postCreatedDate,
                 postText,
-                postType);
+                postType, attachments);
     }
 
     @Override

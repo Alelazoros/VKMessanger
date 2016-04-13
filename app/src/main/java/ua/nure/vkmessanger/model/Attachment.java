@@ -5,7 +5,12 @@ package ua.nure.vkmessanger.model;
  */
 public class Attachment<T> {
 
+    /**
+     * Значения констант совпадают с названием соответствующих объектов в Json.
+     */
     public static final String TYPE_WALL_POST = "wall";
+
+    public static final String TYPE_PHOTO = "photo";
 
     private String type;
 
