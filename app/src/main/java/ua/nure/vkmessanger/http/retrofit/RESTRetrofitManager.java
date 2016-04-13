@@ -191,8 +191,34 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     private Photo parsePhoto(JsonObject photoJSONObject) {
-        //TODO: парсинг фото.
-        return null;
+
+        int id = photoJSONObject.get("id").getAsInt();
+        int albumId = photoJSONObject.get("album_id").getAsInt();
+        int ownerId = photoJSONObject.get("owner_id").getAsInt();
+        int userId = photoJSONObject.get("user_id").getAsInt();
+        String text = photoJSONObject.get("text").getAsString();
+        Date date = new Date(photoJSONObject.get("date").getAsLong());
+
+        String photo75 = photoJSONObject.get("photo_75").getAsString();
+        String photo130 = photoJSONObject.get("photo_130").getAsString();
+        String photo604 = photoJSONObject.get("photo_604").getAsString();
+        String photo807 = photoJSONObject.get("photo_807").getAsString();
+        String photo1280 = photoJSONObject.get("photo_1280").getAsString();
+        String photo2560 = photoJSONObject.get("photo_2560").getAsString();
+
+        int width = 0;
+        int height = 0;
+        if (photoJSONObject.has("width")){
+            width = photoJSONObject.get("width").getAsInt();
+            height = photoJSONObject.get("height").getAsInt();
+        }
+
+        return new Photo(
+                id, albumId, ownerId, userId,
+                text, date,
+                photo75, photo130, photo604, photo807, photo1280, photo2560,
+                width, height
+        );
     }
 
     private WallPost parseWallPost(JsonObject wallPostJSONObject) {
