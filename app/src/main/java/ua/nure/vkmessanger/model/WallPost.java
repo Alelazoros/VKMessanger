@@ -1,6 +1,7 @@
 package ua.nure.vkmessanger.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -20,16 +21,16 @@ public class WallPost implements Serializable {
 
     private String mPostType;
 
-//    private Attachment[] mAttachment;
+    private Attachment[] mAttachments;
 
-
-    public WallPost(int id, int wallOwnerId, int wallAuthorId, Date date, String text, String postType) {
+    public WallPost(int id, int wallOwnerId, int wallAuthorId, Date date, String text, String postType, Attachment[] attachments) {
         this.id = id;
         mWallOwnerId = wallOwnerId;
         mWallAuthorId = wallAuthorId;
         mDate = date;
         mText = text;
         mPostType = postType;
+        mAttachments = attachments;
     }
 
     public int getId() {
@@ -56,6 +57,10 @@ public class WallPost implements Serializable {
         return mPostType;
     }
 
+    public Attachment[] getAttachments() {
+        return mAttachments;
+    }
+
     @Override
     public String toString() {
         return "WallPost{" +
@@ -65,6 +70,7 @@ public class WallPost implements Serializable {
                 ", mDate=" + mDate +
                 ", mText='" + mText + '\'' +
                 ", mPostType='" + mPostType + '\'' +
+                ", mAttachments=" + Arrays.toString(mAttachments) +
                 '}';
     }
 }
