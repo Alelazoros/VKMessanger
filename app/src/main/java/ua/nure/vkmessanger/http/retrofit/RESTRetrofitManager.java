@@ -106,8 +106,12 @@ public class RESTRetrofitManager implements RESTInterface {
     @Override
     public CustomResponse loadSelectedDialogById(int dialogId, int offsetCount) {
         RetrofitAPI api = getRetrofit();
-        Call<JsonElement> retrofitCall = api.dialogHistory(VK_API_VERSION,
-                dialogId, offsetCount, DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT, AccessTokenManager.getAccessToken(mContext));
+        Call<JsonElement> retrofitCall = api.dialogHistory(
+                VK_API_VERSION,
+                dialogId,
+                offsetCount,
+                DIALOG_MESSAGES_DEFAULT_REQUEST_COUNT,
+                AccessTokenManager.getAccessToken(mContext));
 
         CustomResponse customResponseResult = new CustomResponse();
         try {
@@ -129,51 +133,8 @@ public class RESTRetrofitManager implements RESTInterface {
                     JsonObject messageJSON = jsonItemsArray.get(i).getAsJsonObject();
 
                     //Читаю данные о сообщении.
-                    int messageId = messageJSON.get("id").getAsInt();
-                    boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
-                    boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
-                    String messageBody = messageJSON.get("body").getAsString();
-                    Date date = new Date(messageJSON.get("date").getAsLong());
-
-                    //Читаю данные о вложениях сообщений.
-                    Attachment[] attachments = null;
-                    if (messageJSON.has("attachments")){
-
-                        JsonArray attachmentsJSONArray = messageJSON.get("attachments").getAsJsonArray();
-                        attachments = new Attachment[attachmentsJSONArray.size()];
-
-                        for (int j = 0; j < attachmentsJSONArray.size(); j++) {
-                            JsonObject attachmentItemJson = attachmentsJSONArray.get(j).getAsJsonObject();
-
-                            String attachmentItemType = attachmentItemJson.get("type").getAsString();
-                            //TODO: пока что добавляю только записи на стене, но потом сделать и другое.
-                            if (attachmentItemType.equals(Attachment.TYPE_WALL_POST)){
-
-                                JsonObject wallPostJSONObject = attachmentItemJson.get("wall").getAsJsonObject();
-
-                                int postId = wallPostJSONObject.get("id").getAsInt();
-                                int authorId = wallPostJSONObject.get("from_id").getAsInt();
-                                int wallOwnerId = wallPostJSONObject.get("to_id").getAsInt();
-                                Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong());
-                                String postText = wallPostJSONObject.get("text").getAsString();
-                                String postType = wallPostJSONObject.get("post_type").getAsString();
-
-                                attachments[j] = new Attachment(
-                                        attachmentItemType,
-                                        new WallPost(
-                                                postId,
-                                                authorId,
-                                                wallOwnerId,
-                                                postCreatedDate,
-                                                postText,
-                                                postType));
-
-                                //TODO: сделать еще парсинг вложенных в запись на стене Attachments.
-                            }
-                        }
-
-                    }
-                    messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments));
+                    Message message = parseMessage(messageJSON);
+                    messages.add(message);
                 }
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Messages count == %d", messages.size()));
 
@@ -184,6 +145,59 @@ public class RESTRetrofitManager implements RESTInterface {
             e.printStackTrace();
         }
         return customResponseResult;
+    }
+
+    private Message parseMessage(JsonObject messageJSON) {
+
+        int messageId = messageJSON.get("id").getAsInt();
+        boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
+        boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
+        String messageBody = messageJSON.get("body").getAsString();
+        Date date = new Date(messageJSON.get("date").getAsLong());
+
+        //Читаю данные о вложениях сообщений.
+        Attachment[] attachments = null;
+        if (messageJSON.has("attachments")){
+            JsonArray attachmentsJSONArray = messageJSON.get("attachments").getAsJsonArray();
+            attachments = parseMessageAttachments(attachmentsJSONArray);
+        }
+        return new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments);
+    }
+
+    private Attachment[] parseMessageAttachments(JsonArray attachmentsJSONArray) {
+
+        Attachment[] attachments = new Attachment[attachmentsJSONArray.size()];
+
+        for (int j = 0; j < attachmentsJSONArray.size(); j++) {
+            JsonObject attachmentItemJson = attachmentsJSONArray.get(j).getAsJsonObject();
+
+            String attachmentItemType = attachmentItemJson.get("type").getAsString();
+            if (attachmentItemType.equals(Attachment.TYPE_WALL_POST)) {
+                JsonObject wallPostJSONObject = attachmentItemJson.get("wall").getAsJsonObject();
+
+                WallPost wallPost = parseWallPost(wallPostJSONObject);
+                attachments[j] = new Attachment(attachmentItemType, wallPost);
+            }
+            //TODO: сделать парсинг не только записен на стене.
+        }
+        return attachments;
+    }
+
+    private WallPost parseWallPost(JsonObject wallPostJSONObject) {
+        int postId = wallPostJSONObject.get("id").getAsInt();
+        int authorId = wallPostJSONObject.get("from_id").getAsInt();
+        int wallOwnerId = wallPostJSONObject.get("to_id").getAsInt();
+        Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong());
+        String postText = wallPostJSONObject.get("text").getAsString();
+        String postType = wallPostJSONObject.get("post_type").getAsString();
+
+        return new WallPost(
+                postId,
+                authorId,
+                wallOwnerId,
+                postCreatedDate,
+                postText,
+                postType);
     }
 
     @Override
