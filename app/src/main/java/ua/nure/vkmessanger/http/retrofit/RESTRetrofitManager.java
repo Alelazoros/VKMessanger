@@ -82,7 +82,7 @@ public class RESTRetrofitManager implements RESTInterface {
                         .getAsJsonArray("items");
 
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
-                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().get("message").getAsJsonObject();
+                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().getAsJsonObject("message");
                     JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
                     int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
 
@@ -125,10 +125,11 @@ public class RESTRetrofitManager implements RESTInterface {
                     if (!responseBody.has("response")) {
                         return new CustomResponse();    //ResultResponse.ERROR by default.
                     }
-                }catch (NullPointerException ignored) { }    //Не понимаю, как, но иногда вылетает.
+                } catch (NullPointerException ignored) { }    //Не понимаю, как, но иногда вылетает.
 
                 List<Message> messages = new ArrayList<>();
 
+                //Получаю массив сообщений.
                 JsonArray jsonItemsArray = responseBody.getAsJsonObject("response").getAsJsonArray("items");
                 for (int i = 0; i < jsonItemsArray.size(); i++) {
                     JsonObject messageJSON = jsonItemsArray.get(i).getAsJsonObject();
@@ -159,8 +160,7 @@ public class RESTRetrofitManager implements RESTInterface {
         //Читаю данные о вложениях сообщений.
         Attachment[] attachments = null;
         if (messageJSON.has("attachments")){
-            JsonArray attachmentsJSONArray = messageJSON.get("attachments").getAsJsonArray();
-            attachments = parseAttachments(attachmentsJSONArray);
+            attachments = parseAttachments(messageJSON.getAsJsonArray("attachments"));
         }
         return new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments);
     }
@@ -175,11 +175,11 @@ public class RESTRetrofitManager implements RESTInterface {
 
             switch (attachmentItemType){
                 case Attachment.TYPE_WALL_POST:
-                    WallPost wallPost = parseWallPost(attachmentItemJson.get("wall").getAsJsonObject());
+                    WallPost wallPost = parseWallPost(attachmentItemJson.getAsJsonObject("wall"));
                     attachments[j] = new Attachment(attachmentItemType, wallPost);
                     break;
                 case Attachment.TYPE_PHOTO:
-                    Photo photo = parsePhoto(attachmentItemJson.get("photo").getAsJsonObject());
+                    Photo photo = parsePhoto(attachmentItemJson.getAsJsonObject("photo"));
                     attachments[j] = new Attachment(attachmentItemType, photo);
                     break;
             }
@@ -248,7 +248,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         Attachment[] attachments = null;
         if (wallPostJSONObject.has("attachments")){
-            attachments = parseAttachments(wallPostJSONObject.get("attachments").getAsJsonArray());
+            attachments = parseAttachments(wallPostJSONObject.getAsJsonArray("attachments"));
         }
 
         return new WallPost(

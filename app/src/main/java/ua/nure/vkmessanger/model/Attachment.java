@@ -34,4 +34,16 @@ public class Attachment<T> implements Serializable {
     public boolean isWallPost() {
         return type.equals(TYPE_WALL_POST);
     }
+
+    public boolean isPhoto() {
+        return type.equals(TYPE_PHOTO);
+    }
+
+    @Override
+    public String toString() {
+        return "Attachment{" +
+                "type='" + type + '\'' +
+                ", body=" + body +
+                '}';
+    }
 }
