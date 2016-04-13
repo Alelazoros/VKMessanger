@@ -1,9 +1,11 @@
 package ua.nure.vkmessanger.model;
 
+import java.io.Serializable;
+
 /**
  * Данный объект представляет собой вложение в сообщение (запись на стене и т.д.).
  */
-public class Attachment<T> {
+public class Attachment<T> implements Serializable {
 
     /**
      * Значения констант совпадают с названием соответствующих объектов в Json.

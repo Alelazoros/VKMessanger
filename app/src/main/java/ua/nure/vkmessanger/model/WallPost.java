@@ -1,35 +1,67 @@
 package ua.nure.vkmessanger.model;
 
+import android.support.annotation.Nullable;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
 /**
  * Объект записи на стене.
+ * https://vk.com/dev/post
  */
 public class WallPost implements Serializable {
 
     private int id;
-    //to_id
+
+    /**
+     * 'to_id'
+     * Идентификатор владельца стены, на которой размещена запись.
+     */
     private int mWallOwnerId;
-    //from_id
+
+    /**
+     * 'from_id'
+     * Идентификатор автора записи.
+     */
     private int mWallAuthorId;
 
     private Date mDate;
 
     private String mText;
 
+    /**
+     * Тип записи, может принимать следующие значения: post, copy, reply, postpone, suggest.
+     */
     private String mPostType;
 
+    /**
+     * Идентификатор автора, если запись была опубликована от имени сообщества и подписана пользователем.
+     */
+    private int mSignerId;
+
+    /**
+     * Массив, содержащий историю репостов для записи. Возвращается только в том случае, если запись является репостом.
+     * Каждый из объектов массива, в свою очередь, является объектом-записью стандартного формата.
+     */
+    @Nullable
+    private WallPost[] mCopyHistory;
+
+    @Nullable
     private Attachment[] mAttachments;
 
-    public WallPost(int id, int wallOwnerId, int wallAuthorId, Date date, String text, String postType, Attachment[] attachments) {
+    //Возможно позже понадобятся поля post_source, comments, likes, reposts.
+
+    public WallPost(int id, int wallOwnerId, int wallAuthorId, Date date, String text, String postType, int signerId,
+                    @Nullable WallPost[] copyHistory, @Nullable Attachment[] attachments) {
         this.id = id;
         mWallOwnerId = wallOwnerId;
         mWallAuthorId = wallAuthorId;
         mDate = date;
         mText = text;
         mPostType = postType;
+        mSignerId = signerId;
+        mCopyHistory = copyHistory;
         mAttachments = attachments;
     }
 
@@ -57,6 +89,16 @@ public class WallPost implements Serializable {
         return mPostType;
     }
 
+    public int getSignerId() {
+        return mSignerId;
+    }
+
+    @Nullable
+    public WallPost[] getCopyHistory() {
+        return mCopyHistory;
+    }
+
+    @Nullable
     public Attachment[] getAttachments() {
         return mAttachments;
     }
@@ -70,6 +112,8 @@ public class WallPost implements Serializable {
                 ", mDate=" + mDate +
                 ", mText='" + mText + '\'' +
                 ", mPostType='" + mPostType + '\'' +
+                ", mSignerId=" + mSignerId +
+                ", mCopyHistory=" + Arrays.toString(mCopyHistory) +
                 ", mAttachments=" + Arrays.toString(mAttachments) +
                 '}';
     }

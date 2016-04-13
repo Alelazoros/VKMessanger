@@ -41,6 +41,7 @@ public class WallPostActivity extends AppCompatActivity {
 
     private void getDataFromIntent(Intent intent) {
         mWallPost = (WallPost) intent.getExtras().get(EXTRA_WALL_POST);
+        Log.d("CLICKED WALL POST", mWallPost.toString());
     }
 
 }

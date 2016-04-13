@@ -171,19 +171,17 @@ public class RESTRetrofitManager implements RESTInterface {
 
         for (int j = 0; j < attachmentsJSONArray.size(); j++) {
             JsonObject attachmentItemJson = attachmentsJSONArray.get(j).getAsJsonObject();
-
             String attachmentItemType = attachmentItemJson.get("type").getAsString();
-            if (attachmentItemType.equals(Attachment.TYPE_WALL_POST)) {
-                JsonObject wallPostJSONObject = attachmentItemJson.get("wall").getAsJsonObject();
 
-                WallPost wallPost = parseWallPost(wallPostJSONObject);
-                attachments[j] = new Attachment(attachmentItemType, wallPost);
-            }
-            else if (attachmentItemType.equals(Attachment.TYPE_PHOTO)){
-                JsonObject photoJSONObject = attachmentItemJson.get("photo").getAsJsonObject();
-
-                Photo photo = parsePhoto(photoJSONObject);
-                attachments[j] = new Attachment(attachmentItemType, photo);
+            switch (attachmentItemType){
+                case Attachment.TYPE_WALL_POST:
+                    WallPost wallPost = parseWallPost(attachmentItemJson.get("wall").getAsJsonObject());
+                    attachments[j] = new Attachment(attachmentItemType, wallPost);
+                    break;
+                case Attachment.TYPE_PHOTO:
+                    Photo photo = parsePhoto(attachmentItemJson.get("photo").getAsJsonObject());
+                    attachments[j] = new Attachment(attachmentItemType, photo);
+                    break;
             }
             //TODO: сделать парсинг не только записей на стене.
         }
@@ -195,16 +193,17 @@ public class RESTRetrofitManager implements RESTInterface {
         int id = photoJSONObject.get("id").getAsInt();
         int albumId = photoJSONObject.get("album_id").getAsInt();
         int ownerId = photoJSONObject.get("owner_id").getAsInt();
-        int userId = photoJSONObject.get("user_id").getAsInt();
+        int userId = photoJSONObject.has("user_id") ? photoJSONObject.get("user_id").getAsInt() : -1;
+
         String text = photoJSONObject.get("text").getAsString();
         Date date = new Date(photoJSONObject.get("date").getAsLong());
 
-        String photo75 = photoJSONObject.get("photo_75").getAsString();
-        String photo130 = photoJSONObject.get("photo_130").getAsString();
-        String photo604 = photoJSONObject.get("photo_604").getAsString();
-        String photo807 = photoJSONObject.get("photo_807").getAsString();
-        String photo1280 = photoJSONObject.get("photo_1280").getAsString();
-        String photo2560 = photoJSONObject.get("photo_2560").getAsString();
+        String photo75 = photoJSONObject.has("photo_75") ? photoJSONObject.get("photo_75").getAsString() : null;
+        String photo130 = photoJSONObject.has("photo_130") ? photoJSONObject.get("photo_130").getAsString() : null;
+        String photo604 = photoJSONObject.has("photo_604") ? photoJSONObject.get("photo_604").getAsString() : null;
+        String photo807 = photoJSONObject.has("photo_807") ? photoJSONObject.get("photo_807").getAsString() : null;
+        String photo1280 = photoJSONObject.has("photo_1280") ? photoJSONObject.get("photo_1280").getAsString() : null;
+        String photo2560 = photoJSONObject.has("photo_2560") ? photoJSONObject.get("photo_2560").getAsString() : null;
 
         int width = 0;
         int height = 0;
@@ -225,11 +224,27 @@ public class RESTRetrofitManager implements RESTInterface {
 
         int postId = wallPostJSONObject.get("id").getAsInt();
         int authorId = wallPostJSONObject.get("from_id").getAsInt();
-        int wallOwnerId = wallPostJSONObject.get("to_id").getAsInt();
+        int wallOwnerId = wallPostJSONObject.has("to_id") ?
+                wallPostJSONObject.get("to_id").getAsInt() : wallPostJSONObject.get("owner_id").getAsInt();
+
         Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong());
         String postText = wallPostJSONObject.get("text").getAsString();
         String postType = wallPostJSONObject.get("post_type").getAsString();
 
+        int signerId = wallPostJSONObject.has("signer_id") ? wallPostJSONObject.get("signer_id").getAsInt() : -1;
+
+        //Если запись является репостом.
+        WallPost[] copyHistory = null;
+        if (wallPostJSONObject.has("copy_history")){
+
+            JsonArray copyHistoryArray = wallPostJSONObject.getAsJsonArray("copy_history");
+            copyHistory = new WallPost[copyHistoryArray.size()];
+
+            for (int i = 0; i < copyHistoryArray.size(); i++) {
+                JsonObject repostedWallPostJSON = copyHistoryArray.get(i).getAsJsonObject();
+                copyHistory[i] = parseWallPost(repostedWallPostJSON);
+            }
+        }
 
         Attachment[] attachments = null;
         if (wallPostJSONObject.has("attachments")){
@@ -242,7 +257,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 wallOwnerId,
                 postCreatedDate,
                 postText,
-                postType, attachments);
+                postType, signerId, copyHistory, attachments);
     }
 
     @Override

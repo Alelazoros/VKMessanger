@@ -1,12 +1,13 @@
 package ua.nure.vkmessanger.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Объект, описывающий фотографию.
  * https://vk.com/dev/photo
  */
-public class Photo {
+public class Photo implements Serializable {
 
     private int id;
 
@@ -21,8 +22,9 @@ public class Photo {
     private int mOwnerId;
 
     /**
-     * Пользователь, которые загрузил фото (если фотография размещена в сообществе).
-     * Для фотографий, размещенных от имени сообщества, user_id=100
+     * Пользователь, которые загрузил фото (если фотография размещена в сообществе,
+     * а если не в сообществе, то поле отсутствует в ответе API).
+     * Для фотографий, размещенных от имени сообщества, user_id=100.
      */
     private int mUserId;
 
@@ -35,6 +37,7 @@ public class Photo {
 
     /**
      * URL на фотографии в различных размерах.
+     * В ответе не обязательно должны быть все размеры!
      */
     private String mPhoto75;
     private String mPhoto130;
