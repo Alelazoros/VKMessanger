@@ -42,4 +42,15 @@ public interface RESTInterface {
      * @return возвращает ERROR + по возможности error_code
      */
     CustomResponse sendMessageTo(String message, int peerId);
+
+
+    /**
+     * @param groupIds id групп, для которых нужно получить информацию.
+     *                 Передаю не int[], а String[], т.к. можно передавать
+     *                 не только целочисленные id, а вместо этого передать
+     *                 короткий адрес сообщества (url), например 'tproger', вместо его id.
+     *
+     * @return список объектов Group внутри объекта CustomResponse.setAnswer(..), если RequestResult == SUCCESS.
+     */
+    CustomResponse getGroupsInfoByIds(String[] groupIds);
 }

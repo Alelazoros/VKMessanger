@@ -146,6 +146,12 @@ public class RESTVkSdkManager implements RESTInterface {
     }
     public CustomResponse sendMessageTo(String message, int peerId) {
         //Nothing
-        return new CustomResponse().setRequestResult(RequestResult.ERROR);
+        return new CustomResponse();
+    }
+
+    @Override
+    public CustomResponse getGroupsInfoByIds(String[] groupIds) {
+        //Nothing
+        return new CustomResponse();
     }
 }

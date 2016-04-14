@@ -104,6 +104,7 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
+
     @Override
     public CustomResponse loadSelectedDialogById(int dialogId, int offsetCount) {
         RetrofitAPI api = getRetrofit();
@@ -260,6 +261,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 postType, signerId, copyHistory, attachments);
     }
 
+
     @Override
     public CustomResponse sendMessageTo(String message, int peerId) {
         RetrofitAPI api = getRetrofit();
@@ -289,5 +291,12 @@ public class RESTRetrofitManager implements RESTInterface {
             e.printStackTrace();
         }
         return customResponseResult;
+    }
+
+
+    @Override
+    public CustomResponse getGroupsInfoByIds(String[] groupIds) {
+        //TODO: сгенерировать запрос и получить ответ.
+        return null;
     }
 }
