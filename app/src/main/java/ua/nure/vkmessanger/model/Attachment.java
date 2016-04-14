@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 /**
  * Данный объект представляет собой вложение в сообщение (запись на стене и т.д.).
+ * https://vk.com/dev/attachments_m
  */
 public class Attachment<T> implements Serializable {
 
