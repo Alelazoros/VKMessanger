@@ -10,9 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.http.RESTInterface;
@@ -106,12 +109,33 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             switch (loader.getId()) {
                 case LOAD_GROUPS:
                     this.mGroups = data.getTypedAnswer();
+                    updateWallOwnersUIInfo(mGroups);
                     for (Group group : mGroups) {
                         Log.d("GROUP DATA LOADED", group.toString());
                     }
-                    //TODO: Обновить UI.
                     break;
             }
+        }
+    }
+
+    private void updateWallOwnersUIInfo(List<Group> groups) {
+        TextView wallOwnerName = (TextView) findViewById(R.id.wallOwnerNameTV);
+        wallOwnerName.setText(groups.get(0).getName());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
+
+        TextView wallPostDate = (TextView) findViewById(R.id.wallPostDateTV);
+        wallPostDate.setText(sdf.format(mWallPost.getDate()));
+
+        if (groups.size() != 1) {
+            TextView forwardWallOwnerName = (TextView) findViewById(R.id.forwardWallOwnerNameTV);
+            forwardWallOwnerName.setText(groups.get(1).getName());
+
+            TextView forwardWallPostDate = (TextView) findViewById(R.id.forwardWallPostDateTV);
+            forwardWallPostDate.setText(sdf.format(mWallPost.getDate()));
+        } else {
+            //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
+            findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
         }
     }
 

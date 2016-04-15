@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView android:id="@+id/groupAvatar"
+        <ImageView android:id="@+id/wallOwnerAvatar"
             android:layout_row="0"
             android:layout_column="0"
             android:layout_width="wrap_content"
@@ -21,10 +21,9 @@
             android:layout_rowSpan="2"
             android:layout_margin="12dp" />
 
-        <TextView android:id="@+id/groupNameTV"
+        <TextView android:id="@+id/wallOwnerNameTV"
             android:layout_row="0"
             android:layout_column="1"
-            android:text="New Text"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_width="match_parent"
@@ -34,7 +33,6 @@
         <TextView android:id="@+id/wallPostDateTV"
             android:layout_row="1"
             android:layout_column="1"
-            android:text="New Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp" />
@@ -42,15 +40,15 @@
     </GridLayout>
 
     <!--
-    Если выбранная запись - это не репост, то для forwardGroupInfoContainer
+    Если выбранная запись - это не репост, то для forwardWallOwnerInfoContainer
     надо во время выполнения установить visibility="gone"
     -->
-    <GridLayout android:id="@+id/forwardGroupInfoContainer"
+    <GridLayout android:id="@+id/forwardWallOwnerInfoContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2">
 
-        <ImageView android:id="@+id/forwardGroupAvatar"
+        <ImageView android:id="@+id/forwardWallOwnerAvatar"
             android:layout_row="0"
             android:layout_column="0"
             android:layout_width="wrap_content"
@@ -58,10 +56,9 @@
             android:layout_rowSpan="2"
             android:layout_margin="12dp" />
 
-        <TextView android:id="@+id/forwardGroupNameTV"
+        <TextView android:id="@+id/forwardWallOwnerNameTV"
             android:layout_row="0"
             android:layout_column="1"
-            android:text="New Text"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_width="match_parent"
@@ -71,7 +68,6 @@
         <TextView android:id="@+id/forwardWallPostDateTV"
             android:layout_row="1"
             android:layout_column="1"
-            android:text="New Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp" />
