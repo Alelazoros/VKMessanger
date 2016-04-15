@@ -67,10 +67,18 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private void loadGroupsInfo(WallPost wallPost) {
         Bundle args = new Bundle();
-        //TODO: получить все группы.
-        String[] groups = {String.valueOf(Math.abs(wallPost.getWallAuthorId()))};
-        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
 
+        int countGroups = wallPost.getCopyHistory() == null ? 1 : 2;
+        String[] groups = new String[countGroups];
+        groups[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
+
+        //Если запись является репостом.
+        WallPost[] copyHistory = wallPost.getCopyHistory();
+        for (int i = 1; i < groups.length; i++) {
+            groups[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
+        }
+
+        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
         getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
     }
 
@@ -95,8 +103,15 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
         if (data.getRequestResult() == RequestResult.SUCCESS){
-            this.mGroups = data.getTypedAnswer();
-            Log.d("GROUP DATE LOADED", mGroups.get(0).toString());
+            switch (loader.getId()) {
+                case LOAD_GROUPS:
+                    this.mGroups = data.getTypedAnswer();
+                    for (Group group : mGroups) {
+                        Log.d("GROUP DATA LOADED", group.toString());
+                    }
+                    //TODO: Обновить UI.
+                    break;
+            }
         }
     }
 
