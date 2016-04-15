@@ -83,4 +83,17 @@ public class Group {
     public String getPhoto200() {
         return mPhoto200;
     }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", mName='" + mName + '\'' +
+                ", mScreenName='" + mScreenName + '\'' +
+                ", mType='" + mType + '\'' +
+                ", mPhoto50='" + mPhoto50 + '\'' +
+                ", mPhoto100='" + mPhoto100 + '\'' +
+                ", mPhoto200='" + mPhoto200 + '\'' +
+                '}';
+    }
 }

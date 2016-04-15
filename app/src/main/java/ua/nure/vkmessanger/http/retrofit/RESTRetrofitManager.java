@@ -1,6 +1,7 @@
 package ua.nure.vkmessanger.http.retrofit;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -23,6 +24,7 @@ import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.UserDialog;
@@ -269,6 +271,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         CustomResponse customResponseResult = new CustomResponse();
         try {
+            //Sync request.
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             JsonObject responseObject = retrofitResponse.body().getAsJsonObject();
 
@@ -281,11 +284,9 @@ public class RESTRetrofitManager implements RESTInterface {
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(new Message(messageId, true, false, message, date, attachments));
             }
-            else {
-                if (responseObject.has("error")) {
-                    JsonElement errorObject = responseObject.get("error");
-                    customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
-                }
+            else if (responseObject.has("error")) {
+                JsonElement errorObject = responseObject.get("error");
+                customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -296,7 +297,67 @@ public class RESTRetrofitManager implements RESTInterface {
 
     @Override
     public CustomResponse getGroupsInfoByIds(String[] groupIds) {
-        //TODO: сгенерировать запрос и получить ответ.
-        return null;
+        RetrofitAPI api = getRetrofit();
+        Call<JsonElement> retrofitCall = api.getGroupsByIds(VK_API_VERSION, generateGroupsIdsStringParamFromArray(groupIds));
+
+        CustomResponse customResponse = new CustomResponse();
+        try {
+            //Sync request.
+            Response<JsonElement> response = retrofitCall.execute();
+
+            if (response.isSuccessful()) {
+                JsonObject responseObject = response.body().getAsJsonObject();
+
+                if (responseObject.has("response")) {
+                    List<Group> groupsList = new ArrayList<>();
+
+                    JsonArray groupsJSONArray = responseObject.getAsJsonArray("response");
+                    for (JsonElement groupElement : groupsJSONArray) {
+                        Group group = parseGroup(groupElement.getAsJsonObject());
+                        groupsList.add(group);
+                    }
+                    customResponse.setRequestResult(RequestResult.SUCCESS).setAnswer(groupsList);
+
+                } else if (responseObject.has("error")) {
+                    JsonElement errorObject = responseObject.get("error");
+                    customResponse.setAnswer(errorObject.getAsJsonObject().get("error_msg").getAsString());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return customResponse;
+    }
+
+    /**
+     * @param groupIds массив id или screen_name групп, для которых необходимо получить информацию.
+     * @return строка, содержащая все элементы массива, разделенные запятыми.
+     *
+     * (во входящем массиве обязательно должен быть хотя бы один элемент).
+     */
+    private String generateGroupsIdsStringParamFromArray(@NonNull String[] groupIds){
+        if (groupIds.length == 1){
+            return groupIds[0];
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String groupId : groupIds) {
+            sb.append(groupId).append(',');
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    private Group parseGroup(JsonObject groupJSONObject) {
+        int id = groupJSONObject.get("id").getAsInt();
+
+        String name = groupJSONObject.get("name").getAsString();
+        String screenName = groupJSONObject.get("screen_name").getAsString();
+        String type = groupJSONObject.get("type").getAsString();
+
+        String photo50 = groupJSONObject.has("photo_50") ? groupJSONObject.get("photo_50").getAsString() : null;
+        String photo100 = groupJSONObject.has("photo_100") ? groupJSONObject.get("photo_100").getAsString() : null;
+        String photo200 = groupJSONObject.has("photo_200") ? groupJSONObject.get("photo_200").getAsString() : null;
+
+        return new Group(id, name, screenName, type, photo50, photo100, photo200);
     }
 }
