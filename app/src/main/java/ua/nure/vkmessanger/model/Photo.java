@@ -12,12 +12,12 @@ public class Photo implements Serializable {
     private int id;
 
     /**
-     * Альбом, в котором находится фото.
+     * Альбом, в котором находится фото. Отрицательное число.
      */
     private int mAlbumId;
 
     /**
-     * Владелец фото.
+     * Владелец фото. Отрицательное число.
      */
     private int mOwnerId;
 
