@@ -27,21 +27,16 @@ public class Group {
 
     /**
      * тип сообщества:
-            group — группа;
-            page — публичная страница;
-            event — мероприятие.
+     * group — группа;
+     * page — публичная страница;
+     * event — мероприятие.
      */
     private String mType;
 
     /**
-     * Текст описания сообщества.
-     */
-    private String mDescription;
-
-    /**
      * URL на фотографии в различных размерах.
      * В ответе не обязательно должны быть все размеры!
-     *
+     * <p>
      * photo50 - url фотографии сообщества с размером 50x50px.
      * photo100 - url фотографии сообщества с размером 100x100px.
      * photo100 - url фотографии сообщества в максимальном размере.
@@ -51,12 +46,11 @@ public class Group {
     private String mPhoto200;
 
 
-    public Group(int id, String name, String screenName, String type, String description, String photo50, String photo100, String photo200) {
+    public Group(int id, String name, String screenName, String type, String photo50, String photo100, String photo200) {
         this.id = id;
         mName = name;
         mScreenName = screenName;
         mType = type;
-        mDescription = description;
         mPhoto50 = photo50;
         mPhoto100 = photo100;
         mPhoto200 = photo200;
@@ -76,10 +70,6 @@ public class Group {
 
     public String getType() {
         return mType;
-    }
-
-    public String getDescription() {
-        return mDescription;
     }
 
     public String getPhoto50() {
