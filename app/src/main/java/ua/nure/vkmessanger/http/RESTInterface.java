@@ -4,6 +4,9 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 
 /**
  * Интерфейс, который должен быть реализован классом, который работает с Http-запросами.
+ *
+ * Примечание для работы с VK API:
+ * Полученную из Json дату нужно домножать на 1000, так как в Json дата хранится в формате unixtime.
  */
 public interface RESTInterface {
 

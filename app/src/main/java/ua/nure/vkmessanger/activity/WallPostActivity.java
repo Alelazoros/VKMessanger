@@ -105,14 +105,11 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        if (data.getRequestResult() == RequestResult.SUCCESS){
+        if (data.getRequestResult() == RequestResult.SUCCESS) {
             switch (loader.getId()) {
                 case LOAD_GROUPS:
                     this.mGroups = data.getTypedAnswer();
                     updateWallOwnersUIInfo(mGroups);
-                    for (Group group : mGroups) {
-                        Log.d("GROUP DATA LOADED", group.toString());
-                    }
                     break;
             }
         }

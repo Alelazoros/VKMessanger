@@ -158,7 +158,9 @@ public class RESTRetrofitManager implements RESTInterface {
         boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
         boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
         String messageBody = messageJSON.get("body").getAsString();
-        Date date = new Date(messageJSON.get("date").getAsLong());
+
+        //Полученную из Json дату домножаю на 1000, так как в Json дата хранится в формате UNIXTIME.
+        Date date = new Date(messageJSON.get("date").getAsLong() * 1000);
 
         //Читаю данные о вложениях сообщений.
         Attachment[] attachments = null;
@@ -199,7 +201,8 @@ public class RESTRetrofitManager implements RESTInterface {
         int userId = photoJSONObject.has("user_id") ? photoJSONObject.get("user_id").getAsInt() : -1;
 
         String text = photoJSONObject.get("text").getAsString();
-        Date date = new Date(photoJSONObject.get("date").getAsLong());
+        //Полученную из Json дату домножаю на 1000, так как в Json дата хранится в формате UNIXTIME.
+        Date date = new Date(photoJSONObject.get("date").getAsLong() * 1000);
 
         String photo75 = photoJSONObject.has("photo_75") ? photoJSONObject.get("photo_75").getAsString() : null;
         String photo130 = photoJSONObject.has("photo_130") ? photoJSONObject.get("photo_130").getAsString() : null;
@@ -230,7 +233,8 @@ public class RESTRetrofitManager implements RESTInterface {
         int wallOwnerId = wallPostJSONObject.has("to_id") ?
                 wallPostJSONObject.get("to_id").getAsInt() : wallPostJSONObject.get("owner_id").getAsInt();
 
-        Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong());
+        //Полученную из Json дату домножаю на 1000, так как в Json дата хранится в формате UNIXTIME.
+        Date postCreatedDate = new Date(wallPostJSONObject.get("date").getAsLong() * 1000);
         String postText = wallPostJSONObject.get("text").getAsString();
         String postType = wallPostJSONObject.get("post_type").getAsString();
 

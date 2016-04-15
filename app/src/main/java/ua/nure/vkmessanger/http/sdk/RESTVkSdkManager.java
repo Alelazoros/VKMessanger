@@ -111,7 +111,7 @@ public class RESTVkSdkManager implements RESTInterface {
                         boolean isMessageFromMe = object.getInt("out") == MESSAGE_WAS_SEND_FROM_ME;
                         boolean isRead = object.getInt("read_state") == MESSAGE_WAS_READ;
                         String messageBody = object.getString("body");
-                        Date date = new Date(object.getLong("date"));
+                        Date date = new Date(object.getLong("date") * 1000);
                         Attachment[] attachments = null;
 
                         //TODO: сделать парсинг вложений (attachments).
