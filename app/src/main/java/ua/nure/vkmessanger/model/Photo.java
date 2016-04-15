@@ -96,4 +96,9 @@ public class Photo implements Serializable {
     public Date getDate() {
         return mDate;
     }
+
+    public String getPhotoURL(){
+        //TODO: придумать логику, когда какой размер изображения использовать.
+        return mPhoto604;
+    }
 }

@@ -2,11 +2,11 @@ package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -14,16 +14,20 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import ua.nure.vkmessanger.R;
+import ua.nure.vkmessanger.adapter.PhotosAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
+import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Group;
+import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.WallPost;
 
 public class WallPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
@@ -47,6 +51,27 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
         initToolbar();
         getDataFromIntent(getIntent());
+        initPhotosRecyclerView();
+    }
+
+    private void initPhotosRecyclerView() {
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
+//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+
+        //get list of photos.
+        List<Photo> photos = new ArrayList<>();
+        Attachment[] wallPostPhotosAttachments = mWallPost.getCopyHistory() == null ?
+                mWallPost.getAttachments() : mWallPost.getCopyHistory()[0].getAttachments();
+
+        for (Attachment attachment : wallPostPhotosAttachments) {
+            if (attachment != null && attachment.isPhoto()) {
+                photos.add((Photo) attachment.getBody());
+            }
+        }
+
+        recyclerView.setLayoutManager(new GridLayoutManager(this, photos.size() / 3 + 1));
+        recyclerView.setAdapter(new PhotosAdapter(this, photos));
+        recyclerView.setHasFixedSize(true);
     }
 
     private void initToolbar() {
