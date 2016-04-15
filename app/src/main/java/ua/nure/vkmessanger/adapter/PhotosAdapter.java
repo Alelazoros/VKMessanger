@@ -33,6 +33,10 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     private List<Photo> mPhotos;
 
+    /**
+     * Карта используется для того, чтобы сохранить загруженные изображения, не загружая каждый раз
+     * одно и тоже изображение в методе onBind().
+     */
     private Map<Integer, Bitmap> mBitmapsMap;
 
 
@@ -52,7 +56,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
-        if (mPhotos != null){
+        if (mPhotos != null) {
             holder.bind(position, mPhotos, mBitmapsMap);
         }
     }
@@ -69,23 +73,23 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
-        private Context mContext;
+        private Picasso mPicasso;
 
         private ImageView mPhotoImageView;
 
         public PhotoViewHolder(Context context, View itemView) {
             super(itemView);
-            mContext = context;
+            mPicasso = Picasso.with(context);
             mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
         }
 
         public void bind(final int position, List<Photo> photos, final Map<Integer, Bitmap> bitmapsMap) {
 
-            if (bitmapsMap.containsKey(position)){
+            if (bitmapsMap.containsKey(position)) {
                 mPhotoImageView.setImageBitmap(bitmapsMap.get(position));
                 return;
             }
-            Picasso.with(mContext).load(photos.get(position).getPhotoURL()).into(new Target() {
+            mPicasso.load(photos.get(position).getPhotoURL()).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     Log.d("LOAD_IMAGE", "SUCCESS");

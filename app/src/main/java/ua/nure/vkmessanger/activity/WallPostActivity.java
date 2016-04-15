@@ -1,16 +1,23 @@
 package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -56,7 +63,6 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private void initPhotosRecyclerView() {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
-//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
         //get list of photos.
         List<Photo> photos = new ArrayList<>();
@@ -69,6 +75,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             }
         }
 
+//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(photos.size() / 3 + 1, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setLayoutManager(new GridLayoutManager(this, photos.size() / 3 + 1));
         recyclerView.setAdapter(new PhotosAdapter(this, photos));
         recyclerView.setHasFixedSize(true);
@@ -141,20 +148,29 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void updateWallOwnersUIInfo(List<Group> groups) {
+        Group wallOwnerGroup = groups.get(0);
+
         TextView wallOwnerName = (TextView) findViewById(R.id.wallOwnerNameTV);
-        wallOwnerName.setText(groups.get(0).getName());
+        wallOwnerName.setText(wallOwnerGroup.getName());
 
         SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
 
         TextView wallPostDate = (TextView) findViewById(R.id.wallPostDateTV);
         wallPostDate.setText(sdf.format(mWallPost.getDate()));
 
+        final ImageView wallOwnerAvatar = (ImageView) findViewById(R.id.wallOwnerAvatar);
+        Picasso.with(this).load(wallOwnerGroup.getPhoto200()).into(wallOwnerAvatar);
+
         if (groups.size() != 1) {
+            Group forwardedGroup = groups.get(1);
             TextView forwardWallOwnerName = (TextView) findViewById(R.id.forwardWallOwnerNameTV);
-            forwardWallOwnerName.setText(groups.get(1).getName());
+            forwardWallOwnerName.setText(forwardedGroup.getName());
 
             TextView forwardWallPostDate = (TextView) findViewById(R.id.forwardWallPostDateTV);
             forwardWallPostDate.setText(sdf.format(mWallPost.getDate()));
+
+            ImageView forwardWallOwnerAvatar = (ImageView) findViewById(R.id.forwardWallOwnerAvatar);
+            Picasso.with(this).load(forwardedGroup.getPhoto200()).into(forwardWallOwnerAvatar);
         } else {
             //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
             findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
