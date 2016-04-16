@@ -43,19 +43,12 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
 
     private List<Photo> mPhotos;
 
-    /**
-     * Карта используется для того, чтобы сохранить загруженные изображения, не загружая каждый раз
-     * одно и тоже изображение в методе onBind().
-     */
-    private Map<Integer, Bitmap> mBitmapsMap;
-
 
     public WallPostPhotosAdapter(Context context, View header, List<Photo> photos) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
         mHeader = header;
         mPhotos = photos;
-        mBitmapsMap = new HashMap<>();
     }
 
     public boolean isHeader(int position) {
@@ -82,7 +75,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
             if (isHeader(position)) {
                 return; //because logic is in Activity.
             }
-            holder.bindPhoto(position - 1, mPhotos, mBitmapsMap);//position - 1, т.к. учитываю header.
+            holder.bindPhoto(position - 1, mPhotos);//position - 1, т.к. учитываю header.
         }
     }
 
@@ -104,12 +97,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
             mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
         }
 
-        public void bindPhoto(final int position, List<Photo> photos, final Map<Integer, Bitmap> bitmapsMap) {
-
-            if (bitmapsMap.containsKey(position)) {
-                mPhotoImageView.setImageBitmap(bitmapsMap.get(position));
-                return;
-            }
+        public void bindPhoto(final int position, List<Photo> photos) {
             String photoURL = photos.get(position).getNormalSizePhotoURL();
             mPicasso.load(photoURL).into(mPhotoImageView);
         }
