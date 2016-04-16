@@ -60,6 +60,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         initPhotosRecyclerView();
     }
 
+
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.wall_post);

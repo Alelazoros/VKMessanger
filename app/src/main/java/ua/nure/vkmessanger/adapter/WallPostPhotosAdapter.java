@@ -70,10 +70,10 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER_LAYOUT){
-            return new PhotoViewHolder(mContext, mHeader);
+            return new PhotoViewHolder(mHeader, mContext);
         }
         View view = mLayoutInflater.inflate(ATTACHMENT_PHOTO_LAYOUT, parent, false);
-        return new PhotoViewHolder(mContext, view);
+        return new PhotoViewHolder(view, mContext);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
 
         private ImageView mPhotoImageView;
 
-        public PhotoViewHolder(Context context, View itemView) {
+        public PhotoViewHolder(View itemView, Context context) {
             super(itemView);
             mPicasso = Picasso.with(context);
             mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
@@ -110,25 +110,8 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
                 mPhotoImageView.setImageBitmap(bitmapsMap.get(position));
                 return;
             }
-            mPicasso.load(photos.get(position).getNormalSizePhotoURL()).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    Log.d("LOAD_IMAGE", "SUCCESS");
-                    mPhotoImageView.setImageBitmap(bitmap);
-                    bitmapsMap.put(position, bitmap);
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
-                    Log.d("LOAD_IMAGE", "FAILED");
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    Log.d("LOAD_IMAGE", "PREPARE_LOAD");
-                }
-            });
+            String photoURL = photos.get(position).getNormalSizePhotoURL();
+            mPicasso.load(photoURL).into(mPhotoImageView);
         }
     }
-
 }
