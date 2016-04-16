@@ -103,7 +103,9 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
-        mHeader = inflateWallOwnersHeader(recyclerView);
+        //Является ли запись репостом.
+        boolean isSingleHeader = mWallPost.getCopyHistory() == null;
+        mHeader = inflateWallOwnersHeader(recyclerView, isSingleHeader);
 
         final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos);
         recyclerView.setAdapter(adapter);
@@ -130,8 +132,14 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         return photos;
     }
 
-    private View inflateWallOwnersHeader(ViewGroup root) {
-        return LayoutInflater.from(this).inflate(R.layout.wall_post_header, root, false);
+    /**
+     * @param isSingleHeader true - если данная запись не была репостом с другой стены,
+     *                       false - в противном случае.
+     */
+    private View inflateWallOwnersHeader(ViewGroup root, boolean isSingleHeader) {
+        return isSingleHeader ?
+                LayoutInflater.from(this).inflate(R.layout.wall_post_header_single, root, false) :
+                LayoutInflater.from(this).inflate(R.layout.wall_post_header_double, root, false);
     }
 
 
@@ -193,10 +201,6 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
             ImageView forwardWallOwnerAvatar = (ImageView) header.findViewById(R.id.forwardWallOwnerAvatar);
             Picasso.with(this).load(forwardedGroup.getPhotoURL()).into(forwardWallOwnerAvatar);
-        } else {
-            //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
-            header.findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
-            //TODO: возможно тут лучше использовать adapter.notifyItemChanged(0);
         }
     }
 
