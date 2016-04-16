@@ -7,7 +7,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import ua.nure.vkmessanger.R;
-import ua.nure.vkmessanger.adapter.PhotosAdapter;
+import ua.nure.vkmessanger.adapter.WallPostPhotosAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
@@ -105,7 +104,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
         mHeader = inflateWallOwnersHeader(recyclerView);
 
-        final PhotosAdapter adapter = new PhotosAdapter(this, mHeader, photos);
+        final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
 
@@ -158,13 +157,17 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             switch (loader.getId()) {
                 case LOAD_GROUPS:
                     this.mGroups = data.getTypedAnswer();
-                    updateWallOwnersHeaderUIInfo(mGroups, mHeader);
+                    updateWallOwnersHeaderInfo(mGroups, mHeader);
                     break;
             }
         }
     }
 
-    private void updateWallOwnersHeaderUIInfo(List<Group> groups, View header) {
+    /**
+     * Данный метод обновляет header, который должен содержать информацию
+     * о владельце стены, как которой была размещена запись.
+     */
+    private void updateWallOwnersHeaderInfo(List<Group> groups, View header) {
         Group wallOwnerGroup = groups.get(0);
 
         TextView wallOwnerName = (TextView) header.findViewById(R.id.wallOwnerNameTV);
@@ -178,6 +181,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         final ImageView wallOwnerAvatar = (ImageView) header.findViewById(R.id.wallOwnerAvatar);
         Picasso.with(this).load(wallOwnerGroup.getPhotoURL()).into(wallOwnerAvatar);
 
+        //Если запись является репостом, то отображаю еще и владельца стены, с которой был репост.
         if (groups.size() != 1) {
             Group forwardedGroup = groups.get(1);
             TextView forwardWallOwnerName = (TextView) header.findViewById(R.id.forwardWallOwnerNameTV);
@@ -191,6 +195,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         } else {
             //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
             header.findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
+            //TODO: возможно тут лучше использовать adapter.notifyItemChanged(0);
         }
     }
 

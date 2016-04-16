@@ -21,9 +21,11 @@ import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Photo;
 
 /**
- * Адаптер для списка фотографий.
+ * Адаптер для списка фотографий, которые приклеплены к записи на стене.
+ * Адаптер также обеспечивает работу с Header-ом - заголовком, который
+ * отображает владельца стены, на которой была размещена запись.
  */
-public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewHolder> {
+public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAdapter.PhotoViewHolder> {
 
     private static final int ATTACHMENT_PHOTO_LAYOUT = R.layout.attachment_photo;
 
@@ -48,7 +50,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
     private Map<Integer, Bitmap> mBitmapsMap;
 
 
-    public PhotosAdapter(Context context, View header, List<Photo> photos) {
+    public WallPostPhotosAdapter(Context context, View header, List<Photo> photos) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
         mHeader = header;
