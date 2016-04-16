@@ -62,7 +62,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
 
         //get list of photos.
-        List<Photo> photos = new ArrayList<>();
+        final List<Photo> photos = new ArrayList<>();
         Attachment[] wallPostPhotosAttachments = mWallPost.getCopyHistory() == null ?
                 mWallPost.getAttachments() : mWallPost.getCopyHistory()[0].getAttachments();
 
@@ -72,8 +72,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             }
         }
 
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(photos.size() / 4 + 1, StaggeredGridLayoutManager.VERTICAL));
-//        recyclerView.setLayoutManager(new GridLayoutManager(this, photos.size() / 4 + 1));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(new PhotosAdapter(this, photos));
         recyclerView.setHasFixedSize(true);
     }

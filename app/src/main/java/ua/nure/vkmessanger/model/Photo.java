@@ -102,12 +102,15 @@ public class Photo implements Serializable {
     }
 
     public String getNormalSizePhotoURL(){
-        if (mPhoto1280 != null) return mPhoto1280;
-        else if (mPhoto807 != null) return mPhoto807;
+        if (mPhoto807 != null) return mPhoto807;
         return mPhoto604;
     }
 
-    public String getMasSizePhotoURL(){
+    public String getHDPhotoURL(){
+        return mPhoto1280;
+    }
+
+    public String getFullHDPhotoURL(){
         return mPhoto2560;
     }
 }
