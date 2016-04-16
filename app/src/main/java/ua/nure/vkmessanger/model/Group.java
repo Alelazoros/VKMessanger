@@ -72,16 +72,12 @@ public class Group {
         return mType;
     }
 
-    public String getPhoto50() {
+    public String getPhotoURL() {
+        if (mPhoto200 != null)
+            return mPhoto200;
+        else if (mPhoto100 != null)
+            return mPhoto100;
         return mPhoto50;
-    }
-
-    public String getPhoto100() {
-        return mPhoto100;
-    }
-
-    public String getPhoto200() {
-        return mPhoto200;
     }
 
     @Override

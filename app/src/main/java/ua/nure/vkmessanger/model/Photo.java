@@ -97,8 +97,17 @@ public class Photo implements Serializable {
         return mDate;
     }
 
-    public String getPhotoURL(){
-        //TODO: придумать логику, когда какой размер изображения использовать.
+    public String getSmallSizePhotoURL(){
+        return mPhoto130 != null ? mPhoto130 : mPhoto75;
+    }
+
+    public String getNormalSizePhotoURL(){
+        if (mPhoto1280 != null) return mPhoto1280;
+        else if (mPhoto807 != null) return mPhoto807;
         return mPhoto604;
+    }
+
+    public String getMasSizePhotoURL(){
+        return mPhoto2560;
     }
 }

@@ -89,7 +89,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
                 mPhotoImageView.setImageBitmap(bitmapsMap.get(position));
                 return;
             }
-            mPicasso.load(photos.get(position).getPhotoURL()).into(new Target() {
+            mPicasso.load(photos.get(position).getNormalSizePhotoURL()).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     Log.d("LOAD_IMAGE", "SUCCESS");

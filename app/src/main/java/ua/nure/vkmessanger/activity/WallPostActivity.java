@@ -1,8 +1,6 @@
 package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -17,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -75,8 +72,8 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             }
         }
 
-//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(photos.size() / 3 + 1, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setLayoutManager(new GridLayoutManager(this, photos.size() / 3 + 1));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(photos.size() / 4 + 1, StaggeredGridLayoutManager.VERTICAL));
+//        recyclerView.setLayoutManager(new GridLayoutManager(this, photos.size() / 4 + 1));
         recyclerView.setAdapter(new PhotosAdapter(this, photos));
         recyclerView.setHasFixedSize(true);
     }
@@ -159,7 +156,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         wallPostDate.setText(sdf.format(mWallPost.getDate()));
 
         final ImageView wallOwnerAvatar = (ImageView) findViewById(R.id.wallOwnerAvatar);
-        Picasso.with(this).load(wallOwnerGroup.getPhoto200()).into(wallOwnerAvatar);
+        Picasso.with(this).load(wallOwnerGroup.getPhotoURL()).into(wallOwnerAvatar);
 
         if (groups.size() != 1) {
             Group forwardedGroup = groups.get(1);
@@ -170,7 +167,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             forwardWallPostDate.setText(sdf.format(mWallPost.getDate()));
 
             ImageView forwardWallOwnerAvatar = (ImageView) findViewById(R.id.forwardWallOwnerAvatar);
-            Picasso.with(this).load(forwardedGroup.getPhoto200()).into(forwardWallOwnerAvatar);
+            Picasso.with(this).load(forwardedGroup.getPhotoURL()).into(forwardWallOwnerAvatar);
         } else {
             //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
             findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
