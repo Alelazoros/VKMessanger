@@ -9,8 +9,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,33 +49,16 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private List<Group> mGroups;
 
+    private View mHeader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wall_post);
 
-        initToolbar();
         getDataFromIntent(getIntent());
+        initToolbar();
         initPhotosRecyclerView();
-    }
-
-    private void initPhotosRecyclerView() {
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
-
-        //get list of photos.
-        final List<Photo> photos = new ArrayList<>();
-        Attachment[] wallPostPhotosAttachments = mWallPost.getCopyHistory() == null ?
-                mWallPost.getAttachments() : mWallPost.getCopyHistory()[0].getAttachments();
-
-        for (Attachment attachment : wallPostPhotosAttachments) {
-            if (attachment != null && attachment.isPhoto()) {
-                photos.add((Photo) attachment.getBody());
-            }
-        }
-
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setAdapter(new PhotosAdapter(this, photos));
-        recyclerView.setHasFixedSize(true);
     }
 
     private void initToolbar() {
@@ -91,8 +75,6 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private void getDataFromIntent(Intent intent) {
         mWallPost = (WallPost) intent.getExtras().get(EXTRA_WALL_POST);
-        Log.d("CLICKED WALL POST", mWallPost.toString());
-
         loadGroupsInfo(mWallPost);
     }
 
@@ -111,6 +93,45 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
         args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
         getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
+    }
+
+    private void initPhotosRecyclerView() {
+        //At first - get list of photos from WallPost object.
+        List<Photo> photos = getPhotosFromWallPost(mWallPost);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
+        final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(layoutManager);
+
+        mHeader = inflateWallOwnersHeader(recyclerView);
+
+        final PhotosAdapter adapter = new PhotosAdapter(this, mHeader, photos);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true);
+
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return adapter.isHeader(position) ? layoutManager.getSpanCount() : 1;
+            }
+        });
+    }
+
+    private List<Photo> getPhotosFromWallPost(WallPost wallPost) {
+        List<Photo> photos = new ArrayList<>();
+        Attachment[] wallPostPhotosAttachments = wallPost.getCopyHistory() == null ?
+                wallPost.getAttachments() : wallPost.getCopyHistory()[0].getAttachments();
+
+        for (Attachment attachment : wallPostPhotosAttachments) {
+            if (attachment != null && attachment.isPhoto()) {
+                photos.add((Photo) attachment.getBody());
+            }
+        }
+        return photos;
+    }
+
+    private View inflateWallOwnersHeader(ViewGroup root) {
+        return LayoutInflater.from(this).inflate(R.layout.wall_post_header, root, false);
     }
 
 
@@ -137,39 +158,39 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             switch (loader.getId()) {
                 case LOAD_GROUPS:
                     this.mGroups = data.getTypedAnswer();
-                    updateWallOwnersUIInfo(mGroups);
+                    updateWallOwnersHeaderUIInfo(mGroups, mHeader);
                     break;
             }
         }
     }
 
-    private void updateWallOwnersUIInfo(List<Group> groups) {
+    private void updateWallOwnersHeaderUIInfo(List<Group> groups, View header) {
         Group wallOwnerGroup = groups.get(0);
 
-        TextView wallOwnerName = (TextView) findViewById(R.id.wallOwnerNameTV);
+        TextView wallOwnerName = (TextView) header.findViewById(R.id.wallOwnerNameTV);
         wallOwnerName.setText(wallOwnerGroup.getName());
 
         SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
 
-        TextView wallPostDate = (TextView) findViewById(R.id.wallPostDateTV);
+        TextView wallPostDate = (TextView) header.findViewById(R.id.wallPostDateTV);
         wallPostDate.setText(sdf.format(mWallPost.getDate()));
 
-        final ImageView wallOwnerAvatar = (ImageView) findViewById(R.id.wallOwnerAvatar);
+        final ImageView wallOwnerAvatar = (ImageView) header.findViewById(R.id.wallOwnerAvatar);
         Picasso.with(this).load(wallOwnerGroup.getPhotoURL()).into(wallOwnerAvatar);
 
         if (groups.size() != 1) {
             Group forwardedGroup = groups.get(1);
-            TextView forwardWallOwnerName = (TextView) findViewById(R.id.forwardWallOwnerNameTV);
+            TextView forwardWallOwnerName = (TextView) header.findViewById(R.id.forwardWallOwnerNameTV);
             forwardWallOwnerName.setText(forwardedGroup.getName());
 
-            TextView forwardWallPostDate = (TextView) findViewById(R.id.forwardWallPostDateTV);
+            TextView forwardWallPostDate = (TextView) header.findViewById(R.id.forwardWallPostDateTV);
             forwardWallPostDate.setText(sdf.format(mWallPost.getDate()));
 
-            ImageView forwardWallOwnerAvatar = (ImageView) findViewById(R.id.forwardWallOwnerAvatar);
+            ImageView forwardWallOwnerAvatar = (ImageView) header.findViewById(R.id.forwardWallOwnerAvatar);
             Picasso.with(this).load(forwardedGroup.getPhotoURL()).into(forwardWallOwnerAvatar);
         } else {
             //Убираю с екрана второй контейнер для владельца стены, если запись - не репост.
-            findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
+            header.findViewById(R.id.forwardWallOwnerInfoContainer).setVisibility(View.GONE);
         }
     }
 

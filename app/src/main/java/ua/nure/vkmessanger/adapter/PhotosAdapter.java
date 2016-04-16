@@ -27,9 +27,17 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
 
     private static final int ATTACHMENT_PHOTO_LAYOUT = R.layout.attachment_photo;
 
+    private static final int TYPE_HEADER_LAYOUT = 1;
+    private static final int TYPE_PHOTO_LAYOUT = 2;
+
     private Context mContext;
 
     private LayoutInflater mLayoutInflater;
+
+    /**
+     * Заголовок, представляющий собой владельца стены, на которой была размещена запись.
+     */
+    private View mHeader;
 
     private List<Photo> mPhotos;
 
@@ -40,16 +48,28 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
     private Map<Integer, Bitmap> mBitmapsMap;
 
 
-    public PhotosAdapter(Context context, List<Photo> photos) {
+    public PhotosAdapter(Context context, View header, List<Photo> photos) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
+        mHeader = header;
         mPhotos = photos;
         mBitmapsMap = new HashMap<>();
-        setHasStableIds(true);
+    }
+
+    public boolean isHeader(int position) {
+        return position == 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isHeader(position) ? TYPE_HEADER_LAYOUT : TYPE_PHOTO_LAYOUT;
     }
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == TYPE_HEADER_LAYOUT){
+            return new PhotoViewHolder(mContext, mHeader);
+        }
         View view = mLayoutInflater.inflate(ATTACHMENT_PHOTO_LAYOUT, parent, false);
         return new PhotoViewHolder(mContext, view);
     }
@@ -57,19 +77,18 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
         if (mPhotos != null) {
-            holder.bind(position, mPhotos, mBitmapsMap);
+            if (isHeader(position)) {
+                return; //because logic is in Activity.
+            }
+            holder.bindPhoto(position - 1, mPhotos, mBitmapsMap);//position - 1, т.к. учитываю header.
         }
     }
 
     @Override
     public int getItemCount() {
-        return mPhotos == null ? 0 : mPhotos.size();
+        return mPhotos == null ? 1 : mPhotos.size() + 1;//Учитываю header.
     }
 
-    @Override
-    public long getItemId(int position) {
-        return mPhotos == null ? 0 : mPhotos.get(position).getId();
-    }
 
     static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
@@ -83,7 +102,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotoViewH
             mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
         }
 
-        public void bind(final int position, List<Photo> photos, final Map<Integer, Bitmap> bitmapsMap) {
+        public void bindPhoto(final int position, List<Photo> photos, final Map<Integer, Bitmap> bitmapsMap) {
 
             if (bitmapsMap.containsKey(position)) {
                 mPhotoImageView.setImageBitmap(bitmapsMap.get(position));
