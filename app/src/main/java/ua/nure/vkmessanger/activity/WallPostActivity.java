@@ -87,7 +87,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         recyclerView.setLayoutManager(layoutManager);
 
         //Является ли запись репостом.
-        boolean isSingleHeader = mWallPost.getCopyHistory() == null;
+        boolean isSingleHeader = !mWallPost.isRepost();
         mHeader = inflateWallOwnersHeader(recyclerView, isSingleHeader);
 
         final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos);
@@ -104,8 +104,8 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private List<Photo> getPhotosFromWallPost(WallPost wallPost) {
         List<Photo> photos = new ArrayList<>();
-        Attachment[] wallPostPhotosAttachments = wallPost.getCopyHistory() == null ?
-                wallPost.getAttachments() : wallPost.getCopyHistory()[0].getAttachments();
+        Attachment[] wallPostPhotosAttachments = wallPost.isRepost() ?
+                wallPost.getRepostedWallPost().getAttachments() : wallPost.getAttachments();
 
         for (Attachment attachment : wallPostPhotosAttachments) {
             if (attachment != null && attachment.isPhoto()) {
@@ -128,25 +128,23 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
     private void loadGroupsInfo(WallPost wallPost) {
         Bundle args = new Bundle();
 
-        int countGroups = wallPost.getCopyHistory() == null ? 1 : 2;
-        String[] groups = new String[countGroups];
-        groups[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
+        int countGroups = wallPost.isRepost() ? 2 : 1;
+        String[] groupsIds = new String[countGroups];
+        groupsIds[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
 
         //Если запись является репостом.
         WallPost[] copyHistory = wallPost.getCopyHistory();
-        for (int i = 1; i < groups.length; i++) {
-            groups[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
+        for (int i = 1; i < groupsIds.length; i++) {
+            groupsIds[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
         }
 
-        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
+        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groupsIds);
         getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
     }
 
     private void setWallPostContent(View header) {
         TextView contentTV = (TextView) header.findViewById(R.id.wallPostContentTV);
-
-        boolean isWallPostIsRepost = mWallPost.getCopyHistory() != null;
-        contentTV.setText(isWallPostIsRepost ? mWallPost.getCopyHistory()[0].getText() : mWallPost.getText());
+        contentTV.setText(mWallPost.isRepost() ? mWallPost.getRepostedWallPost().getText() : mWallPost.getText());
     }
 
 

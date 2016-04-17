@@ -107,6 +107,15 @@ public class WallPost implements Serializable {
         return mAttachments;
     }
 
+    public boolean isRepost(){
+        return mCopyHistory != null;
+    }
+
+    @Nullable
+    public WallPost getRepostedWallPost(){
+        return mCopyHistory != null ? mCopyHistory[0] : null;
+    }
+
     @Override
     public String toString() {
         return "WallPost{" +
