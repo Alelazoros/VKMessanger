@@ -2,7 +2,8 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:columnCount="2"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp">
 
     <ImageView android:id="@+id/wallOwnerAvatar"
         android:layout_row="0"
@@ -10,7 +11,6 @@
         android:layout_column="0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
         />
 
     <TextView android:id="@+id/wallOwnerNameTV"
@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
-        android:layout_marginTop="12dp"
         />
 
     <TextView android:id="@+id/wallPostDateTV"
@@ -43,7 +42,7 @@
         android:layout_column="0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
+        android:layout_marginTop="12dp"
         />
 
     <TextView android:id="@+id/forwardWallOwnerNameTV"
@@ -65,6 +64,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
+        />
+
+    <!-- Содержимое записи на стене -->
+    <include layout="@layout/wall_post_content_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_row="4"
+        android:layout_column="0"
+        android:layout_columnSpan="2"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="8dp"
         />
 
 </GridLayout>

@@ -55,11 +55,12 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wall_post);
 
-        getDataFromIntent(getIntent());
         initToolbar();
+        mWallPost = getDataFromIntent(getIntent());
         initPhotosRecyclerView();
+        loadGroupsInfo(mWallPost);
+        setWallPostContent(mHeader);
     }
-
 
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -73,26 +74,8 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         });
     }
 
-    private void getDataFromIntent(Intent intent) {
-        mWallPost = (WallPost) intent.getExtras().get(EXTRA_WALL_POST);
-        loadGroupsInfo(mWallPost);
-    }
-
-    private void loadGroupsInfo(WallPost wallPost) {
-        Bundle args = new Bundle();
-
-        int countGroups = wallPost.getCopyHistory() == null ? 1 : 2;
-        String[] groups = new String[countGroups];
-        groups[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
-
-        //Если запись является репостом.
-        WallPost[] copyHistory = wallPost.getCopyHistory();
-        for (int i = 1; i < groups.length; i++) {
-            groups[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
-        }
-
-        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
-        getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
+    private WallPost getDataFromIntent(Intent intent) {
+        return (WallPost) intent.getExtras().get(EXTRA_WALL_POST);
     }
 
     private void initPhotosRecyclerView() {
@@ -140,6 +123,30 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         return isSingleHeader ?
                 LayoutInflater.from(this).inflate(R.layout.wall_post_header_single, root, false) :
                 LayoutInflater.from(this).inflate(R.layout.wall_post_header_double, root, false);
+    }
+
+    private void loadGroupsInfo(WallPost wallPost) {
+        Bundle args = new Bundle();
+
+        int countGroups = wallPost.getCopyHistory() == null ? 1 : 2;
+        String[] groups = new String[countGroups];
+        groups[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
+
+        //Если запись является репостом.
+        WallPost[] copyHistory = wallPost.getCopyHistory();
+        for (int i = 1; i < groups.length; i++) {
+            groups[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
+        }
+
+        args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groups);
+        getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
+    }
+
+    private void setWallPostContent(View header) {
+        TextView contentTV = (TextView) header.findViewById(R.id.wallPostContentTV);
+
+        boolean isWallPostIsRepost = mWallPost.getCopyHistory() != null;
+        contentTV.setText(isWallPostIsRepost ? mWallPost.getCopyHistory()[0].getText() : mWallPost.getText());
     }
 
 
