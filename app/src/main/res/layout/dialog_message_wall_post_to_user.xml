@@ -26,7 +26,10 @@
                 android:paddingEnd="@dimen/messagePaddingLeftRight"
                 android:paddingTop="@dimen/messagePaddingTopBottom"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:autoLink="web|email"
+                android:textColorLink="@color/links_color"
+                />
 
             <TextView
                 android:paddingStart="@dimen/messagePaddingLeftRight"
@@ -37,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/wall_post"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
 
             <TextView android:id="@+id/messageAttachmentWallPostTV"
                 android:paddingStart="@dimen/messagePaddingLeftRight"
@@ -46,7 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:maxLines="1" />
+                android:maxLines="1"
+                />
 
         </LinearLayout>
 

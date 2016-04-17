@@ -7,4 +7,7 @@
     <!-- Messages-->
     <color name="message_from_user_background">#4C9BBD</color>
     <color name="message_to_user_background">#E6E6FA</color>
+
+    <!-- Links-->
+    <color name="links_color">@android:color/holo_blue_dark</color>
 </resources>

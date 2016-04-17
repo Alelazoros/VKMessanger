@@ -3,5 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/wallPostContentTV"
-    android:autoLink="web"
+    android:autoLink="web|email"
+    android:textColorLink="@android:color/holo_blue_dark"
     />
