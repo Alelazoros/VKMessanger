@@ -118,7 +118,8 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
             //TODO: пока что обрабатываю только записи на стене.
             if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
-                attachmentWallPostTitleTV.setText(((WallPost) attachments[0].getBody()).getText());
+                WallPost post = (WallPost) attachments[0].getBody();
+                attachmentWallPostTitleTV.setText(post.isRepost() ? post.getRepostedWallPost().getText() : post.getText());
             }
         }
 
