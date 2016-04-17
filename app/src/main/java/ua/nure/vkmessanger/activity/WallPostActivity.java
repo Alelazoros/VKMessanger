@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.WallPost;
+import ua.nure.vkmessanger.util.PicassoUtils;
 
 public class WallPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
@@ -182,18 +184,23 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
      * о владельце стены, как которой была размещена запись.
      */
     private void updateWallOwnersHeaderInfo(List<Group> groups, View header) {
+        SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
+        //Трансформация изображения в круглую форму.
+        Transformation transformation = PicassoUtils.getCircleTransformation();
+
         Group wallOwnerGroup = groups.get(0);
 
         TextView wallOwnerName = (TextView) header.findViewById(R.id.wallOwnerNameTV);
         wallOwnerName.setText(wallOwnerGroup.getName());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
-
         TextView wallPostDate = (TextView) header.findViewById(R.id.wallPostDateTV);
         wallPostDate.setText(sdf.format(mWallPost.getDate()));
 
-        final ImageView wallOwnerAvatar = (ImageView) header.findViewById(R.id.wallOwnerAvatar);
-        Picasso.with(this).load(wallOwnerGroup.getPhotoURL()).into(wallOwnerAvatar);
+        ImageView wallOwnerAvatar = (ImageView) header.findViewById(R.id.wallOwnerAvatar);
+        Picasso.with(this)
+                .load(wallOwnerGroup.getPhotoURL())
+                .transform(transformation)
+                .into(wallOwnerAvatar);
 
         //Если запись является репостом, то отображаю еще и владельца стены, с которой был репост.
         if (groups.size() != 1) {
@@ -205,7 +212,10 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
             forwardWallPostDate.setText(sdf.format(mWallPost.getDate()));
 
             ImageView forwardWallOwnerAvatar = (ImageView) header.findViewById(R.id.forwardWallOwnerAvatar);
-            Picasso.with(this).load(forwardedGroup.getPhotoURL()).into(forwardWallOwnerAvatar);
+            Picasso.with(this)
+                    .load(forwardedGroup.getPhotoURL())
+                    .transform(transformation)
+                    .into(forwardWallOwnerAvatar);
         }
     }
 
