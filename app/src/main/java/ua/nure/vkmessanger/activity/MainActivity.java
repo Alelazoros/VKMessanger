@@ -96,13 +96,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, SelectedDialogActivity.class);
-
                 //Проверка на статус диалога (групповая беседа, или ЛС) в методе dialog.getDialogId().
                 UserDialog dialog = adapter.getItem(position);
 
-                intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, dialog.getDialogId());
-                startActivity(intent);
+                SelectedDialogActivity.newIntent(MainActivity.this, dialog.getDialogId());
+
                 //TODO: сделать обработку возврата из SelectedDialogActivity.
             }
         });

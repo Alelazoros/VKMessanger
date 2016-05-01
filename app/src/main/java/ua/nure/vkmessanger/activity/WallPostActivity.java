@@ -1,5 +1,6 @@
 package ua.nure.vkmessanger.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -38,7 +39,7 @@ import ua.nure.vkmessanger.util.PicassoUtils;
 
 public class WallPostActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
-    public static final String EXTRA_WALL_POST = "EXTRA_WALL_POST";
+    private static final String EXTRA_WALL_POST = "EXTRA_WALL_POST";
 
     private static final String GROUPS_LOADER_BUNDLE_ARGUMENT = "GROUPS_LOADER_BUNDLE_ARGUMENT";
 
@@ -61,7 +62,13 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         mWallPost = getDataFromIntent(getIntent());
         initPhotosRecyclerView();
         loadGroupsInfo(mWallPost);
-        setWallPostContent(mHeader);
+        setWallPostContent(mHeader, mWallPost);
+    }
+
+    public static void newIntent(Context context, WallPost post){
+        Intent intent = new Intent(context, WallPostActivity.class);
+        intent.putExtra(EXTRA_WALL_POST, post);
+        context.startActivity(intent);
     }
 
     private void initToolbar() {
@@ -144,9 +151,9 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         getSupportLoaderManager().initLoader(LOAD_GROUPS, args, this);
     }
 
-    private void setWallPostContent(View header) {
+    private void setWallPostContent(View header, WallPost wallPost) {
         TextView contentTV = (TextView) header.findViewById(R.id.wallPostContentTV);
-        contentTV.setText(mWallPost.isRepost() ? mWallPost.getRepostedWallPost().getText() : mWallPost.getText());
+        contentTV.setText(wallPost.isRepost() ? wallPost.getRepostedWallPost().getText() : wallPost.getText());
     }
 
 
@@ -179,6 +186,9 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<CustomResponse> loader) { }
+
     /**
      * Данный метод обновляет header, который должен содержать информацию
      * о владельце стены, как которой была размещена запись.
@@ -205,6 +215,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         //Если запись является репостом, то отображаю еще и владельца стены, с которой был репост.
         if (groups.size() != 1) {
             Group forwardedGroup = groups.get(1);
+
             TextView forwardWallOwnerName = (TextView) header.findViewById(R.id.forwardWallOwnerNameTV);
             forwardWallOwnerName.setText(forwardedGroup.getName());
 
@@ -218,7 +229,4 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
                     .into(forwardWallOwnerAvatar);
         }
     }
-
-    @Override
-    public void onLoaderReset(Loader<CustomResponse> loader) { }
 }

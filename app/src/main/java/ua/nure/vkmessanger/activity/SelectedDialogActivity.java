@@ -1,5 +1,6 @@
 package ua.nure.vkmessanger.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -31,7 +32,7 @@ import ua.nure.vkmessanger.model.WallPost;
 public class SelectedDialogActivity extends AppCompatActivity
         implements SelectedDialogRecyclerAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
 
-    public static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
+    private static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
     /**
      * Константа, передаваемая в Bundle Loader-а при подгрузке истории сообщений.
@@ -42,6 +43,7 @@ public class SelectedDialogActivity extends AppCompatActivity
      */
     public static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
 
+
     /**
      * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
      */
@@ -51,6 +53,7 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     public static final int SEND_MESSAGE = 3;
 
+
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private List<Message> messages = new ArrayList<>();
@@ -58,6 +61,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     private SelectedDialogRecyclerAdapter adapter;
 
     private int dialogId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,12 @@ public class SelectedDialogActivity extends AppCompatActivity
         initRecyclerView();
         initSendMessageButton();
         getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
+    }
+
+    public static void newIntent(Context context, int dialogId){
+        Intent intent = new Intent(context, SelectedDialogActivity.class);
+        intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, dialogId);
+        context.startActivity(intent);
     }
 
     private void getDataFromIntent(Intent intent) {
@@ -105,9 +115,7 @@ public class SelectedDialogActivity extends AppCompatActivity
             if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
                 WallPost clickedPost = (WallPost) attachments[0].getBody();
 
-                Intent intent = new Intent(SelectedDialogActivity.this, WallPostActivity.class);
-                intent.putExtra(WallPostActivity.EXTRA_WALL_POST, clickedPost);
-                startActivity(intent);
+                WallPostActivity.newIntent(SelectedDialogActivity.this, clickedPost);
             }
         }
 
