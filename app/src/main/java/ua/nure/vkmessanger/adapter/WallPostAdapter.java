@@ -51,7 +51,7 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
     /**
      * Обработчик кликов по ссылке.
      */
-    private OnLinkClickListener mOnLinkClickListener;
+    private OnAttachmentsItemClickListener mOnAttachmentsItemClickListener;
 
 
     public WallPostAdapter(Context context, View header, @Nullable List<Photo> photos, @Nullable Link link) {
@@ -60,11 +60,13 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
         mHeader = header;
         mPhotos = photos;
         mLink = link;
-        mOnLinkClickListener = new OnLinkClickListener() {
+        mOnAttachmentsItemClickListener = new OnAttachmentsItemClickListener() {
             @Override
-            public void onLinkClick(Link link) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link.getURL()));
-                mContext.startActivity(intent);
+            public void onItemClick(int position) {
+                if (isLink(position)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mLink.getURL()));
+                    mContext.startActivity(intent);
+                }
             }
         };
     }
@@ -91,10 +93,10 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
     @Override
     public WallPostItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER_LAYOUT) {
-            return new WallPostItemViewHolder(mContext, mHeader, viewType, mOnLinkClickListener);
+            return new WallPostItemViewHolder(mContext, mHeader, viewType, mOnAttachmentsItemClickListener);
         }
         View view = mLayoutInflater.inflate(viewType, parent, false);
-        return new WallPostItemViewHolder(mContext, view, viewType, mOnLinkClickListener);
+        return new WallPostItemViewHolder(mContext, view, viewType, mOnAttachmentsItemClickListener);
     }
 
     @Override
@@ -121,11 +123,11 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
     }
 
 
-    static class WallPostItemViewHolder extends RecyclerView.ViewHolder {
+    static class WallPostItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Picasso mPicasso;
 
-        private OnLinkClickListener mLinkClickListener;
+        private OnAttachmentsItemClickListener mAttachmentsItemClickListener;
 
         //----------Photo----------//
 
@@ -140,10 +142,10 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
         private TextView mLinkDescriptionTV;
 
 
-        public WallPostItemViewHolder(Context context, View itemView, int viewType, OnLinkClickListener listener) {
+        public WallPostItemViewHolder(Context context, View itemView, int viewType, OnAttachmentsItemClickListener listener) {
             super(itemView);
             mPicasso = Picasso.with(context);
-            mLinkClickListener = listener;
+            mAttachmentsItemClickListener = listener;
 
             //Photo.
             if (viewType == TYPE_PHOTO_LAYOUT) {
@@ -156,6 +158,7 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
                 mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
                 mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
             }
+            itemView.setOnClickListener(this);
         }
 
         public void bindPhoto(int position, List<Photo> photos) {
@@ -170,26 +173,22 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
             }
             mLinkTitleTV.setText(link.getTitle());
             mLinkDescriptionTV.setText(link.getDescription());
-
-            View rootLinkView = mLinkImageView.getRootView();
-            if (!rootLinkView.hasOnClickListeners()) {
-                rootLinkView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mLinkClickListener.onLinkClick(link);
-                    }
-                });
-            }
         }
 
+        @Override
+        public void onClick(View v) {
+            if (mAttachmentsItemClickListener != null) {
+                mAttachmentsItemClickListener.onItemClick(getLayoutPosition());
+            }
+        }
     }
 
 
     /**
      * Слушатель кликов по ссылке Link.
      */
-    public interface OnLinkClickListener {
-        void onLinkClick(Link link);
+    public interface OnAttachmentsItemClickListener {
+        void onItemClick(int position);
     }
 
 }
