@@ -1,8 +1,6 @@
 package ua.nure.vkmessanger.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +22,7 @@ import ua.nure.vkmessanger.model.WallPost;
 /**
  * Адаптер для списка сообщений в выбранном диалоге.
  */
-public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<SelectedDialogRecyclerAdapter.SelectedDialogViewHolder> {
+public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAdapter.SelectedDialogViewHolder> {
 
     private static final int MESSAGE_FROM_USER_TYPE = R.layout.dialog_message_from_user_layout;
     private static final int MESSAGE_TO_USER_TYPE = R.layout.dialog_message_to_user_layout;
@@ -46,7 +44,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     private OnMessageClickListener mClickListener;
 
 
-    public SelectedDialogRecyclerAdapter(Context context, List<Message> messageList, OnMessageClickListener listener) {
+    public SelectedDialogAdapter(Context context, List<Message> messageList, OnMessageClickListener listener) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mMessageList = messageList;
