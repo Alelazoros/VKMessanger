@@ -2,6 +2,7 @@ package ua.nure.vkmessanger.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -26,6 +27,7 @@ import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.WallPost;
 
@@ -75,7 +77,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
     }
 
-    public static void newIntent(Context context, int dialogId){
+    public static void newIntent(Context context, int dialogId) {
         Intent intent = new Intent(context, SelectedDialogActivity.class);
         intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, dialogId);
         context.startActivity(intent);
@@ -107,23 +109,30 @@ public class SelectedDialogActivity extends AppCompatActivity
     private SelectedDialogRecyclerAdapter.OnMessageClickListener mMessageClickListener =
             new SelectedDialogRecyclerAdapter.OnMessageClickListener() {
 
-        @Override
-        public void onItemClick(int position) {
-            Message clickedMessage = messages.get(position);
-            Attachment[] attachments = clickedMessage.getAttachments();
+                @Override
+                public void onItemClick(int position) {
+                    Message clickedMessage = messages.get(position);
+                    Attachment[] attachments = clickedMessage.getAttachments();
 
-            if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
-                WallPost clickedPost = (WallPost) attachments[0].getBody();
+                    if (attachments == null || attachments[0] == null) {
+                        return;
+                    }
+                    if (attachments[0].isWallPost()) {
+                        WallPost clickedPost = (WallPost) attachments[0].getBody();
+                        WallPostActivity.newIntent(SelectedDialogActivity.this, clickedPost);
 
-                WallPostActivity.newIntent(SelectedDialogActivity.this, clickedPost);
-            }
-        }
+                    } else if (attachments[0].isLink()) {
+                        Link clickedLink = (Link) attachments[0].getBody();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickedLink.getURL()));
+                        startActivity(intent);
+                    }
+                }
 
-        @Override
-        public boolean onItemLongClick(int position) {
-            return true;
-        }
-    };
+                @Override
+                public boolean onItemLongClick(int position) {
+                    return true;
+                }
+            };
 
     private void initSendMessageButton() {
         Button sendButton = (Button) findViewById(R.id.btSendMessage);

@@ -1,17 +1,24 @@
 package ua.nure.vkmessanger.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.WallPost;
 
 /**
@@ -25,6 +32,11 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     private static final int WALL_POST_FROM_USER_TYPE = R.layout.dialog_message_wall_post_from_user;
     private static final int WALL_POST_TO_USER_TYPE = R.layout.dialog_message_wall_post_to_user;
 
+    private static final int TYPE_LINK_FROM_USER = R.layout.dialog_message_link_from_user;
+    private static final int TYPE_LINK_TO_USER = R.layout.dialog_message_link_to_user;
+
+    private Context mContext;
+
     private LayoutInflater mInflater;
 
     private List<Message> mMessageList;
@@ -35,10 +47,11 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
 
 
     public SelectedDialogRecyclerAdapter(Context context, List<Message> messageList, OnMessageClickListener listener) {
-        this.mInflater = LayoutInflater.from(context);
-        this.mMessageList = messageList;
-        this.mDialogEndListener = (OnDialogEndListener) context;
-        this.mClickListener = listener;
+        mContext = context;
+        mInflater = LayoutInflater.from(context);
+        mMessageList = messageList;
+        mDialogEndListener = (OnDialogEndListener) context;
+        mClickListener = listener;
         setHasStableIds(true);
     }
 
@@ -51,22 +64,33 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
         Message message = mMessageList.get(position);
         Attachment[] attachments = message.getAttachments();
 
-        boolean isWallPost = false;
-        if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
-            isWallPost = true;
+        if (attachments == null || attachments[0] == null || (!attachments[0].isWallPost() && !attachments[0].isLink())) {
+            return message.isFromMe() ? MESSAGE_FROM_USER_TYPE : MESSAGE_TO_USER_TYPE;
         }
 
+        boolean isWallPost = attachments[0].isWallPost();
+        boolean isLink = attachments[0].isLink();
+
         if (message.isFromMe()) {
-            return attachments != null && isWallPost ? WALL_POST_FROM_USER_TYPE : MESSAGE_FROM_USER_TYPE;
+            if (isWallPost) {
+                return WALL_POST_FROM_USER_TYPE;
+            } else if (isLink) {
+                return TYPE_LINK_FROM_USER;
+            }
         } else {
-            return attachments != null && isWallPost ? WALL_POST_TO_USER_TYPE : MESSAGE_TO_USER_TYPE;
+            if (isWallPost) {
+                return WALL_POST_FROM_USER_TYPE;
+            } else if (isLink) {
+                return TYPE_LINK_FROM_USER;
+            }
         }
+        return 0;
     }
 
     @Override
     public SelectedDialogViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(viewType, parent, false);
-        return new SelectedDialogViewHolder(view, mClickListener);
+        return new SelectedDialogViewHolder(mContext, view, viewType, mClickListener);
     }
 
     @Override
@@ -95,18 +119,45 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
     static class SelectedDialogViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
 
-        private TextView messageTV;
-
-        private TextView attachmentWallPostTitleTV;
+        private Picasso mPicasso;
 
         private OnMessageClickListener mClickListener;
 
-        public SelectedDialogViewHolder(View itemView, OnMessageClickListener listener) {
+        //-------Message text-----//
+
+        private TextView messageTV;
+
+        //---------Wall post------//
+
+        private TextView attachmentWallPostTitleTV;
+
+        //-----------Link---------//
+
+        private ImageView mLinkImageView;
+
+        private TextView mLinkTitleTV;
+
+        private TextView mLinkDescriptionTV;
+
+
+        public SelectedDialogViewHolder(Context context, View itemView, int viewType, OnMessageClickListener listener) {
             super(itemView);
-            messageTV = (TextView) itemView.findViewById(R.id.messageTextView);
-            attachmentWallPostTitleTV = (TextView) itemView.findViewById(R.id.messageAttachmentWallPostTV);
+            mPicasso = Picasso.with(context);
             mClickListener = listener;
 
+            //Message text.
+            messageTV = (TextView) itemView.findViewById(R.id.messageTextView);
+
+            //Wall post.
+            if (viewType == WALL_POST_FROM_USER_TYPE || viewType == WALL_POST_TO_USER_TYPE) {
+                attachmentWallPostTitleTV = (TextView) itemView.findViewById(R.id.messageAttachmentWallPostTV);
+            }
+            //Link.
+            if (viewType == TYPE_LINK_FROM_USER || viewType == TYPE_LINK_TO_USER) {
+                mLinkImageView = (ImageView) itemView.findViewById(R.id.linkImageView);
+                mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
+                mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
+            }
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -116,12 +167,30 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
             messageTV.setText(message.getMessageBody());
             Attachment[] attachments = message.getAttachments();
 
-            //TODO: пока что обрабатываю только записи на стене.
-            if (attachments != null && attachments[0] != null && attachments[0].isWallPost()) {
-                WallPost post = (WallPost) attachments[0].getBody();
-                attachmentWallPostTitleTV.setText(post.isRepost() ? post.getRepostedWallPost().getText() : post.getText());
+            //TODO: пока что обрабатываю только записи на стене и ссылки (Link).
+            if (attachments == null || attachments[0] == null) {
+                return;
+            }
+            if (attachments[0].isWallPost()) {
+                bindWallPost((WallPost) attachments[0].getBody());
+            } else if (attachments[0].isLink()) {
+                bindLink((Link) attachments[0].getBody());
             }
         }
+
+        private void bindWallPost(WallPost post) {
+            attachmentWallPostTitleTV.setText(post.isRepost() ? post.getRepostedWallPost().getText() : post.getText());
+        }
+
+        private void bindLink(final Link link) {
+            Photo linkPhoto = link.getPhoto();
+            if (linkPhoto != null) {
+                mPicasso.load(linkPhoto.getMaxSizePhotoURL()).into(mLinkImageView);
+            }
+            mLinkTitleTV.setText(link.getTitle());
+            mLinkDescriptionTV.setText(link.getDescription());
+        }
+
 
         @Override
         public void onClick(View v) {
@@ -148,6 +217,7 @@ public class SelectedDialogRecyclerAdapter extends RecyclerView.Adapter<Selected
          */
         void requestMoreMessages(int offsetCount);
     }
+
 
     public interface OnMessageClickListener {
 
