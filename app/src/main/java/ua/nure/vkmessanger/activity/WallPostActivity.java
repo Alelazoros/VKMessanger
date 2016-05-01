@@ -20,18 +20,16 @@ import com.squareup.picasso.Transformation;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import ua.nure.vkmessanger.R;
-import ua.nure.vkmessanger.adapter.WallPostPhotosAdapter;
+import ua.nure.vkmessanger.adapter.WallPostAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
-import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Photo;
@@ -66,7 +64,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         setWallPostContent(mHeader, mWallPost);
     }
 
-    public static void newIntent(Context context, WallPost post){
+    public static void newIntent(Context context, WallPost post) {
         Intent intent = new Intent(context, WallPostActivity.class);
         intent.putExtra(EXTRA_WALL_POST, post);
         context.startActivity(intent);
@@ -102,7 +100,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         boolean isSingleHeader = !mWallPost.isRepost();
         mHeader = inflateWallOwnersHeader(recyclerView, isSingleHeader);
 
-        final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos, link);
+        final WallPostAdapter adapter = new WallPostAdapter(this, mHeader, photos, link);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
 

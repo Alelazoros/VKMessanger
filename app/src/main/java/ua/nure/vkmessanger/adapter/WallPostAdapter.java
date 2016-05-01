@@ -1,11 +1,8 @@
 package ua.nure.vkmessanger.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Link;
@@ -28,7 +22,7 @@ import ua.nure.vkmessanger.model.Photo;
  * Адаптер также обеспечивает работу с Header-ом - заголовком, который
  * отображает владельца стены, на которой была размещена запись.
  */
-public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAdapter.PhotoViewHolder> {
+public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPostItemViewHolder> {
 
     private static final int TYPE_HEADER_LAYOUT = 1;
     private static final int TYPE_PHOTO_LAYOUT = R.layout.attachment_photo;
@@ -53,7 +47,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
     private Link mLink;
 
 
-    public WallPostPhotosAdapter(Context context, View header, @Nullable List<Photo> photos, @Nullable Link link) {
+    public WallPostAdapter(Context context, View header, @Nullable List<Photo> photos, @Nullable Link link) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
         mHeader = header;
@@ -81,16 +75,16 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
     }
 
     @Override
-    public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public WallPostItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER_LAYOUT) {
-            return new PhotoViewHolder(mHeader, mContext);
+            return new WallPostItemViewHolder(mHeader, mContext);
         }
         View view = mLayoutInflater.inflate(viewType, parent, false);
-        return new PhotoViewHolder(view, mContext);
+        return new WallPostItemViewHolder(view, mContext);
     }
 
     @Override
-    public void onBindViewHolder(PhotoViewHolder holder, int position) {
+    public void onBindViewHolder(WallPostItemViewHolder holder, int position) {
         if (isHeader(position)) {
             //because header logic is in Activity.
             return;
@@ -113,7 +107,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
     }
 
 
-    static class PhotoViewHolder extends RecyclerView.ViewHolder {
+    static class WallPostItemViewHolder extends RecyclerView.ViewHolder {
 
         private Picasso mPicasso;
 
@@ -130,7 +124,7 @@ public class WallPostPhotosAdapter extends RecyclerView.Adapter<WallPostPhotosAd
         private TextView mLinkDescriptionTV;
 
 
-        public PhotoViewHolder(View itemView, Context context) {
+        public WallPostItemViewHolder(View itemView, Context context) {
             super(itemView);
             mPicasso = Picasso.with(context);
 
