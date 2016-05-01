@@ -25,6 +25,7 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Group;
+import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.UserDialog;
@@ -55,6 +56,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 .client(CLIENT)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         return retrofit.create(RetrofitAPI.class);
     }
 
@@ -63,6 +65,7 @@ public class RESTRetrofitManager implements RESTInterface {
     public RESTRetrofitManager(Context context) {
         this.mContext = context;
     }
+
 
     @Override
     public CustomResponse loadUserDialogs() {
@@ -100,6 +103,37 @@ public class RESTRetrofitManager implements RESTInterface {
                         .setAnswer(dialogs);
             }
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return customResponseResult;
+    }
+
+
+    @Override
+    public CustomResponse sendMessageTo(String message, int peerId) {
+        RetrofitAPI api = getRetrofit();
+        Call<JsonElement> retrofitCall = api.sendMessage(VK_API_VERSION, peerId, message, AccessTokenManager.getAccessToken(mContext));
+
+        CustomResponse customResponseResult = new CustomResponse();
+        try {
+            //Sync request.
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            JsonObject responseObject = retrofitResponse.body().getAsJsonObject();
+
+            if (responseObject.has("response")) {
+                int messageId = responseObject.get("response").getAsInt();
+                Date date = new Date();
+                Attachment[] attachments = null;
+
+                //TODO: 3-й параметр(isRead) false - под вопросом.
+                customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                        .setAnswer(new Message(messageId, true, false, message, date, attachments));
+            }
+            else if (responseObject.has("error")) {
+                JsonElement errorObject = responseObject.get("error");
+                customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -152,6 +186,10 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
+
+    //----------Parse specified JSON objects--------//
+
+
     private Message parseMessage(JsonObject messageJSON) {
 
         int messageId = messageJSON.get("id").getAsInt();
@@ -186,6 +224,10 @@ public class RESTRetrofitManager implements RESTInterface {
                 case Attachment.TYPE_PHOTO:
                     Photo photo = parsePhoto(attachmentItemJson.getAsJsonObject("photo"));
                     attachments[j] = new Attachment(attachmentItemType, photo);
+                    break;
+                case Attachment.TYPE_LINK:
+                    Link link = parseLink(attachmentItemJson.getAsJsonObject("link"));
+                    attachments[j] = new Attachment(attachmentItemType, link);
                     break;
             }
             //TODO: сделать парсинг не только записей на стене.
@@ -267,37 +309,21 @@ public class RESTRetrofitManager implements RESTInterface {
                 postType, signerId, copyHistory, attachments);
     }
 
+    private Link parseLink(JsonObject linkJSONObject) {
+        String url = linkJSONObject.get("url").getAsString();
+        String title = linkJSONObject.get("title").getAsString();
+        String description = linkJSONObject.get("description").getAsString();
 
-    @Override
-    public CustomResponse sendMessageTo(String message, int peerId) {
-        RetrofitAPI api = getRetrofit();
-        Call<JsonElement> retrofitCall = api.sendMessage(VK_API_VERSION, peerId, message, AccessTokenManager.getAccessToken(mContext));
-
-        CustomResponse customResponseResult = new CustomResponse();
-        try {
-            //Sync request.
-            Response<JsonElement> retrofitResponse = retrofitCall.execute();
-            JsonObject responseObject = retrofitResponse.body().getAsJsonObject();
-
-            if (responseObject.has("response")) {
-                int messageId = responseObject.get("response").getAsInt();
-                Date date = new Date();
-                Attachment[] attachments = null;
-
-                //TODO: 3-й параметр(isRead) false - под вопросом.
-                customResponseResult.setRequestResult(RequestResult.SUCCESS)
-                        .setAnswer(new Message(messageId, true, false, message, date, attachments));
-            }
-            else if (responseObject.has("error")) {
-                JsonElement errorObject = responseObject.get("error");
-                customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        Photo photo = null;
+        if (linkJSONObject.has("photo")){
+            photo = parsePhoto(linkJSONObject.getAsJsonObject("photo"));
         }
-        return customResponseResult;
+
+        return new Link(url, title, description, photo);
     }
 
+
+    //---------------Groups------------//
 
     @Override
     public CustomResponse getGroupsInfoByIds(String[] groupIds) {

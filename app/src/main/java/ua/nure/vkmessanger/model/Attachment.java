@@ -15,6 +15,8 @@ public class Attachment<T> implements Serializable {
 
     public static final String TYPE_PHOTO = "photo";
 
+    public static final String TYPE_LINK = "link";
+
     private String type;
 
     private T body;
@@ -22,10 +24,6 @@ public class Attachment<T> implements Serializable {
     public Attachment(String type, T body) {
         this.type = type;
         this.body = body;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public T getBody() {
@@ -38,6 +36,10 @@ public class Attachment<T> implements Serializable {
 
     public boolean isPhoto() {
         return type.equals(TYPE_PHOTO);
+    }
+
+    public boolean isLink() {
+        return type.equals(TYPE_LINK);
     }
 
     @Override
