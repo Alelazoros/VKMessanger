@@ -33,6 +33,7 @@ import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Group;
+import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.WallPost;
 import ua.nure.vkmessanger.util.PicassoUtils;
@@ -89,7 +90,9 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
     private void initPhotosRecyclerView() {
         //At first - get list of photos from WallPost object.
-        List<Photo> photos = getPhotosFromWallPost(mWallPost);
+        List<Photo> photos = mWallPost.getPhotosAttachments();
+        //WallPost can also contains a Link.
+        Link link = mWallPost.getLink();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.wallPostAttachmentsRecyclerView);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -99,7 +102,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         boolean isSingleHeader = !mWallPost.isRepost();
         mHeader = inflateWallOwnersHeader(recyclerView, isSingleHeader);
 
-        final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos);
+        final WallPostPhotosAdapter adapter = new WallPostPhotosAdapter(this, mHeader, photos, link);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
 
@@ -111,18 +114,6 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         });
     }
 
-    private List<Photo> getPhotosFromWallPost(WallPost wallPost) {
-        List<Photo> photos = new ArrayList<>();
-        Attachment[] wallPostPhotosAttachments = wallPost.isRepost() ?
-                wallPost.getRepostedWallPost().getAttachments() : wallPost.getAttachments();
-
-        for (Attachment attachment : wallPostPhotosAttachments) {
-            if (attachment != null && attachment.isPhoto()) {
-                photos.add((Photo) attachment.getBody());
-            }
-        }
-        return photos;
-    }
 
     /**
      * @param isSingleHeader true - если данная запись не была репостом с другой стены,

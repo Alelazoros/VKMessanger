@@ -18,4 +18,5 @@
     <string name="wall_post">Запись на стене</string>
     <string name="send_message_hint">Message text …</string>
     <string name="button_send_message_text">Send</string>
+    <string name="link_image_view_content_desc">Фото заголовка</string>
 </resources>

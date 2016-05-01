@@ -3,8 +3,10 @@ package ua.nure.vkmessanger.model;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Объект записи на стене.
@@ -114,6 +116,34 @@ public class WallPost implements Serializable {
     @Nullable
     public WallPost getRepostedWallPost(){
         return mCopyHistory != null ? mCopyHistory[0] : null;
+    }
+
+
+    //----------------------------//
+
+    @Nullable
+    public List<Photo> getPhotosAttachments() {
+        List<Photo> photos = new ArrayList<>();
+        Attachment[] wallPostAttachments = isRepost() ? getRepostedWallPost().getAttachments() : getAttachments();
+
+        for (Attachment attachment : wallPostAttachments) {
+            if (attachment != null && attachment.isPhoto()) {
+                photos.add((Photo) attachment.getBody());
+            }
+        }
+        return photos;
+    }
+
+    @Nullable
+    public Link getLink(){
+        Attachment[] wallPostAttachments = isRepost() ? getRepostedWallPost().getAttachments() : getAttachments();
+
+        for (Attachment attachment : wallPostAttachments) {
+            if (attachment != null && attachment.isLink()) {
+                return (Link) attachment.getBody();
+            }
+        }
+        return null;
     }
 
     @Override
