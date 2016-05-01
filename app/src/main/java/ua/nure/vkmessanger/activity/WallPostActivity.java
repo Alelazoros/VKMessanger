@@ -107,7 +107,7 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return adapter.isHeader(position) ? layoutManager.getSpanCount() : 1;
+                return adapter.isHeader(position) || adapter.isLink(position) ? layoutManager.getSpanCount() : 1;
             }
         });
     }
