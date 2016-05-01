@@ -1,6 +1,8 @@
 package ua.nure.vkmessanger.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,7 +20,7 @@ import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Photo;
 
 /**
- * Адаптер для списка фотографий, которые приклеплены к записи на стене.
+ * Адаптер для списка фотографий и ссылок ('link'), которые приклеплены к записи на стене.
  * Адаптер также обеспечивает работу с Header-ом - заголовком, который
  * отображает владельца стены, на которой была размещена запись.
  */
@@ -46,6 +48,11 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
     @Nullable
     private Link mLink;
 
+    /**
+     * Обработчик кликов по ссылке.
+     */
+    private OnLinkClickListener mOnLinkClickListener;
+
 
     public WallPostAdapter(Context context, View header, @Nullable List<Photo> photos, @Nullable Link link) {
         mContext = context;
@@ -53,6 +60,13 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
         mHeader = header;
         mPhotos = photos;
         mLink = link;
+        mOnLinkClickListener = new OnLinkClickListener() {
+            @Override
+            public void onLinkClick(Link link) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link.getURL()));
+                mContext.startActivity(intent);
+            }
+        };
     }
 
     public boolean isHeader(int position) {
@@ -77,10 +91,10 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
     @Override
     public WallPostItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER_LAYOUT) {
-            return new WallPostItemViewHolder(mHeader, mContext);
+            return new WallPostItemViewHolder(mContext, mHeader, viewType, mOnLinkClickListener);
         }
         View view = mLayoutInflater.inflate(viewType, parent, false);
-        return new WallPostItemViewHolder(view, mContext);
+        return new WallPostItemViewHolder(mContext, view, viewType, mOnLinkClickListener);
     }
 
     @Override
@@ -111,6 +125,8 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
 
         private Picasso mPicasso;
 
+        private OnLinkClickListener mLinkClickListener;
+
         //----------Photo----------//
 
         private ImageView mPhotoImageView;
@@ -124,17 +140,22 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
         private TextView mLinkDescriptionTV;
 
 
-        public WallPostItemViewHolder(View itemView, Context context) {
+        public WallPostItemViewHolder(Context context, View itemView, int viewType, OnLinkClickListener listener) {
             super(itemView);
             mPicasso = Picasso.with(context);
+            mLinkClickListener = listener;
 
             //Photo.
-            mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
+            if (viewType == TYPE_PHOTO_LAYOUT) {
+                mPhotoImageView = (ImageView) itemView.findViewById(R.id.attachmentPhotoImageView);
+            }
 
             //Link.
-            mLinkImageView = (ImageView) itemView.findViewById(R.id.linkImageView);
-            mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
-            mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
+            if (viewType == TYPE_LINK_LAYOUT) {
+                mLinkImageView = (ImageView) itemView.findViewById(R.id.linkImageView);
+                mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
+                mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
+            }
         }
 
         public void bindPhoto(int position, List<Photo> photos) {
@@ -142,13 +163,33 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
             mPicasso.load(photoURL).into(mPhotoImageView);
         }
 
-        public void bindLink(Link link) {
+        public void bindLink(final Link link) {
             Photo linkPhoto = link.getPhoto();
             if (linkPhoto != null) {
                 mPicasso.load(linkPhoto.getMaxSizePhotoURL()).into(mLinkImageView);
             }
             mLinkTitleTV.setText(link.getTitle());
             mLinkDescriptionTV.setText(link.getDescription());
+
+            View rootLinkView = mLinkImageView.getRootView();
+            if (!rootLinkView.hasOnClickListeners()) {
+                rootLinkView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mLinkClickListener.onLinkClick(link);
+                    }
+                });
+            }
         }
+
     }
+
+
+    /**
+     * Слушатель кликов по ссылке Link.
+     */
+    public interface OnLinkClickListener {
+        void onLinkClick(Link link);
+    }
+
 }
