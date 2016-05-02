@@ -333,7 +333,23 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     private Audio parseAudio(JsonObject audioJSONObject) {
-        return null;
+
+        int id = audioJSONObject.get("id").getAsInt();
+        int ownerId = audioJSONObject.get("owner_id").getAsInt();
+        String artist = audioJSONObject.get("artist").getAsString();
+        String title = audioJSONObject.get("title").getAsString();
+        int duration = audioJSONObject.get("duration").getAsInt();
+        String mp3Url = audioJSONObject.get("url").getAsString();
+        Date dateAdded = new Date(audioJSONObject.get("date").getAsLong() * 1000);
+
+        //Необязательный параметры.
+        int lyricsId = audioJSONObject.has("lyrics_id") ? audioJSONObject.get("lyrics_id").getAsInt() : -1;
+        int albumId = audioJSONObject.has("album_id") ? audioJSONObject.get("album_id").getAsInt() : -1;
+        int genreId = audioJSONObject.has("genre_id") ? audioJSONObject.get("genre_id").getAsInt() : -1;
+        boolean noSearch = audioJSONObject.has("no_search") && audioJSONObject.get("no_search").getAsBoolean();
+
+        return new Audio(id, ownerId, artist, title, duration, mp3Url, dateAdded,
+                lyricsId, albumId, genreId, noSearch);
     }
 
     private Video parseVideo(JsonObject videoJSONObject) {
