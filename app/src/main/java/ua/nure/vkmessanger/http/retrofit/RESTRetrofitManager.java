@@ -353,7 +353,34 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     private Video parseVideo(JsonObject videoJSONObject) {
-        return null;
+
+        int id = videoJSONObject.get("id").getAsInt();
+        int ownerId = videoJSONObject.get("owner_id").getAsInt();
+        String title = videoJSONObject.get("title").getAsString();
+        String description = videoJSONObject.get("description").getAsString();
+        int duration = videoJSONObject.get("duration").getAsInt();
+
+        String photo130 = videoJSONObject.has("photo_130") ? videoJSONObject.get("photo_130").getAsString() : null;
+        String photo320 = videoJSONObject.has("photo_320") ? videoJSONObject.get("photo_320").getAsString() : null;
+        String photo640 = videoJSONObject.has("photo_640") ? videoJSONObject.get("photo_640").getAsString() : null;
+        String photo800 = videoJSONObject.has("photo_800") ? videoJSONObject.get("photo_800").getAsString() : null;
+
+        Date dateCreated = new Date(videoJSONObject.get("date").getAsLong() * 1000);
+        Date dateAdding = videoJSONObject.has("adding_date") ?
+                new Date(videoJSONObject.get("adding_date").getAsLong() * 1000) : dateCreated;
+
+        int viewsCount = videoJSONObject.get("views").getAsInt();
+        int commentsCount = videoJSONObject.get("comments").getAsInt();
+        String playerUrl = videoJSONObject.has("player") ? videoJSONObject.get("player").getAsString() : null;
+
+        String accessKey = videoJSONObject.get("access_key").getAsString();
+
+        boolean processing = videoJSONObject.has("processing") && videoJSONObject.get("processing").getAsBoolean();
+        boolean liveSteam = videoJSONObject.has("live") && videoJSONObject.get("live").getAsBoolean();
+
+        return new Video(id, ownerId, title, description, duration,
+                photo130, photo320, photo640, photo800, dateCreated, dateAdding,
+                viewsCount, commentsCount, playerUrl, accessKey, processing, liveSteam);
     }
 
 
