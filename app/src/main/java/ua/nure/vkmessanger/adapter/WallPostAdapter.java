@@ -28,7 +28,7 @@ public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPo
 
     private static final int TYPE_HEADER_LAYOUT = 1;
     private static final int TYPE_PHOTO_LAYOUT = R.layout.attachment_photo;
-    private static final int TYPE_LINK_LAYOUT = R.layout.link_layout;
+    private static final int TYPE_LINK_LAYOUT = R.layout.link_layout_wall_post;
 
     private Context mContext;
 

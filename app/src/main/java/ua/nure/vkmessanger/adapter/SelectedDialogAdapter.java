@@ -131,8 +131,6 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
 
         //-----------Link---------//
 
-        private ImageView mLinkImageView;
-
         private TextView mLinkTitleTV;
 
         private TextView mLinkDescriptionTV;
@@ -152,7 +150,6 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
             }
             //Link.
             if (viewType == TYPE_LINK_FROM_USER || viewType == TYPE_LINK_TO_USER) {
-                mLinkImageView = (ImageView) itemView.findViewById(R.id.linkImageView);
                 mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
                 mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
             }
@@ -181,10 +178,6 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
         }
 
         private void bindLink(final Link link) {
-            Photo linkPhoto = link.getPhoto();
-            if (linkPhoto != null) {
-                mPicasso.load(linkPhoto.getMaxSizePhotoURL()).into(mLinkImageView);
-            }
             mLinkTitleTV.setText(link.getTitle());
             mLinkDescriptionTV.setText(link.getDescription());
         }
