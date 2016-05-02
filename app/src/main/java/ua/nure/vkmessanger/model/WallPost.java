@@ -76,11 +76,11 @@ public class WallPost implements Serializable {
     }
 
     public int getWallOwnerId() {
-        return mWallOwnerId;
+        return Math.abs(mWallOwnerId);
     }
 
     public int getWallAuthorId() {
-        return mWallAuthorId;
+        return Math.abs(mWallAuthorId);
     }
 
     public Date getDate() {

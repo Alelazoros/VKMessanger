@@ -128,12 +128,12 @@ public class WallPostActivity extends AppCompatActivity implements LoaderManager
 
         int countGroups = wallPost.isRepost() ? 2 : 1;
         String[] groupsIds = new String[countGroups];
-        groupsIds[0] = String.valueOf(Math.abs(wallPost.getWallOwnerId()));
+        groupsIds[0] = String.valueOf(wallPost.getWallOwnerId());
 
         //Если запись является репостом.
         WallPost[] copyHistory = wallPost.getCopyHistory();
         for (int i = 1; i < groupsIds.length; i++) {
-            groupsIds[i] = String.valueOf(Math.abs(copyHistory[i - 1].getWallOwnerId()));
+            groupsIds[i] = String.valueOf(copyHistory[i - 1].getWallOwnerId());
         }
 
         args.putStringArray(GROUPS_LOADER_BUNDLE_ARGUMENT, groupsIds);
