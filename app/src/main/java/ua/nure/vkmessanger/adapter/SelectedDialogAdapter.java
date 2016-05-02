@@ -10,10 +10,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Audio;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
@@ -32,6 +34,9 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
 
     private static final int TYPE_LINK_FROM_USER = R.layout.dialog_message_link_from_user;
     private static final int TYPE_LINK_TO_USER = R.layout.dialog_message_link_to_user;
+
+    private static final int TYPE_AUDIO_FROM_USER = R.layout.audio_list_container_from_user_layout;
+    private static final int TYPE_AUDIO_TO_USER = R.layout.audio_list_container_to_user_layout;
 
     private Context mContext;
 
@@ -62,24 +67,29 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
         Message message = mMessageList.get(position);
         Attachment[] attachments = message.getAttachments();
 
-        if (attachments == null || attachments[0] == null || (!attachments[0].isWallPost() && !attachments[0].isLink())) {
+        if (attachments == null || attachments[0] == null || (!attachments[0].isWallPost() && !attachments[0].isLink() && !attachments[0].isAudio())) {
             return message.isFromMe() ? MESSAGE_FROM_USER_TYPE : MESSAGE_TO_USER_TYPE;
         }
 
         boolean isWallPost = attachments[0].isWallPost();
         boolean isLink = attachments[0].isLink();
+        boolean isAudio = attachments[0].isAudio();
 
         if (message.isFromMe()) {
             if (isWallPost) {
                 return WALL_POST_FROM_USER_TYPE;
             } else if (isLink) {
                 return TYPE_LINK_FROM_USER;
+            } else if (isAudio) {
+                return TYPE_AUDIO_FROM_USER;
             }
         } else {
             if (isWallPost) {
                 return WALL_POST_FROM_USER_TYPE;
             } else if (isLink) {
                 return TYPE_LINK_FROM_USER;
+            } else if (isAudio) {
+                return TYPE_AUDIO_TO_USER;
             }
         }
         return 0;
@@ -117,7 +127,7 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
     static class SelectedDialogViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
 
-        private Picasso mPicasso;
+        private LayoutInflater mInflater;
 
         private OnMessageClickListener mClickListener;
 
@@ -135,10 +145,14 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
 
         private TextView mLinkDescriptionTV;
 
+        //----------Audio--------//
+
+        private ViewGroup mAudioItemsContainer;
+
 
         public SelectedDialogViewHolder(Context context, View itemView, int viewType, OnMessageClickListener listener) {
             super(itemView);
-            mPicasso = Picasso.with(context);
+            mInflater = LayoutInflater.from(context);
             mClickListener = listener;
 
             //Message text.
@@ -152,6 +166,9 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
             if (viewType == TYPE_LINK_FROM_USER || viewType == TYPE_LINK_TO_USER) {
                 mLinkTitleTV = (TextView) itemView.findViewById(R.id.linkTitleTV);
                 mLinkDescriptionTV = (TextView) itemView.findViewById(R.id.linkDescriptionTV);
+            }
+            if (viewType == TYPE_AUDIO_FROM_USER || viewType == TYPE_AUDIO_TO_USER) {
+                mAudioItemsContainer = (ViewGroup) itemView.findViewById(R.id.audioItemsContainer);
             }
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -170,6 +187,29 @@ public class SelectedDialogAdapter extends RecyclerView.Adapter<SelectedDialogAd
                 bindWallPost((WallPost) attachments[0].getBody());
             } else if (attachments[0].isLink()) {
                 bindLink((Link) attachments[0].getBody());
+            } else if (attachments[0].isAudio()) {
+                List<Audio> audios = new ArrayList<>();
+                for (Attachment a : attachments) {
+                    if (a.isAudio()) {
+                        audios.add((Audio) a.getBody());
+                    }
+                }
+                bindAudios(audios);
+            }
+        }
+
+        private void bindAudios(List<Audio> audios) {
+            mAudioItemsContainer.removeAllViews();
+            for (Audio audio : audios) {
+                View audioItemView = mInflater.inflate(R.layout.audio_item_layout, null);
+
+                TextView artistNameTV = (TextView) audioItemView.findViewById(R.id.artistNameTV);
+                artistNameTV.setText(audio.getArtist());
+
+                TextView audioNameTV = (TextView) audioItemView.findViewById(R.id.audioNameTV);
+                audioNameTV.setText(audio.getTitle());
+
+                mAudioItemsContainer.addView(audioItemView);
             }
         }
 

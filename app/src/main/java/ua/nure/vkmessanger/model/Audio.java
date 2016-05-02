@@ -76,4 +76,12 @@ public class Audio implements Serializable {
         mGenreId = genreId;
         mNoSearch = noSearch;
     }
+
+    public String getArtist() {
+        return mArtist;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
 }
