@@ -34,6 +34,10 @@ public class Attachment<T> implements Serializable {
         return body;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public boolean isWallPost() {
         return type.equals(TYPE_WALL_POST);
     }

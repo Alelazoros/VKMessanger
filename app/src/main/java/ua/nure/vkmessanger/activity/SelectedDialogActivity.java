@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
-import ua.nure.vkmessanger.adapter.SelectedDialogAdapter;
+import ua.nure.vkmessanger.adapter.DialogAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
@@ -31,7 +31,7 @@ import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.WallPost;
 
 public class SelectedDialogActivity extends AppCompatActivity
-        implements SelectedDialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
+        implements DialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
 
     private static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
 
@@ -59,7 +59,7 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private List<Message> messages = new ArrayList<>();
 
-    private SelectedDialogAdapter adapter;
+    private DialogAdapter adapter;
 
     private int dialogId;
 
@@ -99,14 +99,14 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void initRecyclerView() {
-        adapter = new SelectedDialogAdapter(this, messages, mMessageClickListener);
+        adapter = new DialogAdapter(this, messages, mMessageClickListener);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);
     }
 
-    private SelectedDialogAdapter.OnMessageClickListener mMessageClickListener =
-            new SelectedDialogAdapter.OnMessageClickListener() {
+    private DialogAdapter.OnMessageClickListener mMessageClickListener =
+            new DialogAdapter.OnMessageClickListener() {
 
                 @Override
                 public void onItemClick(int position) {
@@ -145,7 +145,7 @@ public class SelectedDialogActivity extends AppCompatActivity
 
 
     /**
-     * Метод определен в интерфейсе SelectedDialogAdapter.OnDialogEndListener и
+     * Метод определен в интерфейсе DialogAdapter.OnDialogEndListener и
      * обеспечивает подгрузку большего количества сообщений.
      */
     @Override

@@ -52,4 +52,8 @@ public class Message {
     public Attachment[] getAttachments() {
         return mAttachments;
     }
+
+    public boolean hasAttachments(){
+        return mAttachments != null;
+    }
 }
