@@ -24,11 +24,13 @@ import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Audio;
 import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
 import ua.nure.vkmessanger.model.UserDialog;
+import ua.nure.vkmessanger.model.Video;
 import ua.nure.vkmessanger.model.WallPost;
 
 /**
@@ -129,8 +131,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 //TODO: 3-й параметр(isRead) false - под вопросом.
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
                         .setAnswer(new Message(messageId, true, false, message, date, attachments));
-            }
-            else if (responseObject.has("error")) {
+            } else if (responseObject.has("error")) {
                 JsonElement errorObject = responseObject.get("error");
                 customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
             }
@@ -162,7 +163,8 @@ public class RESTRetrofitManager implements RESTInterface {
                     if (!responseBody.has("response")) {
                         return new CustomResponse();    //ResultResponse.ERROR by default.
                     }
-                } catch (NullPointerException ignored) { }    //Не понимаю, как, но иногда вылетает.
+                } catch (NullPointerException ignored) {
+                }    //Не понимаю, как, но иногда вылетает.
 
                 List<Message> messages = new ArrayList<>();
 
@@ -202,7 +204,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         //Читаю данные о вложениях сообщений.
         Attachment[] attachments = null;
-        if (messageJSON.has("attachments")){
+        if (messageJSON.has("attachments")) {
             attachments = parseAttachments(messageJSON.getAsJsonArray("attachments"));
         }
         return new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments);
@@ -216,18 +218,26 @@ public class RESTRetrofitManager implements RESTInterface {
             JsonObject attachmentItemJson = attachmentsJSONArray.get(j).getAsJsonObject();
             String attachmentItemType = attachmentItemJson.get("type").getAsString();
 
-            switch (attachmentItemType){
+            switch (attachmentItemType) {
                 case Attachment.TYPE_WALL_POST:
-                    WallPost wallPost = parseWallPost(attachmentItemJson.getAsJsonObject("wall"));
+                    WallPost wallPost = parseWallPost(attachmentItemJson.getAsJsonObject(Attachment.TYPE_WALL_POST));
                     attachments[j] = new Attachment(attachmentItemType, wallPost);
                     break;
                 case Attachment.TYPE_PHOTO:
-                    Photo photo = parsePhoto(attachmentItemJson.getAsJsonObject("photo"));
+                    Photo photo = parsePhoto(attachmentItemJson.getAsJsonObject(Attachment.TYPE_PHOTO));
                     attachments[j] = new Attachment(attachmentItemType, photo);
                     break;
                 case Attachment.TYPE_LINK:
-                    Link link = parseLink(attachmentItemJson.getAsJsonObject("link"));
+                    Link link = parseLink(attachmentItemJson.getAsJsonObject(Attachment.TYPE_LINK));
                     attachments[j] = new Attachment(attachmentItemType, link);
+                    break;
+                case Attachment.TYPE_AUDIO:
+                    Audio audio = parseAudio(attachmentItemJson.getAsJsonObject(Attachment.TYPE_AUDIO));
+                    attachments[j] = new Attachment(attachmentItemType, audio);
+                    break;
+                case Attachment.TYPE_VIDEO:
+                    Video video = parseVideo(attachmentItemJson.getAsJsonObject(Attachment.TYPE_VIDEO));
+                    attachments[j] = new Attachment(attachmentItemType, video);
                     break;
             }
             //TODO: сделать парсинг не только записей на стене.
@@ -255,7 +265,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         int width = 0;
         int height = 0;
-        if (photoJSONObject.has("width")){
+        if (photoJSONObject.has("width")) {
             width = photoJSONObject.get("width").getAsInt();
             height = photoJSONObject.get("height").getAsInt();
         }
@@ -284,7 +294,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         //Если запись является репостом.
         WallPost[] copyHistory = null;
-        if (wallPostJSONObject.has("copy_history")){
+        if (wallPostJSONObject.has("copy_history")) {
 
             JsonArray copyHistoryArray = wallPostJSONObject.getAsJsonArray("copy_history");
             copyHistory = new WallPost[copyHistoryArray.size()];
@@ -296,7 +306,7 @@ public class RESTRetrofitManager implements RESTInterface {
         }
 
         Attachment[] attachments = null;
-        if (wallPostJSONObject.has("attachments")){
+        if (wallPostJSONObject.has("attachments")) {
             attachments = parseAttachments(wallPostJSONObject.getAsJsonArray("attachments"));
         }
 
@@ -315,16 +325,34 @@ public class RESTRetrofitManager implements RESTInterface {
         String description = linkJSONObject.get("description").getAsString();
 
         Photo photo = null;
-        if (linkJSONObject.has("photo")){
+        if (linkJSONObject.has("photo")) {
             photo = parsePhoto(linkJSONObject.getAsJsonObject("photo"));
         }
 
         return new Link(url, title, description, photo);
     }
 
+    private Audio parseAudio(JsonObject audioJSONObject) {
+        return null;
+    }
+
+    private Video parseVideo(JsonObject videoJSONObject) {
+        return null;
+    }
+
+
 
     //---------------Groups------------//
 
+    /**
+     * Метод в данный момент используется для получения информации для заголовка (header)
+     * в WallPostActivity.
+     *
+     * @param groupIds id групп, для которых нужно получить информацию.
+     *                 Передаю не int[], а String[], т.к. можно передавать
+     *                 не только целочисленные id, а вместо этого передать
+     *                 короткий адрес сообщества (url), например 'tproger', вместо его id.
+     */
     @Override
     public CustomResponse getGroupsInfoByIds(String[] groupIds) {
         RetrofitAPI api = getRetrofit();
@@ -362,11 +390,11 @@ public class RESTRetrofitManager implements RESTInterface {
     /**
      * @param groupIds массив id или screen_name групп, для которых необходимо получить информацию.
      * @return строка, содержащая все элементы массива, разделенные запятыми.
-     *
+     * <p>
      * (во входящем массиве обязательно должен быть хотя бы один элемент).
      */
-    private String generateGroupsIdsStringParamFromArray(@NonNull String[] groupIds){
-        if (groupIds.length == 1){
+    private String generateGroupsIdsStringParamFromArray(@NonNull String[] groupIds) {
+        if (groupIds.length == 1) {
             return groupIds[0];
         }
         StringBuilder sb = new StringBuilder();

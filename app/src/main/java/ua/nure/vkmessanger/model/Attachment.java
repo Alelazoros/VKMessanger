@@ -17,6 +17,10 @@ public class Attachment<T> implements Serializable {
 
     public static final String TYPE_LINK = "link";
 
+    public static final String TYPE_AUDIO = "audio";
+
+    public static final String TYPE_VIDEO = "video";
+
     private String type;
 
     private T body;
@@ -40,6 +44,14 @@ public class Attachment<T> implements Serializable {
 
     public boolean isLink() {
         return type.equals(TYPE_LINK);
+    }
+
+    public boolean isAudio() {
+        return type.equals(TYPE_AUDIO);
+    }
+
+    public boolean isVideo() {
+        return type.equals(TYPE_VIDEO);
     }
 
     @Override
