@@ -25,6 +25,7 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Audio;
+import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
@@ -219,28 +220,31 @@ public class RESTRetrofitManager implements RESTInterface {
             String attachmentItemType = attachmentItemJson.get("type").getAsString();
 
             switch (attachmentItemType) {
-                case Attachment.TYPE_WALL_POST:
-                    WallPost wallPost = parseWallPost(attachmentItemJson.getAsJsonObject(Attachment.TYPE_WALL_POST));
-                    attachments[j] = new Attachment(attachmentItemType, wallPost);
-                    break;
                 case Attachment.TYPE_PHOTO:
                     Photo photo = parsePhoto(attachmentItemJson.getAsJsonObject(Attachment.TYPE_PHOTO));
                     attachments[j] = new Attachment(attachmentItemType, photo);
-                    break;
-                case Attachment.TYPE_LINK:
-                    Link link = parseLink(attachmentItemJson.getAsJsonObject(Attachment.TYPE_LINK));
-                    attachments[j] = new Attachment(attachmentItemType, link);
-                    break;
-                case Attachment.TYPE_AUDIO:
-                    Audio audio = parseAudio(attachmentItemJson.getAsJsonObject(Attachment.TYPE_AUDIO));
-                    attachments[j] = new Attachment(attachmentItemType, audio);
                     break;
                 case Attachment.TYPE_VIDEO:
                     Video video = parseVideo(attachmentItemJson.getAsJsonObject(Attachment.TYPE_VIDEO));
                     attachments[j] = new Attachment(attachmentItemType, video);
                     break;
+                case Attachment.TYPE_AUDIO:
+                    Audio audio = parseAudio(attachmentItemJson.getAsJsonObject(Attachment.TYPE_AUDIO));
+                    attachments[j] = new Attachment(attachmentItemType, audio);
+                    break;
+                case Attachment.TYPE_DOC:
+                    Document doc = parseDocument(attachmentItemJson.getAsJsonObject(Attachment.TYPE_DOC));
+                    attachments[j] = new Attachment(attachmentItemType, doc);
+                    break;
+                case Attachment.TYPE_LINK:
+                    Link link = parseLink(attachmentItemJson.getAsJsonObject(Attachment.TYPE_LINK));
+                    attachments[j] = new Attachment(attachmentItemType, link);
+                    break;
+                case Attachment.TYPE_WALL_POST:
+                    WallPost wallPost = parseWallPost(attachmentItemJson.getAsJsonObject(Attachment.TYPE_WALL_POST));
+                    attachments[j] = new Attachment(attachmentItemType, wallPost);
+                    break;
             }
-            //TODO: сделать парсинг не только записей на стене.
         }
         return attachments;
     }
@@ -276,6 +280,74 @@ public class RESTRetrofitManager implements RESTInterface {
                 photo75, photo130, photo604, photo807, photo1280, photo2560,
                 width, height
         );
+    }
+
+    private Video parseVideo(JsonObject videoJSONObject) {
+
+        int id = videoJSONObject.get("id").getAsInt();
+        int ownerId = videoJSONObject.get("owner_id").getAsInt();
+        String title = videoJSONObject.get("title").getAsString();
+        String description = videoJSONObject.get("description").getAsString();
+        int duration = videoJSONObject.get("duration").getAsInt();
+
+        String photo130 = videoJSONObject.has("photo_130") ? videoJSONObject.get("photo_130").getAsString() : null;
+        String photo320 = videoJSONObject.has("photo_320") ? videoJSONObject.get("photo_320").getAsString() : null;
+        String photo640 = videoJSONObject.has("photo_640") ? videoJSONObject.get("photo_640").getAsString() : null;
+        String photo800 = videoJSONObject.has("photo_800") ? videoJSONObject.get("photo_800").getAsString() : null;
+
+        Date dateCreated = new Date(videoJSONObject.get("date").getAsLong() * 1000);
+        Date dateAdding = videoJSONObject.has("adding_date") ?
+                new Date(videoJSONObject.get("adding_date").getAsLong() * 1000) : dateCreated;
+
+        int viewsCount = videoJSONObject.get("views").getAsInt();
+        int commentsCount = videoJSONObject.get("comments").getAsInt();
+        String playerUrl = videoJSONObject.has("player") ? videoJSONObject.get("player").getAsString() : null;
+
+        String accessKey = videoJSONObject.get("access_key").getAsString();
+
+        boolean processing = videoJSONObject.has("processing") && videoJSONObject.get("processing").getAsBoolean();
+        boolean liveSteam = videoJSONObject.has("live") && videoJSONObject.get("live").getAsBoolean();
+
+        return new Video(id, ownerId, title, description, duration,
+                photo130, photo320, photo640, photo800, dateCreated, dateAdding,
+                viewsCount, commentsCount, playerUrl, accessKey, processing, liveSteam);
+    }
+
+    private Audio parseAudio(JsonObject audioJSONObject) {
+
+        int id = audioJSONObject.get("id").getAsInt();
+        int ownerId = audioJSONObject.get("owner_id").getAsInt();
+        String artist = audioJSONObject.get("artist").getAsString();
+        String title = audioJSONObject.get("title").getAsString();
+        int duration = audioJSONObject.get("duration").getAsInt();
+        String mp3Url = audioJSONObject.get("url").getAsString();
+        Date dateAdded = new Date(audioJSONObject.get("date").getAsLong() * 1000);
+
+        //Необязательный параметры.
+        int lyricsId = audioJSONObject.has("lyrics_id") ? audioJSONObject.get("lyrics_id").getAsInt() : -1;
+        int albumId = audioJSONObject.has("album_id") ? audioJSONObject.get("album_id").getAsInt() : -1;
+        int genreId = audioJSONObject.has("genre_id") ? audioJSONObject.get("genre_id").getAsInt() : -1;
+        boolean noSearch = audioJSONObject.has("no_search") && audioJSONObject.get("no_search").getAsBoolean();
+
+        return new Audio(id, ownerId, artist, title, duration, mp3Url, dateAdded,
+                lyricsId, albumId, genreId, noSearch);
+    }
+
+    private Document parseDocument(JsonObject docJSONObject) {
+        return new Document();
+    }
+
+    private Link parseLink(JsonObject linkJSONObject) {
+        String url = linkJSONObject.get("url").getAsString();
+        String title = linkJSONObject.get("title").getAsString();
+        String description = linkJSONObject.get("description").getAsString();
+
+        Photo photo = null;
+        if (linkJSONObject.has("photo")) {
+            photo = parsePhoto(linkJSONObject.getAsJsonObject("photo"));
+        }
+
+        return new Link(url, title, description, photo);
     }
 
     private WallPost parseWallPost(JsonObject wallPostJSONObject) {
@@ -317,70 +389,6 @@ public class RESTRetrofitManager implements RESTInterface {
                 postCreatedDate,
                 postText,
                 postType, signerId, copyHistory, attachments);
-    }
-
-    private Link parseLink(JsonObject linkJSONObject) {
-        String url = linkJSONObject.get("url").getAsString();
-        String title = linkJSONObject.get("title").getAsString();
-        String description = linkJSONObject.get("description").getAsString();
-
-        Photo photo = null;
-        if (linkJSONObject.has("photo")) {
-            photo = parsePhoto(linkJSONObject.getAsJsonObject("photo"));
-        }
-
-        return new Link(url, title, description, photo);
-    }
-
-    private Audio parseAudio(JsonObject audioJSONObject) {
-
-        int id = audioJSONObject.get("id").getAsInt();
-        int ownerId = audioJSONObject.get("owner_id").getAsInt();
-        String artist = audioJSONObject.get("artist").getAsString();
-        String title = audioJSONObject.get("title").getAsString();
-        int duration = audioJSONObject.get("duration").getAsInt();
-        String mp3Url = audioJSONObject.get("url").getAsString();
-        Date dateAdded = new Date(audioJSONObject.get("date").getAsLong() * 1000);
-
-        //Необязательный параметры.
-        int lyricsId = audioJSONObject.has("lyrics_id") ? audioJSONObject.get("lyrics_id").getAsInt() : -1;
-        int albumId = audioJSONObject.has("album_id") ? audioJSONObject.get("album_id").getAsInt() : -1;
-        int genreId = audioJSONObject.has("genre_id") ? audioJSONObject.get("genre_id").getAsInt() : -1;
-        boolean noSearch = audioJSONObject.has("no_search") && audioJSONObject.get("no_search").getAsBoolean();
-
-        return new Audio(id, ownerId, artist, title, duration, mp3Url, dateAdded,
-                lyricsId, albumId, genreId, noSearch);
-    }
-
-    private Video parseVideo(JsonObject videoJSONObject) {
-
-        int id = videoJSONObject.get("id").getAsInt();
-        int ownerId = videoJSONObject.get("owner_id").getAsInt();
-        String title = videoJSONObject.get("title").getAsString();
-        String description = videoJSONObject.get("description").getAsString();
-        int duration = videoJSONObject.get("duration").getAsInt();
-
-        String photo130 = videoJSONObject.has("photo_130") ? videoJSONObject.get("photo_130").getAsString() : null;
-        String photo320 = videoJSONObject.has("photo_320") ? videoJSONObject.get("photo_320").getAsString() : null;
-        String photo640 = videoJSONObject.has("photo_640") ? videoJSONObject.get("photo_640").getAsString() : null;
-        String photo800 = videoJSONObject.has("photo_800") ? videoJSONObject.get("photo_800").getAsString() : null;
-
-        Date dateCreated = new Date(videoJSONObject.get("date").getAsLong() * 1000);
-        Date dateAdding = videoJSONObject.has("adding_date") ?
-                new Date(videoJSONObject.get("adding_date").getAsLong() * 1000) : dateCreated;
-
-        int viewsCount = videoJSONObject.get("views").getAsInt();
-        int commentsCount = videoJSONObject.get("comments").getAsInt();
-        String playerUrl = videoJSONObject.has("player") ? videoJSONObject.get("player").getAsString() : null;
-
-        String accessKey = videoJSONObject.get("access_key").getAsString();
-
-        boolean processing = videoJSONObject.has("processing") && videoJSONObject.get("processing").getAsBoolean();
-        boolean liveSteam = videoJSONObject.has("live") && videoJSONObject.get("live").getAsBoolean();
-
-        return new Video(id, ownerId, title, description, duration,
-                photo130, photo320, photo640, photo800, dateCreated, dateAdding,
-                viewsCount, commentsCount, playerUrl, accessKey, processing, liveSteam);
     }
 
 
