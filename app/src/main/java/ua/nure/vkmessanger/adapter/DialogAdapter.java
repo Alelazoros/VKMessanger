@@ -6,7 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ import ua.nure.vkmessanger.model.Audio;
 import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.Photo;
+import ua.nure.vkmessanger.model.Video;
 import ua.nure.vkmessanger.model.WallPost;
 
 /**
@@ -207,7 +212,30 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void bindPhotoVideo(Attachment attachment) {
+            if (attachment.isPhoto()){
+                Photo photo = (Photo) attachment.getBody();
 
+                View attachmentPhotoView = mInflater.inflate(R.layout.attachment_item_photo, null);
+
+                ImageView photoImageView = (ImageView) attachmentPhotoView.findViewById(R.id.attachmentPhotoImageView);
+                Picasso.with(mContext)
+                        .load(photo.getNormalSizePhotoURL())
+                        .into(photoImageView);
+
+                mPhotoVideoContainer.addView(attachmentPhotoView);
+            }else {
+                Video photo = (Video) attachment.getBody();
+
+                View attachmentVideoView = mInflater.inflate(R.layout.attachment_item_video, null);
+
+                ImageView photoImageView = (ImageView) attachmentVideoView.findViewById(R.id.attachmentVideoImageView);
+                Picasso.with(mContext)
+                        .load(photo.getPhoto320())
+                        .into(photoImageView);
+
+                mPhotoVideoContainer.addView(attachmentVideoView);
+            }
+            mPhotosAndVideosCounter++;
         }
 
         private void bindAudio(Audio audio) {

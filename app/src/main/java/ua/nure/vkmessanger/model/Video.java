@@ -117,4 +117,8 @@ public class Video implements Serializable {
     public int getOwnerId() {
         return Math.abs(mOwnerId);
     }
+
+    public String getPhoto320() {
+        return mPhoto320;
+    }
 }

@@ -33,7 +33,7 @@
                 />
 
             <!-- Next containers must fill by their views dynamically -->
-            <!-- Photo -->
+            <!-- Photo and Video -->
             <LinearLayout android:id="@+id/messageAttachmentsPhotoVideoContainer"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
