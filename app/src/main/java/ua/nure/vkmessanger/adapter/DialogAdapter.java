@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -212,30 +213,62 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void bindPhotoVideo(Attachment attachment) {
-            if (attachment.isPhoto()){
+            ViewGroup smallContainer = (ViewGroup) mPhotoVideoContainer.findViewById(R.id.smallAudioVideoContainer);
+            ViewGroup container = smallContainer != null ? smallContainer : mPhotoVideoContainer;
+
+            if (mPhotosAndVideosCounter >= 2 && smallContainer == null) {
+                smallContainer = createSmallHorizontalPhotoVideoContainer();
+                //Добавляю layout.
+                container.addView(smallContainer);
+                //И назвачаю его контейнером, в который идет дальнейщее добавление элементов View.
+                container = smallContainer;
+            }
+
+            boolean isNeedSmallImage = smallContainer != null;
+            if (attachment.isPhoto()) {
                 Photo photo = (Photo) attachment.getBody();
-
-                View attachmentPhotoView = mInflater.inflate(R.layout.attachment_item_photo, null);
-
-                ImageView photoImageView = (ImageView) attachmentPhotoView.findViewById(R.id.attachmentPhotoImageView);
-                Picasso.with(mContext)
-                        .load(photo.getNormalSizePhotoURL())
-                        .into(photoImageView);
-
-                mPhotoVideoContainer.addView(attachmentPhotoView);
-            }else {
-                Video photo = (Video) attachment.getBody();
-
-                View attachmentVideoView = mInflater.inflate(R.layout.attachment_item_video, null);
-
-                ImageView photoImageView = (ImageView) attachmentVideoView.findViewById(R.id.attachmentVideoImageView);
-                Picasso.with(mContext)
-                        .load(photo.getPhoto320())
-                        .into(photoImageView);
-
-                mPhotoVideoContainer.addView(attachmentVideoView);
+                addPhotoToContainer(container, photo, isNeedSmallImage);
+            } else {
+                Video video = (Video) attachment.getBody();
+                addVideoToContainer(container, video, isNeedSmallImage);
             }
             mPhotosAndVideosCounter++;
+        }
+
+        private ViewGroup createSmallHorizontalPhotoVideoContainer() {
+
+            LinearLayout resultContainer = new LinearLayout(mContext);
+            //id хранится в ids.xml.
+            resultContainer.setId(R.id.smallAudioVideoContainer);
+            resultContainer.setOrientation(LinearLayout.HORIZONTAL);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            resultContainer.setLayoutParams(layoutParams);
+
+            return resultContainer;
+        }
+
+        private void addPhotoToContainer(ViewGroup container, Photo photo, boolean isNeedSmallImage) {
+            View attachmentPhotoView = mInflater.inflate(R.layout.attachment_item_photo, null);
+
+            ImageView photoImageView = (ImageView) attachmentPhotoView.findViewById(R.id.attachmentPhotoImageView);
+            Picasso.with(mContext)
+                    .load(isNeedSmallImage ? photo.getSmallSizePhotoURL() : photo.getHDPhotoURL())
+                    .into(photoImageView);
+
+            container.addView(attachmentPhotoView);
+        }
+
+        private void addVideoToContainer(ViewGroup container, Video video, boolean isNeedSmallImage) {
+            View attachmentVideoView = mInflater.inflate(R.layout.attachment_item_video, null);
+
+            ImageView photoImageView = (ImageView) attachmentVideoView.findViewById(R.id.attachmentVideoImageView);
+            Picasso.with(mContext)
+                    .load(isNeedSmallImage ? video.getSmallSizePhotoURL() : video.getBigPhotoURL())
+                    .into(photoImageView);
+
+            container.addView(attachmentVideoView);
         }
 
         private void bindAudio(Audio audio) {

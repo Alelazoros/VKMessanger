@@ -118,7 +118,16 @@ public class Video implements Serializable {
         return Math.abs(mOwnerId);
     }
 
-    public String getPhoto320() {
-        return mPhoto320;
+    public String getSmallSizePhotoURL() {
+        return mPhoto130;
+    }
+
+    public String getNormalSizePhotoURL() {
+        if (mPhoto640 != null) return mPhoto640;
+        return mPhoto320 != null ? mPhoto320 : getSmallSizePhotoURL();
+    }
+
+    public String getBigPhotoURL() {
+        return mPhoto800 != null ? mPhoto800 : getNormalSizePhotoURL();
     }
 }
