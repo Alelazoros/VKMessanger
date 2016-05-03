@@ -27,8 +27,8 @@ import ua.nure.vkmessanger.model.Photo;
 public class WallPostAdapter extends RecyclerView.Adapter<WallPostAdapter.WallPostItemViewHolder> {
 
     private static final int TYPE_HEADER_LAYOUT = 1;
-    private static final int TYPE_PHOTO_LAYOUT = R.layout.attachment_photo;
-    private static final int TYPE_LINK_LAYOUT = R.layout.link_layout_wall_post;
+    private static final int TYPE_PHOTO_LAYOUT = R.layout.attachment_item_photo;
+    private static final int TYPE_LINK_LAYOUT = R.layout.attachment_item_link_for_wall_post;
 
     private Context mContext;
 

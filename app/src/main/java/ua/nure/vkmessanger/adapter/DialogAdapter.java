@@ -13,6 +13,7 @@ import java.util.List;
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Audio;
+import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
@@ -162,7 +163,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         private void bindMessageAttachments(Attachment[] attachments) {
             clearAttachmentContainers();
             for (Attachment attach : attachments) {
-                if (attach == null){
+                if (attach == null) {
                     continue;
                 }
                 switch (attach.getType()) {
@@ -178,10 +179,10 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
                         Audio audio = (Audio) attach.getBody();
                         bindAudio(audio);
                         break;
-//                    case Attachment.TYPE_DOCUMENT:
-//                        Document document = (Document) attach.getBody();
-//                        bindDocument(document);
-//                        break;
+                    case Attachment.TYPE_DOC:
+                        Document document = (Document) attach.getBody();
+                        bindDocument(document);
+                        break;
                     case Attachment.TYPE_LINK:
                         Link link = (Link) attach.getBody();
                         bindLink(link);
@@ -212,7 +213,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void bindAudio(Audio audio) {
-            View audioItemView = mInflater.inflate(R.layout.audio_item_layout, null);
+            View audioItemView = mInflater.inflate(R.layout.attachment_item_audio, null);
 
             TextView artistNameTV = (TextView) audioItemView.findViewById(R.id.artistNameTV);
             TextView audioNameTV = (TextView) audioItemView.findViewById(R.id.audioNameTV);
@@ -223,8 +224,12 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
             mAudioContainer.addView(audioItemView);
         }
 
+        private void bindDocument(Document document) {
+            //TODO: bind a document.
+        }
+
         private void bindLink(Link link) {
-            View linkAttachmentView = mInflater.inflate(R.layout.link_layout_selected_dialog, null);
+            View linkAttachmentView = mInflater.inflate(R.layout.attachment_item_link_for_selected_dialog, null);
 
             TextView linkTitleTV = (TextView) linkAttachmentView.findViewById(R.id.linkTitleTV);
             TextView linkDescriptionTV = (TextView) linkAttachmentView.findViewById(R.id.linkDescriptionTV);
@@ -236,7 +241,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void bindWallPost(WallPost post) {
-            View wallPostAttachmentView = mInflater.inflate(R.layout.dialog_message_attachment_wall_post, null);
+            View wallPostAttachmentView = mInflater.inflate(R.layout.attachment_item_wall_post, null);
 
             String postTitle = post.isRepost() ? post.getRepostedWallPost().getText() : post.getText();
 
