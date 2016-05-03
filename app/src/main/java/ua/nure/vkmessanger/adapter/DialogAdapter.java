@@ -16,8 +16,6 @@ import ua.nure.vkmessanger.model.Audio;
 import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
-import ua.nure.vkmessanger.model.Photo;
-import ua.nure.vkmessanger.model.Video;
 import ua.nure.vkmessanger.model.WallPost;
 
 /**
@@ -115,16 +113,24 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
 
         //---Attachment containers---//
 
-        private ViewGroup mPhotoContainer;
+        /**
+         * Составной контейнер, который должен хранить фото и видео.
+         */
+        private ViewGroup mPhotoVideoContainer;
 
-        private ViewGroup mVideoContainer;
-
+        /**
+         * Простые контейнеры.
+         */
         private ViewGroup mAudioContainer;
 
         private ViewGroup mDocsContainer;
 
         private ViewGroup mLinkContainer;
+
         private ViewGroup mWallPostContainer;
+
+        //Счечик количества добавленных View фото или видео в их общий контейнер.
+        private int mPhotosAndVideosCounter = 0;
 
 
         public MessageViewHolder(Context context, View itemView, int viewType, OnMessageClickListener clickListener) {
@@ -143,8 +149,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
                 return;
             }
             //Attachment containers.
-            mPhotoContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsPhotoContainer);
-            mVideoContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsVideoContainer);
+            mPhotoVideoContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsPhotoVideoContainer);
             mAudioContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsAudioContainer);
             mDocsContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsDocContainer);
             mLinkContainer = (ViewGroup) itemView.findViewById(R.id.messageAttachmentsLinkContainer);
@@ -169,12 +174,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
                 }
                 switch (attach.getType()) {
                     case Attachment.TYPE_PHOTO:
-                        Photo photo = (Photo) attach.getBody();
-                        bindPhoto(photo);
-                        break;
                     case Attachment.TYPE_VIDEO:
-                        Video video = (Video) attach.getBody();
-                        bindVideo(video);
+                        bindPhotoVideo(attach);
                         break;
                     case Attachment.TYPE_AUDIO:
                         Audio audio = (Audio) attach.getBody();
@@ -197,20 +198,16 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void clearAttachmentContainers() {
-            mPhotoContainer.removeAllViews();
-            mVideoContainer.removeAllViews();
+            mPhotosAndVideosCounter = 0;
+            mPhotoVideoContainer.removeAllViews();
             mAudioContainer.removeAllViews();
             mDocsContainer.removeAllViews();
             mLinkContainer.removeAllViews();
             mWallPostContainer.removeAllViews();
         }
 
-        private void bindVideo(Video video) {
-            //TODO: bind a video.
-        }
+        private void bindPhotoVideo(Attachment attachment) {
 
-        private void bindPhoto(Photo photo) {
-            //TODO: bind a photo.
         }
 
         private void bindAudio(Audio audio) {
