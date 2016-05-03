@@ -334,7 +334,22 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
     private Document parseDocument(JsonObject docJSONObject) {
-        return new Document();
+
+        int id = docJSONObject.get("id").getAsInt();
+        int ownerId = docJSONObject.get("owner_id").getAsInt();
+
+        String title = docJSONObject.get("title").getAsString();
+        int sizeInBytes = docJSONObject.get("size").getAsInt();
+        String extension = docJSONObject.get("ext").getAsString();
+        String url = docJSONObject.get("url").getAsString();
+
+        String photo100 = docJSONObject.has("photo_100") ? docJSONObject.get("photo_100").getAsString() : null;
+        String photo130 = docJSONObject.has("photo_130") ? docJSONObject.get("photo_130").getAsString() : null;
+
+        Date dateAdded = new Date(docJSONObject.get("date").getAsLong() * 1000);
+        int docType = docJSONObject.get("type").getAsInt();
+
+        return new Document(id, ownerId, title, sizeInBytes, extension, url, photo100, photo130, dateAdded, docType);
     }
 
     private Link parseLink(JsonObject linkJSONObject) {
