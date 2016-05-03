@@ -1,8 +1,11 @@
 package ua.nure.vkmessanger.model;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import java.util.Date;
+
+import ua.nure.vkmessanger.R;
 
 /**
  *  Объект 'doc', описывающий документ в VK API.
@@ -82,7 +85,19 @@ public class Document {
         return mTitle;
     }
 
-    public int getSize() {
-        return mSize;
+    /**
+     * @return строка, которая отображает размер файла, только не просто в виде количества байт
+     * а с окончанием 'kб' или 'Мб'.
+     */
+    public String getStringViewOfSize(Context context) {
+        if (mSize < 1000) {
+            return String.valueOf(mSize);
+        } else if (mSize < 1000_000) {
+            return String.valueOf(mSize / 1000) + " " + context.getString(R.string.size_kilo_byte);
+        } else if (mSize < 1000_000_000) {
+            return String.valueOf(mSize / 1000_000) + " " + context.getString(R.string.size_mega_byte);
+        } else {
+            return String.valueOf(mSize / 1000_000_000) + " " + context.getString(R.string.size_giga_byte);
+        }
     }
 }

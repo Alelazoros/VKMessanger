@@ -103,6 +103,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
 
     static class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
+        private Context mContext;
+
         private LayoutInflater mInflater;
 
         private OnMessageClickListener mClickListener;
@@ -122,13 +124,12 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         private ViewGroup mDocsContainer;
 
         private ViewGroup mLinkContainer;
-
         private ViewGroup mWallPostContainer;
 
 
         public MessageViewHolder(Context context, View itemView, int viewType, OnMessageClickListener clickListener) {
             super(itemView);
-
+            mContext = context;
             mInflater = LayoutInflater.from(context);
             mClickListener = clickListener;
 
@@ -231,7 +232,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
             TextView documentSizeTV = (TextView) documentAttachmentView.findViewById(R.id.documentSizeTV);
 
             documentNameTV.setText(document.getTitle());
-            documentSizeTV.setText(String.valueOf(document.getSize()));
+            documentSizeTV.setText(document.getStringViewOfSize(mContext));
 
             mDocsContainer.addView(documentAttachmentView);
         }

@@ -16,7 +16,8 @@
     <!-- Document size-->
     <string name="size_byte">байт</string>
     <string name="size_kilo_byte">кб</string>
-    <string name="size__mega_byte">Мб</string>
+    <string name="size_mega_byte">Мб</string>
+    <string name="size_giga_byte">Гб</string>
 
     <!-- Other-->
     <string name="title_login">Войти</string>
