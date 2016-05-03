@@ -13,6 +13,11 @@
     <!-- Menu-->
     <string name="action_settings">Settings</string>
 
+    <!-- Document size-->
+    <string name="size_byte">байт</string>
+    <string name="size_kilo_byte">кб</string>
+    <string name="size__mega_byte">Мб</string>
+
     <!-- Other-->
     <string name="title_login">Войти</string>
     <string name="wall_post">Запись на стене</string>
@@ -20,4 +25,6 @@
     <string name="button_send_message_text">Send</string>
     <string name="link_image_view_content_desc">Фото заголовка</string>
     <string name="audio_image_view_content_desc">Воспроизвести аудиозапись</string>
+    <string name="document_text">Документ</string>
+
 </resources>

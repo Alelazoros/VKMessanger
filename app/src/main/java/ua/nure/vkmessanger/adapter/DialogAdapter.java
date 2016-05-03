@@ -225,7 +225,15 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         }
 
         private void bindDocument(Document document) {
-            //TODO: bind a document.
+            View documentAttachmentView = mInflater.inflate(R.layout.attachment_item_document, null);
+
+            TextView documentNameTV = (TextView) documentAttachmentView.findViewById(R.id.documentNameTV);
+            TextView documentSizeTV = (TextView) documentAttachmentView.findViewById(R.id.documentSizeTV);
+
+            documentNameTV.setText(document.getTitle());
+            documentSizeTV.setText(String.valueOf(document.getSize()));
+
+            mDocsContainer.addView(documentAttachmentView);
         }
 
         private void bindLink(Link link) {
