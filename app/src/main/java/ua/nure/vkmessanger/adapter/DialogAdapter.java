@@ -268,6 +268,10 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
                     .load(isNeedSmallImage ? video.getSmallSizePhotoURL() : video.getBigPhotoURL())
                     .into(photoImageView);
 
+            //Длительность видео.
+            TextView durationTV = (TextView) attachmentVideoView.findViewById(R.id.attachmentVideoDurationTV);
+            durationTV.setText(video.getDurationStringValue());
+
             container.addView(attachmentVideoView);
         }
 
@@ -290,7 +294,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
             TextView documentSizeTV = (TextView) documentAttachmentView.findViewById(R.id.documentSizeTV);
 
             documentNameTV.setText(document.getTitle());
-            documentSizeTV.setText(document.getStringViewOfSize(mContext));
+            documentSizeTV.setText(document.getSizeStringValue(mContext));
 
             mDocsContainer.addView(documentAttachmentView);
         }

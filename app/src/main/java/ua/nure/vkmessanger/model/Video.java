@@ -1,6 +1,8 @@
 package ua.nure.vkmessanger.model;
 
 import android.support.annotation.Nullable;
+import android.support.v4.util.TimeUtils;
+import android.text.format.Time;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -116,6 +118,21 @@ public class Video implements Serializable {
 
     public int getOwnerId() {
         return Math.abs(mOwnerId);
+    }
+
+    public String getDurationStringValue() {
+        int hours = mDuration / 3600;
+        int minutes = (mDuration - hours * 3600) / 60;
+        int seconds = mDuration - hours * 3600 - minutes * 60;
+
+        StringBuilder sb = new StringBuilder();
+        if (hours > 0){
+            sb.append(hours).append(':');
+        }
+        return sb.append(minutes)
+                .append(':')
+                .append(seconds)
+                .toString();
     }
 
     public String getSmallSizePhotoURL() {

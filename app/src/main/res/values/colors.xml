@@ -10,4 +10,7 @@
 
     <!-- Links-->
     <color name="links_color">@android:color/holo_blue_dark</color>
+
+    <!-- Video duration field-->
+    <color name="video_duration_color">#88000000</color>
 </resources>

@@ -89,7 +89,7 @@ public class Document {
      * @return строка, которая отображает размер файла, только не просто в виде количества байт
      * а с окончанием 'kб' или 'Мб'.
      */
-    public String getStringViewOfSize(Context context) {
+    public String getSizeStringValue(Context context) {
         if (mSize < 1000) {
             return String.valueOf(mSize);
         } else if (mSize < 1000_000) {
