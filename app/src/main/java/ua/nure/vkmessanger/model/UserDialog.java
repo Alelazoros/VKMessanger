@@ -28,6 +28,7 @@ public class UserDialog {
     public int getUserId() {
         return userId;
     }
+    public int getChatId() { return chatId; }
 
     /**
      * @return id пользователя, если это ЛС, или id общего чата, если это групповой диалог.
@@ -35,6 +36,9 @@ public class UserDialog {
     public int getDialogId(){
         return chatId > 0 ? CHAT_PREFIX + chatId : userId;
     }
+
+
+    public boolean isChat() { return chatId > 0; }
 
     public String getLastMessage() {
         return lastMessage;

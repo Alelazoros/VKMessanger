@@ -1,8 +1,10 @@
 package ua.nure.vkmessanger.http.retrofit;
 
 import android.content.Context;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,11 +27,13 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Audio;
+import ua.nure.vkmessanger.model.Chat;
 import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Group;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
+import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.Video;
 import ua.nure.vkmessanger.model.WallPost;
@@ -38,6 +42,9 @@ import ua.nure.vkmessanger.model.WallPost;
  * Класс-обертка для выполнения Http-запросов с помощью Retrofit.
  */
 public class RESTRetrofitManager implements RESTInterface {
+
+    private  static final String deafaultFieldForInfo = "photo_max_orig,bdate";
+    private static final String defaultNamecaseForInfo = "Nom";
 
     private static final String RETROFIT_MANAGER_LOG_TAG = "RETROFIT_MANAGER_LOG";
 
@@ -69,6 +76,120 @@ public class RESTRetrofitManager implements RESTInterface {
         this.mContext = context;
     }
 
+
+    @Override
+    public CustomResponse loadUsers(List<UserDialog> input) {
+        CustomResponse customResponseResult = new CustomResponse();
+        RetrofitAPI api = getRetrofit();
+        List<User> users = new ArrayList<User>();
+
+        StringBuilder idsBuilder = new StringBuilder();
+        for (int i = 0; i < input.size(); i++) {
+            UserDialog current = input.get(i);
+            if (!current.isChat()) {
+                idsBuilder.append((idsBuilder.length() > 0 ? "," : "") + current.getUserId());
+            }
+        }
+        Call<JsonElement> retrofitCall = api.getUser(VK_API_VERSION, idsBuilder.toString(), deafaultFieldForInfo, defaultNamecaseForInfo,
+                AccessTokenManager.getAccessToken(mContext));
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+                JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject().getAsJsonArray("response");
+                for (int i = 0; i < jsonItemsArray.size(); i++) {
+                    JsonObject currentElement = jsonItemsArray.get(i).getAsJsonObject();
+                    users.add(new User(currentElement.get("id").getAsInt(),
+                            (currentElement.has("photo_max_orig") ? currentElement.get("photo_max_orig").getAsString() : null),
+                            (currentElement.has("first_name") ? currentElement.get("first_name").getAsString() : null),
+                            (currentElement.has("last_name") ? currentElement.get("last_name").getAsString() : null),
+                            (currentElement.has("bdate") ? currentElement.get("bdate").getAsString() : null)));
+
+
+                }
+                customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(users);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return customResponseResult;
+
+    }
+
+    @Override
+    public CustomResponse loadChats(List<UserDialog> input){
+        CustomResponse customResponseResult = new CustomResponse();
+        RetrofitAPI api = getRetrofit();
+        List<Chat> chats = new ArrayList<Chat>();
+
+        for (int i = 0; i < input.size(); i++){
+            UserDialog current = input.get(i);
+            if (current.isChat()) {
+                Call<JsonElement> retrofitCall = api.getChat(VK_API_VERSION, current.getChatId(),  AccessTokenManager.getAccessToken(mContext));
+                try {
+                    Response<JsonElement> retrofitResponse = retrofitCall.execute();
+                    if (retrofitResponse.isSuccessful()) {
+                        StringBuilder prepadredIds = new StringBuilder();
+                        List<User> gettedUsers = new ArrayList<User>();
+                        JsonObject response = retrofitResponse.body().getAsJsonObject();
+                        if (response.has("response")) {
+                        JsonObject jsonObject = response.getAsJsonObject("response");
+                        if (jsonObject.has("users")) {
+                            JsonArray jsonArrayUsers = jsonObject.getAsJsonArray("users");
+                            for (int x = 0; x < jsonArrayUsers.size(); x++) {
+                                prepadredIds.append((prepadredIds.length() > 0 ? "," : "") + jsonArrayUsers.get(x).getAsInt());
+                            }
+
+
+                            Call<JsonElement> retrofitCallusers = api.getUser(VK_API_VERSION, prepadredIds.toString(), deafaultFieldForInfo, defaultNamecaseForInfo,
+                                    AccessTokenManager.getAccessToken(mContext));
+                            try {
+                                Response<JsonElement> retrofitResponseUsers = retrofitCallusers.execute();
+
+                                if (retrofitResponseUsers.isSuccessful()) {
+                                    JsonArray jsonItemsArrayUsers = retrofitResponseUsers.body().getAsJsonObject().getAsJsonArray("response");
+                                    for (int c = 0; c < jsonItemsArrayUsers.size(); c++) {
+                                        JsonObject currentElement = jsonItemsArrayUsers.get(c).getAsJsonObject();
+                                        gettedUsers.add(new User(currentElement.get("id").getAsInt(),
+                                                (currentElement.has("photo_max_orig") ? currentElement.get("photo_max_orig").getAsString() : null),
+                                                (currentElement.has("first_name") ? currentElement.get("first_name").getAsString() : null),
+                                                (currentElement.has("last_name") ? currentElement.get("last_name").getAsString() : null),
+                                                (currentElement.has("bdate") ? currentElement.get("bdate").getAsString() : null)));
+
+
+                                    }
+
+                                    chats.add(new Chat(jsonObject.get("id").getAsInt(),
+                                            jsonObject.get("title").getAsString(),
+                                            gettedUsers,
+                                            jsonObject.get("admin_id").getAsInt()));
+
+
+                                }
+
+
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    }
+
+                    }
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
+
+
+            }
+        }
+        customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(chats);
+        return customResponseResult;
+    }
 
     @Override
     public CustomResponse loadUserDialogs() {

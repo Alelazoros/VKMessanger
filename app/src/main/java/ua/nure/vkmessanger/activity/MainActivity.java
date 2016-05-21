@@ -32,6 +32,8 @@ import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
+import ua.nure.vkmessanger.model.Chat;
+import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private final List<UserDialog> dialogs = new ArrayList<>();
+    private  final List<User> users = new ArrayList<>();
+    private final List<Chat> chats = new ArrayList<>();
 
     private ArrayAdapter<UserDialog> adapter;
 
@@ -46,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Константа, используемая в LoaderCallbacks для идентификации Loader-а.
      */
     private static final int LOAD_USER_DIALOGS = 1;
+
+    private static final int LOAD_USERS = 2;
+
+    private static final int LOAD_CHATS = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +124,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
         if (VKSdk.wakeUpSession(this)) {
+
             loadUserDialogs();
+
+
         } else {
             loginButton.setVisibility(View.VISIBLE);
         }
@@ -131,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loginButton.setVisibility(View.INVISIBLE);
 
                 loadUserDialogs();
+
             }
 
             @Override
@@ -145,6 +158,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void loadUserDialogs() {
         getSupportLoaderManager().restartLoader(LOAD_USER_DIALOGS, null, this);
     }
+    private void loadUsers() {
+        getSupportLoaderManager().restartLoader(LOAD_USERS, null, this);
+    }
+    private void loadChats() {
+        getSupportLoaderManager().restartLoader(LOAD_CHATS, null, this);
+    }
 
 
 
@@ -158,6 +177,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 switch (id){
                     case LOAD_USER_DIALOGS:
                         return restInterface.loadUserDialogs();
+                    case LOAD_USERS:
+                        return restInterface.loadUsers(dialogs);
+                    case LOAD_CHATS:
+                        return restInterface.loadChats(dialogs);
                     default:
                         return null;
                 }
@@ -172,6 +195,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 dialogs.clear();
                 dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
                 adapter.notifyDataSetChanged();
+              //  loadUsers();
+                loadChats();
+               // loadChats();
+                break;
+            case LOAD_USERS:
+                users.addAll(data.<List<User>>getTypedAnswer());
+
+                break;
+            case LOAD_CHATS:
+                chats.addAll(data.<List<Chat>>getTypedAnswer());
                 break;
         }
     }
