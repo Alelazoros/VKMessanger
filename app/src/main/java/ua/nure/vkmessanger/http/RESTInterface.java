@@ -42,9 +42,8 @@ public interface RESTInterface {
     CustomResponse loadSelectedDialogById(int dialogId, int offsetCount);
 
     /**
-     *
      * @param message сообщение для отправления
-     * @param peerId id группы (2000000 + ID) или ID юзера
+     * @param peerId  id группы (2000000 + ID) или ID юзера
      * @return возвращает ERROR + по возможности error_code
      */
     CustomResponse sendMessageTo(String message, int peerId);
@@ -55,12 +54,13 @@ public interface RESTInterface {
      *                 Передаю не int[], а String[], т.к. можно передавать
      *                 не только целочисленные id, а вместо этого передать
      *                 короткий адрес сообщества (url), например 'tproger', вместо его id.
-     *
      * @return список объектов Group внутри объекта CustomResponse.setAnswer(..), если RequestResult == SUCCESS.
      */
     CustomResponse getGroupsInfoByIds(String[] groupIds);
 
+
     CustomResponse loadUsers(List<UserDialog> input);
+
     CustomResponse loadChats(List<UserDialog> input);
 
 }

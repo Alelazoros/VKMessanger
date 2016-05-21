@@ -144,20 +144,22 @@ public class RESTVkSdkManager implements RESTInterface {
 
         return customResponseResult;
     }
+
     public CustomResponse sendMessageTo(String message, int peerId) {
-        //Nothing
         return new CustomResponse();
     }
 
     @Override
     public CustomResponse getGroupsInfoByIds(String[] groupIds) {
-        //Nothing
         return new CustomResponse();
     }
+
     @Override
     public CustomResponse loadUsers(List<UserDialog> input){
         return new CustomResponse();
     }
+
+    @Override
     public CustomResponse loadChats(List<UserDialog> input){
         return new CustomResponse();
     }

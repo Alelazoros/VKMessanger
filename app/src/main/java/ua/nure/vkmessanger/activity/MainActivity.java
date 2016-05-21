@@ -38,10 +38,10 @@ import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
 
-    private RESTInterface restInterface = new RESTRetrofitManager(this);
+    private final RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private final List<UserDialog> dialogs = new ArrayList<>();
-    private  final List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
     private final List<Chat> chats = new ArrayList<>();
 
     private ArrayAdapter<UserDialog> adapter;
@@ -124,10 +124,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
         if (VKSdk.wakeUpSession(this)) {
-
             loadUserDialogs();
-
-
         } else {
             loginButton.setVisibility(View.VISIBLE);
         }
@@ -143,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loginButton.setVisibility(View.INVISIBLE);
 
                 loadUserDialogs();
-
             }
 
             @Override
@@ -158,9 +154,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void loadUserDialogs() {
         getSupportLoaderManager().restartLoader(LOAD_USER_DIALOGS, null, this);
     }
+
     private void loadUsers() {
         getSupportLoaderManager().restartLoader(LOAD_USERS, null, this);
     }
+
     private void loadChats() {
         getSupportLoaderManager().restartLoader(LOAD_CHATS, null, this);
     }
@@ -201,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
             case LOAD_USERS:
                 users.addAll(data.<List<User>>getTypedAnswer());
-
                 break;
             case LOAD_CHATS:
                 chats.addAll(data.<List<Chat>>getTypedAnswer());
