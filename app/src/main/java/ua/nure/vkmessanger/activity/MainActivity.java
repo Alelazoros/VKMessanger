@@ -92,22 +92,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void initListView() {
-        adapter = new MainAdapter(this, null);
+        adapter = new MainAdapter(this, null, new MainAdapter.OnDialogClickListener() {
+            @Override
+            public void onDialogClick(int position) {
+                UserDialog dialog = dialogs.get(position);
+                SelectedDialogActivity.newIntent(MainActivity.this, dialog.getDialogId());
+            }
+        });
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.dialogRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                //Проверка на статус диалога (групповая беседа, или ЛС) в методе dialog.getDialogId().
-//                UserDialog dialog = adapter.getItem(position);
-//
-//                SelectedDialogActivity.newIntent(MainActivity.this, dialog.getDialogId());
-//
-//                //TODO: сделать обработку возврата из SelectedDialogActivity.
-//            }
-//        });
     }
 
     private void login() {
@@ -202,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case LOAD_USER_DIALOGS:
                 dialogs.clear();
                 dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
-                adapter.notifyDataSetChanged();
                 loadUsers();
                 loadChats();
                 break;

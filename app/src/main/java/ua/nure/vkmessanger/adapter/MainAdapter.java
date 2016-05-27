@@ -3,6 +3,7 @@ package ua.nure.vkmessanger.adapter;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,20 +35,25 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
     @Nullable
     private List<UserDialog> mDialogs;
 
-    public MainAdapter(Context context, @Nullable List<UserDialog> dialogs) {
+    @Nullable
+    private OnDialogClickListener mClickListener;
+
+
+    public MainAdapter(Context context, @Nullable List<UserDialog> dialogs, @Nullable OnDialogClickListener clickListener) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mDialogs = dialogs;
+        mClickListener = clickListener;
     }
 
-    public void setDialogs(List<UserDialog> dialogs){
+    public void setDialogs(List<UserDialog> dialogs) {
         mDialogs = dialogs;
     }
 
     @Override
     public DialogHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(LAYOUT, parent, false);
-        return new DialogHolder(mContext, view);
+        return new DialogHolder(mContext, view, mClickListener);
     }
 
     @Override
@@ -62,11 +68,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
         return mDialogs != null ? mDialogs.size() : 0;
     }
 
-    static class DialogHolder extends RecyclerView.ViewHolder {
+    static class DialogHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private OnDialogClickListener clickListener;
 
         private Picasso picasso;
 
         private Transformation circleImageTransformation;
+
 
         private ImageView dialogAvatarIV;
 
@@ -77,8 +86,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
         private TextView lastMessageTV;
 
 
-        public DialogHolder(Context context, View itemView) {
+        public DialogHolder(Context context, View itemView, OnDialogClickListener listener) {
             super(itemView);
+
+            clickListener = listener;
+            itemView.setOnClickListener(this);
 
             picasso = Picasso.with(context);
             circleImageTransformation = PicassoUtils.getCircleTransformation();
@@ -110,6 +122,17 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             dialogTitleTV.setText(title);
             lastMessageTV.setText(dialog.getLastMessage());
         }
+
+        @Override
+        public void onClick(View v) {
+            if (clickListener != null){
+                clickListener.onDialogClick(getLayoutPosition());
+            }
+        }
+    }
+
+    public interface OnDialogClickListener {
+        void onDialogClick(int position);
     }
 
 }
