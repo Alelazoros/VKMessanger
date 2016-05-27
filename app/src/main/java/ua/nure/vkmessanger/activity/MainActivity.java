@@ -177,9 +177,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 dialog.setBody(chats.get(indexChat++));
             }
         }
-        for (UserDialog dialog : dialogs) {
-            Log.d("DIALOG", dialog.getBody().toString());
-        }
     }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
