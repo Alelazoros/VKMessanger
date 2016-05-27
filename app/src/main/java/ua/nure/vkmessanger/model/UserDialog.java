@@ -19,10 +19,29 @@ public class UserDialog {
 
     private String lastMessage;
 
+    /**
+     * Объект User или Chat.
+     */
+    private Object body;
+
+    /**
+     * @param chatId id чата, если это групповая беседа. Но если это ЛС, то chatId = 0
+     * @param userId id пользователя, с которым идет переписка в ЛС.
+     *               В случае, если данный диалог - групповая беседа,
+     *               то userId обозначает пользователя, который написал последнее сообщеие в беседе.
+     */
     public UserDialog(int chatId, int userId, String lastMessage) {
         this.chatId = chatId;
         this.userId = userId;
         this.lastMessage = lastMessage;
+    }
+
+    public void setBody(Object body) {
+        this.body = body;
+    }
+
+    public Object getBody(){
+        return body;
     }
 
     public int getUserId() {

@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private final List<UserDialog> dialogs = new ArrayList<>();
+
     private final List<User> users = new ArrayList<>();
+
     private final List<Chat> chats = new ArrayList<>();
 
     private ArrayAdapter<UserDialog> adapter;
@@ -163,6 +166,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getSupportLoaderManager().restartLoader(LOAD_CHATS, null, this);
     }
 
+    private void mergeUsersWithChats() {
+        int indexChat = 0;
+        int indexUser = 0;
+        for (UserDialog dialog : dialogs) {
+
+            if (dialog.isSingle()) {
+                dialog.setBody(users.get(indexUser++));
+            } else {
+                dialog.setBody(chats.get(indexChat++));
+            }
+        }
+        for (UserDialog dialog : dialogs) {
+            Log.d("DIALOG", dialog.getBody().toString());
+        }
+    }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
@@ -185,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
     }
 
+    private boolean usersOrChatsLoaded = false;
+
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
         switch (loader.getId()) {
@@ -196,10 +216,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loadChats();
                 break;
             case LOAD_USERS:
+                users.clear();
                 users.addAll(data.<List<User>>getTypedAnswer());
+                if (usersOrChatsLoaded) {
+                    mergeUsersWithChats();
+                    usersOrChatsLoaded = false;
+                } else {
+                    usersOrChatsLoaded = true;
+                }
                 break;
             case LOAD_CHATS:
+                chats.clear();
                 chats.addAll(data.<List<Chat>>getTypedAnswer());
+                if (usersOrChatsLoaded) {
+                    mergeUsersWithChats();
+                    usersOrChatsLoaded = false;
+                } else {
+                    usersOrChatsLoaded = true;
+                }
                 break;
         }
     }

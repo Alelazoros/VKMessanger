@@ -69,4 +69,17 @@ public class Chat {
     public void setUsersList(List<User> usersList) {
         this.usersList = usersList;
     }
+
+
+    @Override
+    public String toString() {
+        return "Chat{" +
+                "chatId=" + chatId +
+                ", chatName='" + chatName + '\'' +
+                ", usersList=" + usersList +
+                ", chatAdminId=" + chatAdminId +
+                ", chatAvatar100Url='" + chatAvatar100Url + '\'' +
+                ", chatAvatar200Url='" + chatAvatar200Url + '\'' +
+                '}';
+    }
 }

@@ -54,4 +54,17 @@ public class User {
     public boolean isOnline() {
         return isOnline;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", fullAvatarOriginalUrl='" + fullAvatarOriginalUrl + '\'' +
+                ", avatar200Url='" + avatar200Url + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDayDate='" + birthDayDate + '\'' +
+                ", isOnline=" + isOnline +
+                '}';
+    }
 }
