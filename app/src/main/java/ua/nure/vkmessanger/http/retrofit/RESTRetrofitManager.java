@@ -155,8 +155,10 @@ public class RESTRetrofitManager implements RESTInterface {
                     chats.add(parseChat(currentChatJsonObject, chatsUsersTempMap, chatUserIdsSet, i));
                 }
 
+                //Подгружаю всех пользователей-собеседников для всех чатов одним запросом.
                 CustomResponse chatUsersResponse = loadChatsUsers(api, chatUserIdsSet, chatsUsersTempMap);
                 if (chatUsersResponse.getRequestResult() == RequestResult.SUCCESS) {
+
                     //Получил список всех пользователей для каждого чата.
                     Map<Integer, List<User>> chatUsers = chatUsersResponse.getTypedAnswer();
                     for (int i = 0; i < chats.size(); i++) {
@@ -171,8 +173,7 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
-    private CustomResponse loadChatsUsers(RetrofitAPI api, Set<Integer> usersSet,
-                                          Map<Integer, List<Integer>> chatsUsersTempMap) {
+    private CustomResponse loadChatsUsers(RetrofitAPI api, Set<Integer> usersSet, Map<Integer, List<Integer>> chatsUsersMap) {
         CustomResponse response = new CustomResponse();
 
         StringBuilder idsBuilder = new StringBuilder();
@@ -196,7 +197,7 @@ public class RESTRetrofitManager implements RESTInterface {
                     JsonObject currentElement = jsonItemsArray.get(i).getAsJsonObject();
                     User user = parseUser(currentElement);
 
-                    for (Map.Entry<Integer, List<Integer>> entry : chatsUsersTempMap.entrySet()){
+                    for (Map.Entry<Integer, List<Integer>> entry : chatsUsersMap.entrySet()){
 
                         if (entry.getValue().contains(user.getId())){
                             List<User> list = usersMap.get(entry.getKey());
@@ -563,7 +564,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 currentElement.has("online") && currentElement.get("online").getAsBoolean());
     }
 
-    private Chat parseChat(JsonObject currentChatJsonObject, Map<Integer, List<Integer>> chatsUsersTempMap,
+    private Chat parseChat(JsonObject currentChatJsonObject, Map<Integer, List<Integer>> chatsUsersIdsMap,
                            Set<Integer> chatUserIdsSet, int position) {
 
         List<Integer> chatUsersIds = new ArrayList<>();
@@ -574,7 +575,7 @@ public class RESTRetrofitManager implements RESTInterface {
         }
 
         //Сохраняю список id пользователей для чата в Map, чтобы потом сделать один общий запрос.
-        chatsUsersTempMap.put(position, chatUsersIds);
+        chatsUsersIdsMap.put(position, chatUsersIds);
         chatUserIdsSet.addAll(chatUsersIds);
 
         return new Chat(currentChatJsonObject.get("id").getAsInt(),

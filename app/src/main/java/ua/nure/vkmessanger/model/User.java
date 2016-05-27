@@ -7,13 +7,13 @@ public class User {
 
     private int id;
 
-    private String fullAvatarOriginalUrl;
-
-    private String avatar200Url;
-
     private String firstName, lastName;
 
     private String birthDayDate;
+
+    private String avatar200Url;
+
+    private String fullAvatarOriginalUrl;
 
     private boolean isOnline;
 

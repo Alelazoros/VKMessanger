@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView android:id="@+id/dialogAvatarImageView"
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:contentDescription="@string/dialog_avatar"
+            />
+
+        <ImageView android:id="@+id/dialogLastMessageAuthorAvatarImageView"
+            android:layout_toRightOf="@+id/dialogAvatarImageView"
+            android:layout_toEndOf="@+id/dialogAvatarImageView"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/dialog_last_message_author"
+            android:visibility="gone"
+            />
+
+        <TextView android:id="@+id/dialogTitleTV"
+            android:layout_toRightOf="@+id/dialogLastMessageAuthorAvatarImageView"
+            android:layout_toEndOf="@+id/dialogLastMessageAuthorAvatarImageView"
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView android:id="@+id/dialogLastMessageTV"
+            android:layout_toRightOf="@+id/dialogLastMessageAuthorAvatarImageView"
+            android:layout_toEndOf="@+id/dialogLastMessageAuthorAvatarImageView"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dialogTitleTV"
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

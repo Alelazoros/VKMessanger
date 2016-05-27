@@ -27,5 +27,7 @@
     <string name="link_image_view_content_desc">Фото заголовка</string>
     <string name="audio_image_view_content_desc">Воспроизвести аудиозапись</string>
     <string name="document_text">Документ</string>
+    <string name="dialog_avatar">Аватар диалога</string>
+    <string name="dialog_last_message_author">Автор последнего сообщения</string>
 
 </resources>
