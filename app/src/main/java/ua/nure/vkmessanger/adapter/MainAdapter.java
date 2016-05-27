@@ -3,7 +3,6 @@ package ua.nure.vkmessanger.adapter;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,6 +122,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
             picasso.load(avatarUrl)
                     .transform(circleImageTransformation)
+                    .placeholder(R.drawable.default_avatar_camera_100)
                     .into(dialogAvatarIV);
 
             if (!dialog.isLastMessageFromMe() || dialog.isChat()) {
