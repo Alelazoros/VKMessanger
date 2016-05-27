@@ -17,6 +17,7 @@ public class Application extends android.app.Application {
             if (oldToken != null)
                 Log.d("oldAccessToken", oldToken.accessToken);
             Log.d("newAccessToken", newToken.accessToken);
+            //newToken.userId - можно получить id текущего пользователя.
             AccessTokenManager.setAccessToken(getApplicationContext(), newToken.accessToken);
         }
     };

@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onResult(VKAccessToken res) {
                 //Успешная авторизация.
                 Button loginButton = (Button) findViewById(R.id.login_button);
-                loginButton.setVisibility(View.INVISIBLE);
+                loginButton.setVisibility(View.GONE);
 
                 loadUserDialogs();
             }

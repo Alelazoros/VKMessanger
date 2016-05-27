@@ -19,6 +19,8 @@ public class UserDialog {
 
     private String lastMessage;
 
+    private boolean isLastMessageFromMe;
+
     /**
      * Объект User или Chat.
      */
@@ -30,17 +32,18 @@ public class UserDialog {
      *               В случае, если данный диалог - групповая беседа,
      *               то userId обозначает пользователя, который написал последнее сообщеие в беседе.
      */
-    public UserDialog(int chatId, int userId, String lastMessage) {
+    public UserDialog(int chatId, int userId, String lastMessage, boolean isLastMessageFromMe) {
         this.chatId = chatId;
         this.userId = userId;
         this.lastMessage = lastMessage;
+        this.isLastMessageFromMe = isLastMessageFromMe;
     }
 
     public void setBody(Object body) {
         this.body = body;
     }
 
-    public Object getBody(){
+    public Object getBody() {
         return body;
     }
 
@@ -72,6 +75,10 @@ public class UserDialog {
 
     public String getLastMessage() {
         return lastMessage;
+    }
+
+    public boolean isLastMessageFromMe() {
+        return isLastMessageFromMe;
     }
 
     @Override

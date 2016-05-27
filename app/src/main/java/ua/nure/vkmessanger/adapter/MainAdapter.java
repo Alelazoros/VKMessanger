@@ -79,7 +79,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         private ImageView dialogAvatarIV;
 
-//        private ImageView lastMessageAuthorAvatarIV;
+        private ImageView lastMessageAuthorAvatarIV;
 
         private TextView dialogTitleTV;
 
@@ -96,7 +96,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             circleImageTransformation = PicassoUtils.getCircleTransformation();
 
             dialogAvatarIV = (ImageView) itemView.findViewById(R.id.dialogAvatarImageView);
-//            lastMessageAuthorAvatarIV = (ImageView) itemView.findViewById(R.id.dialogLastMessageAuthorAvatarImageView);
+            lastMessageAuthorAvatarIV = (ImageView) itemView.findViewById(R.id.dialogLastMessageAuthorAvatarImageView);
             dialogTitleTV = (TextView) itemView.findViewById(R.id.dialogTitleTV);
             lastMessageTV = (TextView) itemView.findViewById(R.id.dialogLastMessageTV);
         }
@@ -119,8 +119,39 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             picasso.load(avatarUrl)
                     .transform(circleImageTransformation)
                     .into(dialogAvatarIV);
+
+            if (!dialog.isLastMessageFromMe() || dialog.isChat()) {
+
+                String lastMessageAuthorAvatar = getLastMessageAuthorAvatar(dialog);
+                lastMessageAuthorAvatarIV.setVisibility(View.VISIBLE);
+                picasso.load(lastMessageAuthorAvatar)
+                        .transform(circleImageTransformation)
+                        .into(lastMessageAuthorAvatarIV);
+            } else {
+                lastMessageAuthorAvatarIV.setVisibility(View.GONE);
+            }
+
             dialogTitleTV.setText(title);
             lastMessageTV.setText(dialog.getLastMessage());
+        }
+
+        private String getLastMessageAuthorAvatar(UserDialog dialog) {
+            String lastMessageAuthorAvatarUrl = null;
+            if (!dialog.isChat()) {
+                User user = (User) dialog.getBody();
+                lastMessageAuthorAvatarUrl = user.getAvatar200Url();
+            } else {
+                int userId = dialog.getUserId();
+
+                Chat chat = (Chat) dialog.getBody();
+                List<User> users = chat.getUsersList();
+                for (User user : users) {
+                    if (user.getId() == userId) {
+                        lastMessageAuthorAvatarUrl = user.getAvatar200Url();
+                    }
+                }
+            }
+            return lastMessageAuthorAvatarUrl;
         }
 
         @Override

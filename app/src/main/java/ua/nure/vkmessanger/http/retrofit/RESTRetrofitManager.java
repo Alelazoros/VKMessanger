@@ -241,11 +241,13 @@ public class RESTRetrofitManager implements RESTInterface {
                     JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().getAsJsonObject("message");
                     JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
                     int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
+                    boolean isLastMessageFromMe = dialogJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
 
                     dialogs.add(new UserDialog(
                             chatId,
                             dialogJSON.get("user_id").getAsInt(),
-                            dialogJSON.get("body").getAsString()
+                            dialogJSON.get("body").getAsString(),
+                            isLastMessageFromMe
                     ));
                 }
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
