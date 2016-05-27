@@ -70,6 +70,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
     static class DialogHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private static final int MAX_TITLE_LENGTH = 30;
+
+        private static final int MAX_LAST_MESSAGE_LENGTH = 50;
+
         private OnDialogClickListener clickListener;
 
         private Picasso picasso;
@@ -105,6 +109,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             Object dialogBody = dialog.getBody();
             String avatarUrl;
             String title;
+            String lastMessage = dialog.getLastMessage();
 
             if (dialog.isSingle()) {
                 User user = (User) dialogBody;
@@ -131,8 +136,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
                 lastMessageAuthorAvatarIV.setVisibility(View.GONE);
             }
 
-            dialogTitleTV.setText(title);
-            lastMessageTV.setText(dialog.getLastMessage());
+            dialogTitleTV.setText(title.substring(0, title.length() <= MAX_TITLE_LENGTH ? title.length() : MAX_TITLE_LENGTH));
+            lastMessageTV.setText(lastMessage.substring(0,
+                    lastMessage.length() <= MAX_LAST_MESSAGE_LENGTH ? lastMessage.length() : MAX_LAST_MESSAGE_LENGTH));
         }
 
         private String getLastMessageAuthorAvatar(UserDialog dialog) {
