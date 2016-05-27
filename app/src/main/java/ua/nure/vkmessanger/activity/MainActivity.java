@@ -36,7 +36,7 @@ import ua.nure.vkmessanger.model.Chat;
 import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
     private final RESTInterface restInterface = new RESTRetrofitManager(this);
 
@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
     @Override
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return new BaseLoader(this) {
             @Override
             public CustomResponse apiCall() throws IOException {
-                switch (id){
+                switch (id) {
                     case LOAD_USER_DIALOGS:
                         return restInterface.loadUserDialogs();
                     case LOAD_USERS:
@@ -188,14 +187,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        switch (loader.getId()){
+        switch (loader.getId()) {
             case LOAD_USER_DIALOGS:
                 dialogs.clear();
                 dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
                 adapter.notifyDataSetChanged();
-              //  loadUsers();
+                loadUsers();
                 loadChats();
-               // loadChats();
                 break;
             case LOAD_USERS:
                 users.addAll(data.<List<User>>getTypedAnswer());

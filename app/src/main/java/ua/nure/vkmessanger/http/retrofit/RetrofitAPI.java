@@ -32,17 +32,29 @@ public interface RetrofitAPI {
                                   @Query("message") String message,
                                   @Query("access_token") String accessToken);
 
+    /**
+     * @param userIds  список id пользователей, разделенных через запятую.
+     * @param fields   список дополнительных полей профилей, которые необходимо вернуть.
+     * @param nameCase падеж для склонения имени и фамилии пользователя.
+     *                 Возможные значения:
+     *                 именительный – nom, родительный – gen, дательный – dat,
+     *                 винительный – acc, творительный – ins, предложный – abl.
+     *                 По умолчанию nom.
+     */
     @GET("users.get")
-    Call<JsonElement> getUser(@Query("v") String vkApiVersion,
-                              @Query("user_ids") String user_ids,
-                              @Query("fields") String fields,
-                              @Query("name_case") String name_case,
-                              @Query("access_token") String accessToken);
+    Call<JsonElement> getUsers(@Query("v") String vkApiVersion,
+                               @Query("user_ids") String userIds,
+                               @Query("fields") String fields,
+                               @Query("name_case") String nameCase,
+                               @Query("access_token") String accessToken);
 
+    /**
+     * @param chatIds список id чатов, разделенных через запятую.
+     */
     @GET("messages.getChat")
-    Call<JsonElement> getChat(@Query("v") String vkApiVersion,
-                              @Query("chat_id") int chat_id,
-                              @Query("access_token") String accessToken);
+    Call<JsonElement> getChats(@Query("v") String vkApiVersion,
+                               @Query("chat_ids") String chatIds,
+                               @Query("access_token") String accessToken);
 
     /**
      * @param groupsIds id или screen_name одной или нескольких(до 500 шт.) групп,

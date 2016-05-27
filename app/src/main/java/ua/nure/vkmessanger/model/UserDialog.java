@@ -28,17 +28,28 @@ public class UserDialog {
     public int getUserId() {
         return userId;
     }
-    public int getChatId() { return chatId; }
+
+    public int getChatId() {
+        return chatId;
+    }
 
     /**
      * @return id пользователя, если это ЛС, или id общего чата, если это групповой диалог.
      */
-    public int getDialogId(){
+    public int getDialogId() {
         return chatId > 0 ? CHAT_PREFIX + chatId : userId;
     }
 
+    public boolean isChat() {
+        return chatId > 0;
+    }
 
-    public boolean isChat() { return chatId > 0; }
+    /**
+     * @return true, если это ЛС.
+     */
+    public boolean isSingle() {
+        return chatId == 0;
+    }
 
     public String getLastMessage() {
         return lastMessage;

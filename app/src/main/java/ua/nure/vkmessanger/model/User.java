@@ -9,24 +9,26 @@ public class User {
 
     private String fullAvatarOriginalUrl;
 
+    private String avatar200Url;
+
     private String firstName, lastName;
 
     private String birthDayDate;
 
-    public User(int id, String avatar, String fName, String lName, String birthday) {
+    private boolean isOnline;
+
+    public User(int id, String fName, String lName, String birthday, String avatar200, String avatarOriginal, boolean online) {
         this.id = id;
-        this.fullAvatarOriginalUrl = avatar;
         this.lastName = lName;
         this.firstName = fName;
         this.birthDayDate = birthday;
+        this.avatar200Url = avatar200;
+        this.fullAvatarOriginalUrl = avatarOriginal;
+        this.isOnline = online;
     }
 
     public int getId() {
         return id;
-    }
-
-    public String getFullAvatarOriginalUrl() {
-        return fullAvatarOriginalUrl;
     }
 
     public String getFirstName() {
@@ -39,5 +41,17 @@ public class User {
 
     public String getBirthDayDate() {
         return birthDayDate;
+    }
+
+    public String getAvatar200Url() {
+        return avatar200Url;
+    }
+
+    public String getFullAvatarOriginalUrl() {
+        return fullAvatarOriginalUrl;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
     }
 }

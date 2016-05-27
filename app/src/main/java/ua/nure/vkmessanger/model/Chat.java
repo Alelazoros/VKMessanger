@@ -1,5 +1,7 @@
 package ua.nure.vkmessanger.model;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 /**
@@ -8,15 +10,34 @@ import java.util.List;
 public class Chat {
 
     private int chatId;
+
     private String chatName;
-    private List<User> usersInChat;
+
+    private List<User> usersList;
+
     private int chatAdminId;
 
-    public Chat(int id, String name, List<User> users, int chatAdminId) {
-        this.chatId = id;
-        this.chatName = name;
-        this.usersInChat = users;
-        this.chatAdminId = chatAdminId;
+    @Nullable
+    private String chatAvatar100Url;
+
+    @Nullable
+    private String chatAvatar200Url;
+
+
+    /**
+     * Поле usersList данного объекта Chat будет инициализированно не в констркуторе,
+     * а cеттером setUsersList(List<User> list);
+     * <p/>
+     * После загрузки всех чатов будет сделан один общий запрос, из которого
+     * будет получен список всех пользователей для всех чатов. А затем из этого
+     * списка будет заполняться usersList для каждого диалога.
+     */
+    public Chat(int id, String title, int adminId, @Nullable String avatar100, @Nullable String avatar200) {
+        chatId = id;
+        chatName = title;
+        chatAdminId = adminId;
+        chatAvatar100Url = avatar100;
+        chatAvatar200Url = avatar200;
     }
 
     public int getChatId() {
@@ -27,11 +48,25 @@ public class Chat {
         return chatName;
     }
 
-    public List<User> getUsersInChat() {
-        return usersInChat;
+    public List<User> getUsersList() {
+        return usersList;
     }
 
     public int getChatAdminId() {
         return chatAdminId;
+    }
+
+    @Nullable
+    public String getChatAvatar100Url() {
+        return chatAvatar100Url;
+    }
+
+    @Nullable
+    public String getChatAvatar200Url() {
+        return chatAvatar200Url;
+    }
+
+    public void setUsersList(List<User> usersList) {
+        this.usersList = usersList;
     }
 }
