@@ -139,7 +139,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             String lastMessageAuthorAvatarUrl = null;
             if (!dialog.isChat()) {
                 User user = (User) dialog.getBody();
-                lastMessageAuthorAvatarUrl = user.getAvatar200Url();
+                lastMessageAuthorAvatarUrl = user.getAvatar100Url();
             } else {
                 int userId = dialog.getUserId();
 
@@ -147,7 +147,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
                 List<User> users = chat.getUsersList();
                 for (User user : users) {
                     if (user.getId() == userId) {
-                        lastMessageAuthorAvatarUrl = user.getAvatar200Url();
+                        lastMessageAuthorAvatarUrl = user.getAvatar100Url();
                     }
                 }
             }
@@ -156,7 +156,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         @Override
         public void onClick(View v) {
-            if (clickListener != null){
+            if (clickListener != null) {
                 clickListener.onDialogClick(getLayoutPosition());
             }
         }
