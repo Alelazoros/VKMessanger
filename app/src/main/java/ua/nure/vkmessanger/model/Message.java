@@ -9,6 +9,11 @@ public class Message {
 
     private int mMessageId;
 
+    /**
+     * Когда отправляю свое сообщение, то userId ставлю -1 в качестве заглушки.
+     */
+    private int mUserId;
+
     private boolean mFromMe;
 
     private boolean mRead;
@@ -20,17 +25,22 @@ public class Message {
     private Attachment[] mAttachments;
 
 
-    public Message(int messageId, boolean fromMe, boolean read, String messageBody, Date date, Attachment[] attachments) {
-        this.mMessageId = messageId;
-        this.mFromMe = fromMe;
-        this.mRead = read;
-        this.mMessageBody = messageBody;
-        this.mDate = date;
-        this.mAttachments = attachments;
+    public Message(int messageId, int userId, boolean fromMe, boolean read, String messageBody, Date date, Attachment[] attachments) {
+        mMessageId = messageId;
+        mUserId = userId;
+        mFromMe = fromMe;
+        mRead = read;
+        mMessageBody = messageBody;
+        mDate = date;
+        mAttachments = attachments;
     }
 
     public int getMessageId() {
         return mMessageId;
+    }
+
+    public int getUserId() {
+        return mUserId;
     }
 
     public boolean isFromMe() {

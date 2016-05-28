@@ -114,7 +114,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void initRecyclerView() {
-        adapter = new DialogAdapter(this, messages, mMessageClickListener);
+        adapter = new DialogAdapter(this, dialog, messages, mMessageClickListener, this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);

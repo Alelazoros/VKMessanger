@@ -3,6 +3,7 @@ package ua.nure.vkmessanger.adapter;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +18,16 @@ import java.util.List;
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Audio;
+import ua.nure.vkmessanger.model.Chat;
 import ua.nure.vkmessanger.model.Document;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.Photo;
+import ua.nure.vkmessanger.model.User;
+import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.Video;
 import ua.nure.vkmessanger.model.WallPost;
+import ua.nure.vkmessanger.util.PicassoUtils;
 
 /**
  * Адаптер для диалога.
@@ -57,13 +62,20 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
     @Nullable
     private OnMessageClickListener mClickListener;
 
+    /**
+     * Объект текущего диалога.
+     */
+    private UserDialog mDialog;
 
-    public DialogAdapter(Context context, @Nullable List<Message> messages, @Nullable OnMessageClickListener listener) {
+
+    public DialogAdapter(Context context, UserDialog dialog, @Nullable List<Message> messages,
+                         @Nullable OnMessageClickListener listener, @Nullable OnDialogEndListener dialogEndListener) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mMessages = messages;
-        mDialogEndListener = (OnDialogEndListener) context;
+        mDialogEndListener = dialogEndListener;
         mClickListener = listener;
+        mDialog = dialog;
         setHasStableIds(true);
     }
 
@@ -80,7 +92,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(viewType, parent, false);
-        return new MessageViewHolder(mContext, view, viewType, mClickListener);
+        return new MessageViewHolder(mContext, view, viewType, mClickListener, mDialog);
     }
 
     @Override
@@ -109,9 +121,15 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
 
         private Context mContext;
 
+        private UserDialog mDialog;
+
         private LayoutInflater mInflater;
 
         private OnMessageClickListener mClickListener;
+
+        //------Chat user avatar-----//
+
+        private ImageView mChatUserAvatarImageView;
 
         //--------Message text-------//
 
@@ -139,11 +157,19 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         private int mPhotosAndVideosCounter = 0;
 
 
-        public MessageViewHolder(Context context, View itemView, int viewType, OnMessageClickListener clickListener) {
+        public MessageViewHolder(Context context, View itemView, int viewType, OnMessageClickListener clickListener,
+                                 UserDialog dialog) {
             super(itemView);
             mContext = context;
             mInflater = LayoutInflater.from(context);
             mClickListener = clickListener;
+
+            this.mDialog = dialog;
+            mChatUserAvatarImageView = (ImageView) itemView.findViewById(R.id.chatUserAvatarImageView);
+            if (mDialog.isChat() && mChatUserAvatarImageView != null) {
+                mChatUserAvatarImageView.setVisibility(View.VISIBLE);
+            }
+
 
             //Message text.
             mMessageTV = (TextView) itemView.findViewById(R.id.messageTextView);
@@ -166,10 +192,34 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
             mMessageTV.setVisibility(message.getMessageBody().equals("") ? View.GONE : View.VISIBLE);
             mMessageTV.setText(message.getMessageBody());
 
-            if (!message.hasAttachments()) {
-                return;
+            //Если это чат и это не мое сообщение, то получаю аватарку юзера.
+            if (mDialog.isChat() && !message.isFromMe()) {
+                Chat chat = (Chat) mDialog.getBody();
+                bindChatUserAvatar(message, chat);
             }
-            bindMessageAttachments(message.getAttachments());
+
+            if (message.hasAttachments()) {
+                bindMessageAttachments(message.getAttachments());
+            }
+        }
+
+        private void bindChatUserAvatar(Message message, Chat chat) {
+            List<User> chatUsers = chat.getUsersList();
+
+            String avatar = null;
+            for (User user : chatUsers) {
+                if (user.getId() == message.getUserId()) {
+                    avatar = user.getAvatar100Url();
+                }
+            }
+            if (avatar != null) {
+                Picasso.with(mContext)
+                        .load(avatar)
+                        .transform(PicassoUtils.getCircleTransformation())
+                        .into(mChatUserAvatarImageView);
+            } else {
+                mChatUserAvatarImageView.setImageResource(R.drawable.default_avatar_camera_100);
+            }
         }
 
         private void bindMessageAttachments(Attachment[] attachments) {

@@ -109,6 +109,7 @@ public class RESTVkSdkManager implements RESTInterface {
                         JSONObject object = jsonMessagesArray.getJSONObject(i);
 
                         int messageId = object.getInt("id");
+                        int userId = object.getInt("user_id");
                         boolean isMessageFromMe = object.getInt("out") == MESSAGE_WAS_SEND_FROM_ME;
                         boolean isRead = object.getInt("read_state") == MESSAGE_WAS_READ;
                         String messageBody = object.getString("body");
@@ -116,8 +117,7 @@ public class RESTVkSdkManager implements RESTInterface {
                         Attachment[] attachments = null;
 
                         //TODO: сделать парсинг вложений (attachments).
-
-                        messages.add(new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments));
+                        messages.add(new Message(messageId, userId, isMessageFromMe, isRead, messageBody, date, attachments));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

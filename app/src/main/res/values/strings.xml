@@ -29,5 +29,6 @@
     <string name="document_text">Документ</string>
     <string name="dialog_avatar">Аватар диалога</string>
     <string name="dialog_last_message_author">Автор последнего сообщения</string>
+    <string name="chat_user_avatar">Аватар пользователя</string>
 
 </resources>

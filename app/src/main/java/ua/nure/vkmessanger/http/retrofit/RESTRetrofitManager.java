@@ -10,10 +10,8 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -280,8 +278,9 @@ public class RESTRetrofitManager implements RESTInterface {
                 Attachment[] attachments = null;
 
                 //TODO: 3-й параметр(isRead) false - под вопросом.
+                //TODO: передавать реальный userId, а не заглушку -1.
                 customResponseResult.setRequestResult(RequestResult.SUCCESS)
-                        .setAnswer(new Message(messageId, true, false, message, date, attachments));
+                        .setAnswer(new Message(messageId, -1, true, false, message, date, attachments));
             } else if (responseObject.has("error")) {
                 JsonElement errorObject = responseObject.get("error");
                 customResponseResult.setAnswer(errorObject.getAsJsonObject().get("error_code").getAsInt());
@@ -346,6 +345,7 @@ public class RESTRetrofitManager implements RESTInterface {
     private Message parseMessage(JsonObject messageJSON) {
 
         int messageId = messageJSON.get("id").getAsInt();
+        int userId = messageJSON.get("user_id").getAsInt();
         boolean isMessageFromMe = messageJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
         boolean isRead = messageJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
         String messageBody = messageJSON.get("body").getAsString();
@@ -358,7 +358,7 @@ public class RESTRetrofitManager implements RESTInterface {
         if (messageJSON.has("attachments")) {
             attachments = parseAttachments(messageJSON.getAsJsonArray("attachments"));
         }
-        return new Message(messageId, isMessageFromMe, isRead, messageBody, date, attachments);
+        return new Message(messageId, userId, isMessageFromMe, isRead, messageBody, date, attachments);
     }
 
     private Attachment[] parseAttachments(JsonArray attachmentsJSONArray) {
