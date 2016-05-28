@@ -155,13 +155,4 @@ public class RESTVkSdkManager implements RESTInterface {
         return new CustomResponse();
     }
 
-    @Override
-    public CustomResponse loadUsers(List<UserDialog> input){
-        return new CustomResponse();
-    }
-
-    @Override
-    public CustomResponse loadChats(List<UserDialog> input){
-        return new CustomResponse();
-    }
 }

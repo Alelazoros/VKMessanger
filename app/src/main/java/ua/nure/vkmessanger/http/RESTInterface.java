@@ -1,9 +1,6 @@
 package ua.nure.vkmessanger.http;
 
-import java.util.List;
-
 import ua.nure.vkmessanger.http.model.CustomResponse;
-import ua.nure.vkmessanger.model.UserDialog;
 
 /**
  * Интерфейс, который должен быть реализован классом, который работает с Http-запросами.
@@ -57,10 +54,5 @@ public interface RESTInterface {
      * @return список объектов Group внутри объекта CustomResponse.setAnswer(..), если RequestResult == SUCCESS.
      */
     CustomResponse getGroupsInfoByIds(String[] groupIds);
-
-
-    CustomResponse loadUsers(List<UserDialog> input);
-
-    CustomResponse loadChats(List<UserDialog> input);
 
 }

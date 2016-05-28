@@ -33,6 +33,7 @@ import ua.nure.vkmessanger.model.Message;
 import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.WallPost;
+import ua.nure.vkmessanger.util.CollectionsUtils;
 
 public class SelectedDialogActivity extends AppCompatActivity
         implements DialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
@@ -266,18 +267,10 @@ public class SelectedDialogActivity extends AppCompatActivity
             }
 
             //В адаптер передаю только поверхностную копию списка сообщений.
-            List<Message> copy = copyOf(messages);
+            List<Message> copy = CollectionsUtils.copyOf(messages);
             adapter.setMessages(copy);
             adapter.notifyDataSetChanged();
         }
-    }
-
-    private List<Message> copyOf(List<Message> list) {
-        List<Message> copy = new ArrayList<>(list.size());
-        for (int i = 0; i < list.size(); i++) {
-            copy.add(list.get(i));
-        }
-        return copy;
     }
 
     private void mergeUpdatedMessages(List<Message> oldMessages, List<Message> updatedMessages) {

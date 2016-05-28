@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -32,9 +31,8 @@ import ua.nure.vkmessanger.http.model.CustomResponse;
 import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
-import ua.nure.vkmessanger.model.Chat;
-import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
+import ua.nure.vkmessanger.util.CollectionsUtils;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
@@ -47,10 +45,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private final List<UserDialog> dialogs = new ArrayList<>();
 
-    private final List<User> users = new ArrayList<>();
-
-    private final List<Chat> chats = new ArrayList<>();
-
     private MainAdapter adapter;
 
     private Handler handler = new Handler();
@@ -59,10 +53,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Константа, используемая в LoaderCallbacks для идентификации Loader-а.
      */
     private static final int LOAD_USER_DIALOGS = 1;
-
-    private static final int LOAD_USERS = 2;
-
-    private static final int LOAD_CHATS = 3;
 
 
     @Override
@@ -147,15 +137,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getSupportLoaderManager().restartLoader(LOAD_USER_DIALOGS, null, this);
     }
 
-    private void loadUsers() {
-        getSupportLoaderManager().restartLoader(LOAD_USERS, null, this);
-    }
-
-    private void loadChats() {
-        getSupportLoaderManager().restartLoader(LOAD_CHATS, null, this);
+    private void loadDialogsWithTimeout() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadUserDialogs();
+            }
+        }, UPDATE_INTERVAL_MILLIS);
     }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
+
 
     @Override
     public Loader<CustomResponse> onCreateLoader(final int id, Bundle args) {
@@ -165,10 +157,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 switch (id) {
                     case LOAD_USER_DIALOGS:
                         return restInterface.loadUserDialogs();
-                    case LOAD_USERS:
-                        return restInterface.loadUsers(dialogs);
-                    case LOAD_CHATS:
-                        return restInterface.loadChats(dialogs);
                     default:
                         return null;
                 }
@@ -176,88 +164,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
     }
 
-    private boolean usersOrChatsLoaded = false;
-
-    private boolean allLoadersFinished = false;
-
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
 
-        if (data.getRequestResult() != RequestResult.SUCCESS){
-            return;
-        }
+        if (data.getRequestResult() == RequestResult.SUCCESS) {
 
-        switch (loader.getId()) {
-            case LOAD_USER_DIALOGS:
-                if (allLoadersFinished) {
-                    //Если onLoadFinished() вызывается после того, как пользователь вернулся на данную
-                    //Активити, то надо перезапустить главный лоадер, иначе слияние пользователей и чатов
-                    //будет произведено не корректно, вследствие чего есть вероятность выброса
-                    //NullPointerException в MainAdapter-е.
-                    loadUserDialogs();
-                    allLoadersFinished = false;
-                } else {
+            switch (loader.getId()) {
+                case LOAD_USER_DIALOGS:
                     dialogs.clear();
                     dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
-                    loadUsers();
-                    loadChats();
-                }
-                break;
-            case LOAD_USERS:
-                users.clear();
-                users.addAll(data.<List<User>>getTypedAnswer());
-                if (usersOrChatsLoaded) {
-                    mergeUsersWithChats();
-                    usersOrChatsLoaded = false;
-                } else {
-                    usersOrChatsLoaded = true;
-                }
-                break;
-            case LOAD_CHATS:
-                chats.clear();
-                chats.addAll(data.<List<Chat>>getTypedAnswer());
-                if (usersOrChatsLoaded) {
-                    mergeUsersWithChats();
-                    usersOrChatsLoaded = false;
-                } else {
-                    usersOrChatsLoaded = true;
-                }
-                break;
-        }
-    }
 
+                    //В адаптер передаю поверхностную копию списка диалогов.
+                    List<UserDialog> copyDialogs = CollectionsUtils.copyOf(dialogs);
+                    adapter.setDialogs(copyDialogs);
+                    adapter.notifyDataSetChanged();
 
-    private void mergeUsersWithChats() {
-        int indexChat = 0;
-        int indexUser = 0;
-        for (UserDialog dialog : dialogs) {
-
-            if (dialog.isSingle()) {
-                dialog.setBody(users.get(indexUser++));
-            } else {
-                dialog.setBody(chats.get(indexChat++));
+                    //Затем запускаю обновление диалога с определенным интервалом.
+                    loadDialogsWithTimeout();
+                    break;
             }
         }
-        //В адаптер передаю поверхностную копию списка диалогов.
-        List<UserDialog> copyDialogs = new ArrayList<>(dialogs.size());
-        for (int i = 0; i < dialogs.size(); i++) {
-            copyDialogs.add(dialogs.get(i));
-        }
-
-        adapter.setDialogs(copyDialogs);
-        adapter.notifyDataSetChanged();
-        allLoadersFinished = true;
-
-        loadDialogsWithTimeout();
-    }
-
-    private void loadDialogsWithTimeout() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadUserDialogs();
-            }
-        }, UPDATE_INTERVAL_MILLIS);
     }
 
     @Override

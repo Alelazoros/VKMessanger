@@ -76,8 +76,7 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
 
-    @Override
-    public CustomResponse loadUsers(List<UserDialog> input) {
+    private CustomResponse loadUsers(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
         RetrofitAPI api = getRetrofit();
@@ -113,8 +112,7 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
-    @Override
-    public CustomResponse loadChats(List<UserDialog> input) {
+    private CustomResponse loadChats(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
         RetrofitAPI api = getRetrofit();
@@ -154,13 +152,13 @@ public class RESTRetrofitManager implements RESTInterface {
                 }
 
                 //Подгружаю всех пользователей-собеседников для всех чатов одним запросом.
-                CustomResponse chatUsersResponse = loadChatsUsers(api, chatUserIdsSet, chatsUsersTempMap);
+                CustomResponse chatUsersResponse = mapUsersToChats(api, chatUserIdsSet, chatsUsersTempMap);
                 if (chatUsersResponse.getRequestResult() == RequestResult.SUCCESS) {
 
                     //Получил список всех пользователей для каждого чата.
-                    Map<Integer, List<User>> chatUsers = chatUsersResponse.getTypedAnswer();
+                    Map<Integer, List<User>> chatUsersResultMap = chatUsersResponse.getTypedAnswer();
                     for (int i = 0; i < chats.size(); i++) {
-                        chats.get(i).setUsersList(chatUsers.get(i));
+                        chats.get(i).setUsersList(chatUsersResultMap.get(i));
                     }
                     customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(chats);
                 }
@@ -171,7 +169,7 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
-    private CustomResponse loadChatsUsers(RetrofitAPI api, Set<Integer> usersSet, Map<Integer, List<Integer>> chatsUsersMap) {
+    private CustomResponse mapUsersToChats(RetrofitAPI api, Set<Integer> usersSet, Map<Integer, List<Integer>> chatsUsersMap) {
         CustomResponse response = new CustomResponse();
 
         StringBuilder idsBuilder = new StringBuilder();
@@ -227,7 +225,7 @@ public class RESTRetrofitManager implements RESTInterface {
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
-                Log.d(RETROFIT_MANAGER_LOG_TAG, "request SUCCESSFUL");
+                Log.d(RETROFIT_MANAGER_LOG_TAG, "LOAD DIALOGS SUCCESSFUL");
 
                 List<UserDialog> dialogs = new ArrayList<>();
 
@@ -250,14 +248,40 @@ public class RESTRetrofitManager implements RESTInterface {
                 }
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
 
-                customResponseResult.setRequestResult(RequestResult.SUCCESS)
-                        .setAnswer(dialogs);
+                //После получания самих объектов UserDialog нужно заполнить их содержимое (Chat or User).
+                CustomResponse usersResponse = loadUsers(dialogs);
+                CustomResponse chatsResponse = loadChats(dialogs);
+
+                if (usersResponse.getRequestResult() == RequestResult.SUCCESS &&
+                        chatsResponse.getRequestResult() == RequestResult.SUCCESS) {
+
+                    List<User> users = usersResponse.getTypedAnswer();
+                    List<Chat> chats = chatsResponse.getTypedAnswer();
+
+                    mergeUsersWithChats(dialogs, users, chats);
+
+                    customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                            .setAnswer(dialogs);
+                }
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         return customResponseResult;
+    }
+
+    private void mergeUsersWithChats(List<UserDialog> dialogs, List<User> users, List<Chat> chats) {
+        int indexChat = 0;
+        int indexUser = 0;
+        for (UserDialog dialog : dialogs) {
+
+            if (dialog.isSingle()) {
+                dialog.setBody(users.get(indexUser++));
+            } else {
+                dialog.setBody(chats.get(indexChat++));
+            }
+        }
     }
 
 
