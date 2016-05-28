@@ -71,7 +71,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         private static final int MAX_TITLE_LENGTH = 30;
 
-        private static final int MAX_LAST_MESSAGE_LENGTH = 50;
+        private static final int MAX_LAST_MESSAGE_LENGTH = 40;
 
         private OnDialogClickListener clickListener;
 
