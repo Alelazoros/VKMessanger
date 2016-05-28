@@ -2,12 +2,13 @@ package ua.nure.vkmessanger.model;
 
 import android.support.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Nickitee on 15.05.2016.
  */
-public class Chat {
+public class Chat implements Serializable {
 
     private int chatId;
 

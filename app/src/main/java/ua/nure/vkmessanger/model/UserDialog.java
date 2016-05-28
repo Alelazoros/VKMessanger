@@ -1,9 +1,11 @@
 package ua.nure.vkmessanger.model;
 
+import java.io.Serializable;
+
 /**
  * Объект, представляющий диалог в списке диалогов пользователя.
  */
-public class UserDialog {
+public class UserDialog implements Serializable {
 
     /**
      * Префикс нужен для передачи аргумента в метод messages.getHistory из VK API.

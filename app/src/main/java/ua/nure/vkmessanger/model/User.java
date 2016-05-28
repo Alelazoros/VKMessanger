@@ -1,9 +1,11 @@
 package ua.nure.vkmessanger.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Nickitee on 15.05.2016.
  */
-public class User {
+public class User implements Serializable {
 
     private int id;
 

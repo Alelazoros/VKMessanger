@@ -28,12 +28,13 @@ import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Attachment;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.WallPost;
 
 public class SelectedDialogActivity extends AppCompatActivity
         implements DialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
 
-    private static final String EXTRA_SELECTED_DIALOG_ID = "EXTRA_SELECTED_DIALOG_ID";
+    private static final String EXTRA_SELECTED_DIALOG = "EXTRA_SELECTED_DIALOG";
 
     /**
      * Константа, передаваемая в Bundle Loader-а при подгрузке истории сообщений.
@@ -61,7 +62,7 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private DialogAdapter adapter;
 
-    private int dialogId;
+    private UserDialog dialog;
 
 
     @Override
@@ -76,14 +77,14 @@ public class SelectedDialogActivity extends AppCompatActivity
         getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
     }
 
-    public static void newIntent(Context context, int dialogId) {
+    public static void newIntent(Context context, UserDialog dialog) {
         Intent intent = new Intent(context, SelectedDialogActivity.class);
-        intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG_ID, dialogId);
+        intent.putExtra(SelectedDialogActivity.EXTRA_SELECTED_DIALOG, dialog);
         context.startActivity(intent);
     }
 
     private void getDataFromIntent(Intent intent) {
-        dialogId = intent.getIntExtra(EXTRA_SELECTED_DIALOG_ID, -1);
+        dialog = (UserDialog) intent.getExtras().get(EXTRA_SELECTED_DIALOG);
     }
 
     private void initToolbar() {
@@ -176,13 +177,13 @@ public class SelectedDialogActivity extends AppCompatActivity
             public CustomResponse apiCall() throws IOException {
                 switch (id) {
                     case LOAD_FIRST_MESSAGES:
-                        return restInterface.loadSelectedDialogById(dialogId, 0);
+                        return restInterface.loadSelectedDialogById(dialog.getDialogId(), 0);
                     case LOAD_MORE_MESSAGES:
                         int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
-                        return restInterface.loadSelectedDialogById(dialogId, offset);
+                        return restInterface.loadSelectedDialogById(dialog.getDialogId(), offset);
                     case SEND_MESSAGE:
                         String Message = args.getString(MESSAGE_LOADER_BUNDLE_ARGUMENT);
-                        return restInterface.sendMessageTo(Message, dialogId);
+                        return restInterface.sendMessageTo(Message, dialog.getDialogId());
                     default:
                         return null;
                 }

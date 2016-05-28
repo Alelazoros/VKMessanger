@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onDialogClick(int position) {
                 UserDialog dialog = dialogs.get(position);
-                SelectedDialogActivity.newIntent(MainActivity.this, dialog.getDialogId());
+                SelectedDialogActivity.newIntent(MainActivity.this, dialog);
             }
         });
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.dialogRecyclerView);
