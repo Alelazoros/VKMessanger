@@ -43,6 +43,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
         mInflater = LayoutInflater.from(context);
         mDialogs = dialogs;
         mClickListener = clickListener;
+        setHasStableIds(true);
     }
 
     public void setDialogs(List<UserDialog> dialogs) {
@@ -65,6 +66,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
     @Override
     public int getItemCount() {
         return mDialogs != null ? mDialogs.size() : 0;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mDialogs != null ? mDialogs.get(position).getDialogId() : -1;
     }
 
     static class DialogHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
