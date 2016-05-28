@@ -112,6 +112,50 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
+    private CustomResponse loadFriends() {
+        CustomResponse customResponseResult = new CustomResponse();
+        RetrofitAPI api = getRetrofit();
+        List<User> users = new ArrayList<>();
+
+
+        Call<JsonElement> retrofitCall = api.getFriends(VK_API_VERSION,
+                                                        "hints",
+                                                        "photo_200_orig, photo_100,bdate",
+                                                        "Nom",
+                                                        AccessTokenManager.getAccessToken((mContext)));
+
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+                JsonObject jsonResponse = retrofitResponse.body().getAsJsonObject().get("response").getAsJsonObject();
+                if (jsonResponse.get("count").getAsInt() > 0) {
+                    JsonArray jsonArray = jsonResponse.getAsJsonArray("items");
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonObject eachElement = jsonArray.get(i).getAsJsonObject();
+                        users.add(new User(eachElement.get("id").getAsInt(),
+                                eachElement.has("first_name") ? eachElement.get("first_name").getAsString() : null,
+                                eachElement.has("last_name") ? eachElement.get("last_name").getAsString() : null,
+                                eachElement.has("bdate") ? eachElement.get("bdate").getAsString() : null,
+                                eachElement.has("photo_100") ? eachElement.get("photo_100").getAsString() : null,
+                                eachElement.has("photo_200_orig") ? eachElement.get("photo_200_orig").getAsString() : null,
+                                eachElement.has("photo_200_orig") ? eachElement.get("photo_200_orig").getAsString() : null,
+                                eachElement.get("online").getAsBoolean()
+                        ));
+
+
+                    }
+                    customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(users);
+
+                }
+            }
+        }
+        catch (IOException e ){
+            e.printStackTrace();
+        }
+
+        return customResponseResult;
+
+    }
     private CustomResponse loadChats(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
@@ -251,6 +295,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 //После получания самих объектов UserDialog нужно заполнить их содержимое (Chat or User).
                 CustomResponse usersResponse = loadUsers(dialogs);
                 CustomResponse chatsResponse = loadChats(dialogs);
+                CustomResponse friendsResponse = loadFriends();
 
                 if (usersResponse.getRequestResult() == RequestResult.SUCCESS &&
                         chatsResponse.getRequestResult() == RequestResult.SUCCESS) {

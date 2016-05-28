@@ -32,6 +32,8 @@ public interface RetrofitAPI {
                                   @Query("message") String message,
                                   @Query("access_token") String accessToken);
 
+
+
     /**
      * @param userIds  список id пользователей, разделенных через запятую.
      * @param fields   список дополнительных полей профилей, которые необходимо вернуть.
@@ -64,5 +66,12 @@ public interface RetrofitAPI {
     @GET("groups.getById")
     Call<JsonElement> getGroupsByIds(@Query("v") String vkApiVersion,
                                      @Query("group_ids") String groupsIds);
+
+    @GET("friends.get")
+    Call<JsonElement> getFriends(@Query("v") String vkApiVersion,
+                                   @Query("order") String order,
+                                   @Query("fields")  String fields,
+                                   @Query("name_case") String name_case,
+                                   @Query("access_token") String accessToken);
 
 }
