@@ -29,6 +29,7 @@ import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.adapter.MainAdapter;
 import ua.nure.vkmessanger.http.RESTInterface;
 import ua.nure.vkmessanger.http.model.CustomResponse;
+import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Chat;
@@ -181,7 +182,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
-        Log.d("LOADERS", String.valueOf(loader.isAbandoned()) + loader.getId());
+
+        if (data.getRequestResult() != RequestResult.SUCCESS){
+            return;
+        }
 
         switch (loader.getId()) {
             case LOAD_USER_DIALOGS:
@@ -192,13 +196,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     //NullPointerException в MainAdapter-е.
                     loadUserDialogs();
                     allLoadersFinished = false;
-//                    Log.d("MAIN_ACTIVITY", "ALL_LOADERS_FINISHED");
                 } else {
                     dialogs.clear();
                     dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
                     loadUsers();
                     loadChats();
-//                    Log.d("MAIN_ACTIVITY", "FIRSTLY_LOADERS_FINISHED");
                 }
                 break;
             case LOAD_USERS:
@@ -210,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else {
                     usersOrChatsLoaded = true;
                 }
-//                Log.d("MAIN_ACTIVITY", "LOAD_USERS" + allLoadersFinished);
                 break;
             case LOAD_CHATS:
                 chats.clear();
@@ -221,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else {
                     usersOrChatsLoaded = true;
                 }
-//                Log.d("MAIN_ACTIVITY", "LOAD_CHATS" + allLoadersFinished);
                 break;
         }
     }

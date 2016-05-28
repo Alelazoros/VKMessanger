@@ -27,24 +27,22 @@ public abstract class BaseLoader extends AsyncTaskLoader<CustomResponse> {
     public CustomResponse loadInBackground() {
         try {
             CustomResponse response = apiCall();
-            if (response.getRequestResult() == RequestResult.SUCCESS){
+            if (response.getRequestResult() == RequestResult.SUCCESS) {
                 response.save(getContext());
                 onSuccess();
-            }
-            else {
+            } else {
                 onError();
             }
             return response;
-        }
-        catch (IOException ex){
+        } catch (Exception ex) {
             onError();
             return new CustomResponse();
         }
     }
 
-    protected void onSuccess(){ }
+    protected void onSuccess() { }
 
-    protected void onError(){ }
+    protected void onError() { }
 
     public abstract CustomResponse apiCall() throws IOException;
 }
