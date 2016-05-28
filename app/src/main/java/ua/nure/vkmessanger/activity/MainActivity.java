@@ -152,21 +152,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getSupportLoaderManager().restartLoader(LOAD_CHATS, null, this);
     }
 
-    private void mergeUsersWithChats() {
-        int indexChat = 0;
-        int indexUser = 0;
-        for (UserDialog dialog : dialogs) {
-
-            if (dialog.isSingle()) {
-                dialog.setBody(users.get(indexUser++));
-            } else {
-                dialog.setBody(chats.get(indexChat++));
-            }
-        }
-        adapter.setDialogs(dialogs);
-        adapter.notifyDataSetChanged();
-    }
-
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
     @Override
@@ -190,14 +175,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private boolean usersOrChatsLoaded = false;
 
+    private boolean allLoadersFinished = false;
+
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
         switch (loader.getId()) {
             case LOAD_USER_DIALOGS:
-                dialogs.clear();
-                dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
-                loadUsers();
-                loadChats();
+                if (allLoadersFinished) {
+                    //Если onLoadFinished() вызывается после того, как пользователь вернулся на данную
+                    //Активити, то надо перезапустить главный лоадер, иначе слияние пользователей и чатов
+                    //будет произведено не корректно, вследствие чего есть вероятность выброса
+                    //NullPointerException в MainAdapter-е.
+                    allLoadersFinished = false;
+                    loadUserDialogs();
+                } else {
+                    dialogs.clear();
+                    dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
+                    loadUsers();
+                    loadChats();
+                }
                 break;
             case LOAD_USERS:
                 users.clear();
@@ -220,6 +216,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 break;
         }
+    }
+
+
+
+    private void mergeUsersWithChats() {
+        int indexChat = 0;
+        int indexUser = 0;
+        for (UserDialog dialog : dialogs) {
+
+            if (dialog.isSingle()) {
+                dialog.setBody(users.get(indexUser++));
+            } else {
+                dialog.setBody(chats.get(indexChat++));
+            }
+        }
+        adapter.setDialogs(dialogs);
+        adapter.notifyDataSetChanged();
+        allLoadersFinished = true;
     }
 
     @Override
