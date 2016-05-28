@@ -178,11 +178,15 @@ public class SelectedDialogActivity extends AppCompatActivity
             Bundle args = new Bundle();
             args.putString(MESSAGE_LOADER_BUNDLE_ARGUMENT, messageText);
             editText.setText("");
-            getSupportLoaderManager().restartLoader(SEND_MESSAGE, args, this);
+            getSupportLoaderManager().initLoader(SEND_MESSAGE, args, this);
         }
     }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
+
+    private void destroyLoader(int loaderId){
+        getSupportLoaderManager().destroyLoader(loaderId);
+    }
 
     @Override
     public Loader<CustomResponse> onCreateLoader(final int id, final Bundle args) {
@@ -216,9 +220,11 @@ public class SelectedDialogActivity extends AppCompatActivity
                     break;
                 case LOAD_MORE_MESSAGES:
                     messages.addAll(data.<List<Message>>getTypedAnswer());
+                    destroyLoader(loader.getId());
                     break;
                 case SEND_MESSAGE:
                     messages.add(0, data.<Message>getTypedAnswer());
+                    destroyLoader(loader.getId());
                     break;
             }
             adapter.notifyDataSetChanged();
