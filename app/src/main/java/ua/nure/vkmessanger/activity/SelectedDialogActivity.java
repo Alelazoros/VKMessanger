@@ -26,8 +26,10 @@ import ua.nure.vkmessanger.http.model.RequestResult;
 import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.Attachment;
+import ua.nure.vkmessanger.model.Chat;
 import ua.nure.vkmessanger.model.Link;
 import ua.nure.vkmessanger.model.Message;
+import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.WallPost;
 
@@ -89,7 +91,7 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Selected dialog");
+        toolbar.setTitle(getDialogTitle(dialog));
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_backspace);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +99,18 @@ public class SelectedDialogActivity extends AppCompatActivity
                 finish();
             }
         });
+    }
+
+    private String getDialogTitle(UserDialog userDialog) {
+        String title;
+        if (userDialog.isSingle()) {
+            User user = (User) userDialog.getBody();
+            title = String.format("%s %s", user.getFirstName(), user.getLastName());
+        } else {
+            Chat chat = (Chat) userDialog.getBody();
+            title = chat.getChatName();
+        }
+        return title;
     }
 
     private void initRecyclerView() {
