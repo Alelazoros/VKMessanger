@@ -50,6 +50,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
         mDialogs = dialogs;
     }
 
+    public UserDialog getItem(int position){
+        return mDialogs != null ? mDialogs.get(position) : null;
+    }
+
     @Override
     public DialogHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(LAYOUT, parent, false);

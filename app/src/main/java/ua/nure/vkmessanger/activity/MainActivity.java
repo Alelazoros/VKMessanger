@@ -11,14 +11,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
@@ -28,6 +22,7 @@ import com.vk.sdk.api.VKError;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
@@ -69,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         initToolbar();
         initFAB();
-        initListView();
+        initDialogsList();
         login();
     }
 
@@ -91,11 +86,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    private void initListView() {
+    private void initDialogsList() {
         adapter = new MainAdapter(this, null, new MainAdapter.OnDialogClickListener() {
             @Override
             public void onDialogClick(int position) {
-                UserDialog dialog = dialogs.get(position);
+                UserDialog dialog = adapter.getItem(position);
                 SelectedDialogActivity.newIntent(MainActivity.this, dialog);
             }
         });
@@ -188,11 +183,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     //NullPointerException в MainAdapter-е.
                     allLoadersFinished = false;
                     loadUserDialogs();
+//                    Log.d("MAIN_ACTIVITY", "ALL_LOADERS_FINISHED");
                 } else {
                     dialogs.clear();
                     dialogs.addAll(data.<List<UserDialog>>getTypedAnswer());
                     loadUsers();
                     loadChats();
+//                    Log.d("MAIN_ACTIVITY", "FIRSTLY_LOADERS_FINISHED");
                 }
                 break;
             case LOAD_USERS:
@@ -204,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else {
                     usersOrChatsLoaded = true;
                 }
+//                Log.d("MAIN_ACTIVITY", "LOAD_USERS" + allLoadersFinished);
                 break;
             case LOAD_CHATS:
                 chats.clear();
@@ -214,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else {
                     usersOrChatsLoaded = true;
                 }
+//                Log.d("MAIN_ACTIVITY", "LOAD_CHATS" + allLoadersFinished);
                 break;
         }
     }
@@ -231,7 +230,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 dialog.setBody(chats.get(indexChat++));
             }
         }
-        adapter.setDialogs(dialogs);
+        //В адаптер передаю поверхностную копию списка диалогов.
+        List<UserDialog> copyDialogs = new ArrayList<>(dialogs.size());
+        for (int i = 0; i < dialogs.size(); i++) {
+            copyDialogs.add(dialogs.get(i));
+        }
+
+        adapter.setDialogs(copyDialogs);
         adapter.notifyDataSetChanged();
         allLoadersFinished = true;
     }
