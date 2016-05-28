@@ -118,7 +118,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
             if (dialog.isSingle()) {
                 User user = (User) dialogBody;
-                avatarUrl = user.getAvatar200Url();
+                avatarUrl = user.getAvatar200Url() != null ? user.getAvatar200Url() : user.getAvatar100Url();
                 title = String.format("%s %s", user.getFirstName(), user.getLastName());
             } else {
                 Chat chat = (Chat) dialogBody;
