@@ -2,6 +2,7 @@ package ua.nure.vkmessanger.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
@@ -22,7 +23,6 @@ import com.vk.sdk.api.VKError;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import ua.nure.vkmessanger.R;
@@ -37,6 +37,11 @@ import ua.nure.vkmessanger.model.UserDialog;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
+    /**
+     * Интервал запросов обновлений диалогов в миллисекундах.
+     */
+    private static final int UPDATE_INTERVAL_MILLIS = 5000;
+
     private final RESTInterface restInterface = new RESTRetrofitManager(this);
 
     private final List<UserDialog> dialogs = new ArrayList<>();
@@ -46,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final List<Chat> chats = new ArrayList<>();
 
     private MainAdapter adapter;
+
+    private Handler handler = new Handler();
 
     /**
      * Константа, используемая в LoaderCallbacks для идентификации Loader-а.
@@ -174,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<CustomResponse> loader, CustomResponse data) {
+        Log.d("LOADERS", String.valueOf(loader.isAbandoned()) + loader.getId());
+
         switch (loader.getId()) {
             case LOAD_USER_DIALOGS:
                 if (allLoadersFinished) {
@@ -181,8 +190,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     //Активити, то надо перезапустить главный лоадер, иначе слияние пользователей и чатов
                     //будет произведено не корректно, вследствие чего есть вероятность выброса
                     //NullPointerException в MainAdapter-е.
-                    allLoadersFinished = false;
                     loadUserDialogs();
+                    allLoadersFinished = false;
 //                    Log.d("MAIN_ACTIVITY", "ALL_LOADERS_FINISHED");
                 } else {
                     dialogs.clear();
@@ -218,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-
     private void mergeUsersWithChats() {
         int indexChat = 0;
         int indexUser = 0;
@@ -239,6 +247,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         adapter.setDialogs(copyDialogs);
         adapter.notifyDataSetChanged();
         allLoadersFinished = true;
+
+        loadDialogsWithTimeout();
+    }
+
+    private void loadDialogsWithTimeout() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadUserDialogs();
+            }
+        }, UPDATE_INTERVAL_MILLIS);
     }
 
     @Override
