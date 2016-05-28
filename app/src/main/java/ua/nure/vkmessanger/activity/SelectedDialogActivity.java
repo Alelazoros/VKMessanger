@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,11 @@ import ua.nure.vkmessanger.model.WallPost;
 public class SelectedDialogActivity extends AppCompatActivity
         implements DialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
 
+    /**
+     * Интервал, с которым производится обновление диалога.
+     */
+    private static final int UPDATE_MESSAGES_TIMEOUT_MILLISECONDS = 5000;
+
     private static final String EXTRA_SELECTED_DIALOG = "EXTRA_SELECTED_DIALOG";
 
     /**
@@ -49,13 +55,16 @@ public class SelectedDialogActivity extends AppCompatActivity
 
 
     /**
-     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE - константы, используемые в LoaderCallbacks для идентификации Loader-ов.
+     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE, UPDATE_DIALOG_MESSAGES - константы,
+     * используемые в LoaderCallbacks для идентификации Loader-ов.
      */
     public static final int LOAD_FIRST_MESSAGES = 1;
 
     public static final int LOAD_MORE_MESSAGES = 2;
 
     public static final int SEND_MESSAGE = 3;
+
+    private static final int UPDATE_DIALOG_MESSAGES = 4;
 
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
@@ -65,6 +74,8 @@ public class SelectedDialogActivity extends AppCompatActivity
     private DialogAdapter adapter;
 
     private UserDialog dialog;
+
+    private Handler handler = new Handler();
 
 
     @Override
@@ -76,7 +87,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         initToolbar();
         initRecyclerView();
         initSendMessageButton();
-        getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
+        loadFirstMessages();
     }
 
     public static void newIntent(Context context, UserDialog dialog) {
@@ -114,7 +125,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void initRecyclerView() {
-        adapter = new DialogAdapter(this, dialog, messages, mMessageClickListener, this);
+        adapter = new DialogAdapter(this, dialog, null, mMessageClickListener, this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewSelectedDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         recyclerView.setAdapter(adapter);
@@ -158,6 +169,10 @@ public class SelectedDialogActivity extends AppCompatActivity
         });
     }
 
+    private void loadFirstMessages() {
+        getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
+    }
+
 
     /**
      * Метод определен в интерфейсе DialogAdapter.OnDialogEndListener и
@@ -182,9 +197,20 @@ public class SelectedDialogActivity extends AppCompatActivity
         }
     }
 
+    //--------------------------------Update dialog messages------------------------------//
+
+    private void updateMessages() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getSupportLoaderManager().restartLoader(UPDATE_DIALOG_MESSAGES, null, SelectedDialogActivity.this);
+            }
+        }, UPDATE_MESSAGES_TIMEOUT_MILLISECONDS);
+    }
+
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
-    private void destroyLoader(int loaderId){
+    private void destroyLoader(int loaderId) {
         getSupportLoaderManager().destroyLoader(loaderId);
     }
 
@@ -202,6 +228,9 @@ public class SelectedDialogActivity extends AppCompatActivity
                     case SEND_MESSAGE:
                         String Message = args.getString(MESSAGE_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.sendMessageTo(Message, dialog.getDialogId());
+                    case UPDATE_DIALOG_MESSAGES:
+                        //По умолчанию я так получаю первые 50 сообщений.
+                        return restInterface.loadSelectedDialogById(dialog.getDialogId(), 0);
                     default:
                         return null;
                 }
@@ -217,6 +246,7 @@ public class SelectedDialogActivity extends AppCompatActivity
                 case LOAD_FIRST_MESSAGES:
                     messages.clear();
                     messages.addAll(data.<List<Message>>getTypedAnswer());
+                    updateMessages();
                     break;
                 case LOAD_MORE_MESSAGES:
                     messages.addAll(data.<List<Message>>getTypedAnswer());
@@ -226,8 +256,43 @@ public class SelectedDialogActivity extends AppCompatActivity
                     messages.add(0, data.<Message>getTypedAnswer());
                     destroyLoader(loader.getId());
                     break;
+                case UPDATE_DIALOG_MESSAGES:
+                    List<Message> updatedMessages = data.getTypedAnswer();
+                    mergeUpdatedMessages(messages, updatedMessages);
+
+                    //Снова запускаю лоадер для обновления сообщений диалога.
+                    updateMessages();
+                    break;
             }
+
+            //В адаптер передаю только поверхностную копию списка сообщений.
+            List<Message> copy = copyOf(messages);
+            adapter.setMessages(copy);
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    private List<Message> copyOf(List<Message> list) {
+        List<Message> copy = new ArrayList<>(list.size());
+        for (int i = 0; i < list.size(); i++) {
+            copy.add(list.get(i));
+        }
+        return copy;
+    }
+
+    private void mergeUpdatedMessages(List<Message> oldMessages, List<Message> updatedMessages) {
+        //Индекс и Id последнего сообщения, которое было самыс свежим для обновления.
+        int lastOldMessageId = oldMessages.get(0).getMessageId();
+        int lastOldMessageIndex = 0;
+
+        for (int i = 0; i < oldMessages.size(); i++) {
+            if (updatedMessages.get(i).getMessageId() == lastOldMessageId) {
+                lastOldMessageIndex = i;
+                break;
+            }
+        }
+        for (int i = 0; i < lastOldMessageIndex; i++) {
+            oldMessages.add(i, updatedMessages.get(i));
         }
     }
 

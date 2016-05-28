@@ -79,6 +79,10 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         setHasStableIds(true);
     }
 
+    public void setMessages(List<Message> messages){
+        mMessages = messages;
+    }
+
     @Override
     public int getItemViewType(int position) {
         Message current = mMessages.get(position);
