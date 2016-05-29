@@ -2,12 +2,15 @@
 <resources>
     <color name="colorPrimary">#1E88E5</color>
     <color name="colorPrimaryDark">#1565C0</color>
-    <color name="colorAccent">#FFAB00</color>
+    <!--<color name="colorAccent">#FFAB00</color>-->
+    <color name="colorAccent">#F50057</color>
 
     <color name="dialogs_background">#F9F9F9</color>
 
     <!-- Messages-->
-    <color name="message_from_user_background">#4C9BBD</color>
+    <!--<color name="message_from_user_background">#4C9BBD</color>-->
+    <!--<color name="message_from_user_background">#4DB6AC</color>-->
+    <color name="message_from_user_background">#80CBC4</color>
     <color name="message_to_user_background">#E6E6FA</color>
 
     <!-- Links-->
