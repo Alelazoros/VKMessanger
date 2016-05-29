@@ -2,12 +2,9 @@ package ua.nure.vkmessanger.http.retrofit;
 
 import com.google.gson.JsonElement;
 
-import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import retrofit2.http.QueryMap;
 
 /**
  * Retrofit API interface.
@@ -31,7 +28,6 @@ public interface RetrofitAPI {
                                   @Query("peer_id") int peerId,
                                   @Query("message") String message,
                                   @Query("access_token") String accessToken);
-
 
 
     /**
@@ -69,9 +65,9 @@ public interface RetrofitAPI {
 
     @GET("friends.get")
     Call<JsonElement> getFriends(@Query("v") String vkApiVersion,
-                                   @Query("order") String order,
-                                   @Query("fields")  String fields,
-                                   @Query("name_case") String name_case,
-                                   @Query("access_token") String accessToken);
+                                 @Query("order") String order,
+                                 @Query("fields") String fields,
+                                 @Query("name_case") String name_case,
+                                 @Query("access_token") String accessToken);
 
 }

@@ -76,6 +76,64 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
 
+    @Override
+    public CustomResponse loadUserDialogs() {
+        RetrofitAPI api = getRetrofit();
+        Call<JsonElement> retrofitCall = api.userDialogs(VK_API_VERSION,
+                USER_DIALOGS_DEFAULT_REQUEST_COUNT,
+                AccessTokenManager.getAccessToken(mContext));
+
+        CustomResponse customResponseResult = new CustomResponse();
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+                Log.d(RETROFIT_MANAGER_LOG_TAG, "LOAD DIALOGS SUCCESSFUL");
+
+                List<UserDialog> dialogs = new ArrayList<>();
+
+                JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject()
+                        .getAsJsonObject("response")
+                        .getAsJsonArray("items");
+
+                for (int i = 0; i < jsonItemsArray.size(); i++) {
+                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().getAsJsonObject("message");
+                    JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
+                    int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
+                    boolean isLastMessageFromMe = dialogJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
+
+                    dialogs.add(new UserDialog(
+                            chatId,
+                            dialogJSON.get("user_id").getAsInt(),
+                            dialogJSON.get("body").getAsString(),
+                            isLastMessageFromMe
+                    ));
+                }
+                Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
+
+                //После получания самих объектов UserDialog нужно заполнить их содержимое (Chat or User).
+                CustomResponse usersResponse = loadUsers(dialogs);
+                CustomResponse chatsResponse = loadChats(dialogs);
+
+                if (usersResponse.getRequestResult() == RequestResult.SUCCESS &&
+                        chatsResponse.getRequestResult() == RequestResult.SUCCESS) {
+
+                    List<User> users = usersResponse.getTypedAnswer();
+                    List<Chat> chats = chatsResponse.getTypedAnswer();
+
+                    mergeUsersWithChats(dialogs, users, chats);
+
+                    customResponseResult.setRequestResult(RequestResult.SUCCESS)
+                            .setAnswer(dialogs);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return customResponseResult;
+    }
+
+
     private CustomResponse loadUsers(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
@@ -112,50 +170,6 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
-    private CustomResponse loadFriends() {
-        CustomResponse customResponseResult = new CustomResponse();
-        RetrofitAPI api = getRetrofit();
-        List<User> users = new ArrayList<>();
-
-
-        Call<JsonElement> retrofitCall = api.getFriends(VK_API_VERSION,
-                                                        "hints",
-                                                        "photo_200_orig, photo_100,bdate",
-                                                        "Nom",
-                                                        AccessTokenManager.getAccessToken((mContext)));
-
-        try {
-            Response<JsonElement> retrofitResponse = retrofitCall.execute();
-            if (retrofitResponse.isSuccessful()) {
-                JsonObject jsonResponse = retrofitResponse.body().getAsJsonObject().get("response").getAsJsonObject();
-                if (jsonResponse.get("count").getAsInt() > 0) {
-                    JsonArray jsonArray = jsonResponse.getAsJsonArray("items");
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        JsonObject eachElement = jsonArray.get(i).getAsJsonObject();
-                        users.add(new User(eachElement.get("id").getAsInt(),
-                                eachElement.has("first_name") ? eachElement.get("first_name").getAsString() : null,
-                                eachElement.has("last_name") ? eachElement.get("last_name").getAsString() : null,
-                                eachElement.has("bdate") ? eachElement.get("bdate").getAsString() : null,
-                                eachElement.has("photo_100") ? eachElement.get("photo_100").getAsString() : null,
-                                eachElement.has("photo_200_orig") ? eachElement.get("photo_200_orig").getAsString() : null,
-                                eachElement.has("photo_200_orig") ? eachElement.get("photo_200_orig").getAsString() : null,
-                                eachElement.get("online").getAsBoolean()
-                        ));
-
-
-                    }
-                    customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(users);
-
-                }
-            }
-        }
-        catch (IOException e ){
-            e.printStackTrace();
-        }
-
-        return customResponseResult;
-
-    }
     private CustomResponse loadChats(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
@@ -257,65 +271,6 @@ public class RESTRetrofitManager implements RESTInterface {
         return response;
     }
 
-
-    @Override
-    public CustomResponse loadUserDialogs() {
-        RetrofitAPI api = getRetrofit();
-        Call<JsonElement> retrofitCall = api.userDialogs(VK_API_VERSION,
-                USER_DIALOGS_DEFAULT_REQUEST_COUNT,
-                AccessTokenManager.getAccessToken(mContext));
-
-        CustomResponse customResponseResult = new CustomResponse();
-        try {
-            Response<JsonElement> retrofitResponse = retrofitCall.execute();
-            if (retrofitResponse.isSuccessful()) {
-                Log.d(RETROFIT_MANAGER_LOG_TAG, "LOAD DIALOGS SUCCESSFUL");
-
-                List<UserDialog> dialogs = new ArrayList<>();
-
-                JsonArray jsonItemsArray = retrofitResponse.body().getAsJsonObject()
-                        .getAsJsonObject("response")
-                        .getAsJsonArray("items");
-
-                for (int i = 0; i < jsonItemsArray.size(); i++) {
-                    JsonObject dialogJSON = jsonItemsArray.get(i).getAsJsonObject().getAsJsonObject("message");
-                    JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
-                    int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
-                    boolean isLastMessageFromMe = dialogJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
-
-                    dialogs.add(new UserDialog(
-                            chatId,
-                            dialogJSON.get("user_id").getAsInt(),
-                            dialogJSON.get("body").getAsString(),
-                            isLastMessageFromMe
-                    ));
-                }
-                Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
-
-                //После получания самих объектов UserDialog нужно заполнить их содержимое (Chat or User).
-                CustomResponse usersResponse = loadUsers(dialogs);
-                CustomResponse chatsResponse = loadChats(dialogs);
-                CustomResponse friendsResponse = loadFriends();
-
-                if (usersResponse.getRequestResult() == RequestResult.SUCCESS &&
-                        chatsResponse.getRequestResult() == RequestResult.SUCCESS) {
-
-                    List<User> users = usersResponse.getTypedAnswer();
-                    List<Chat> chats = chatsResponse.getTypedAnswer();
-
-                    mergeUsersWithChats(dialogs, users, chats);
-
-                    customResponseResult.setRequestResult(RequestResult.SUCCESS)
-                            .setAnswer(dialogs);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return customResponseResult;
-    }
-
     private void mergeUsersWithChats(List<UserDialog> dialogs, List<User> users, List<Chat> chats) {
         int indexChat = 0;
         int indexUser = 0;
@@ -327,6 +282,42 @@ public class RESTRetrofitManager implements RESTInterface {
                 dialog.setBody(chats.get(indexChat++));
             }
         }
+    }
+
+
+    @Override
+    public CustomResponse loadFriends() {
+        CustomResponse customResponseResult = new CustomResponse();
+        RetrofitAPI api = getRetrofit();
+        List<User> users = new ArrayList<>();
+
+
+        Call<JsonElement> retrofitCall = api.getFriends(VK_API_VERSION,
+                "hints",
+                "photo_100,photo_200,photo_max_orig,bdate",
+                "Nom",
+                AccessTokenManager.getAccessToken((mContext)));
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+
+                JsonObject jsonResponse = retrofitResponse.body().getAsJsonObject().get("response").getAsJsonObject();
+                if (jsonResponse.get("count").getAsInt() > 0) {
+
+                    JsonArray jsonArray = jsonResponse.getAsJsonArray("items");
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonObject eachElement = jsonArray.get(i).getAsJsonObject();
+                        users.add(parseUser(eachElement));
+
+                    }
+                    customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(users);
+                }
+            }
+        }
+        catch (IOException e ){
+            e.printStackTrace();
+        }
+        return customResponseResult;
     }
 
 
@@ -657,6 +648,20 @@ public class RESTRetrofitManager implements RESTInterface {
                 currentChatJsonObject.has("photo_200") ? currentChatJsonObject.get("photo_200").getAsString() : null);
     }
 
+    private Group parseGroup(JsonObject groupJSONObject) {
+        int id = groupJSONObject.get("id").getAsInt();
+
+        String name = groupJSONObject.get("name").getAsString();
+        String screenName = groupJSONObject.get("screen_name").getAsString();
+        String type = groupJSONObject.get("type").getAsString();
+
+        String photo50 = groupJSONObject.has("photo_50") ? groupJSONObject.get("photo_50").getAsString() : null;
+        String photo100 = groupJSONObject.has("photo_100") ? groupJSONObject.get("photo_100").getAsString() : null;
+        String photo200 = groupJSONObject.has("photo_200") ? groupJSONObject.get("photo_200").getAsString() : null;
+
+        return new Group(id, name, screenName, type, photo50, photo100, photo200);
+    }
+
     //---------------Groups------------//
 
     /**
@@ -709,28 +714,10 @@ public class RESTRetrofitManager implements RESTInterface {
      * (во входящем массиве обязательно должен быть хотя бы один элемент).
      */
     private String generateGroupsIdsStringParamFromArray(@NonNull String[] groupIds) {
-        if (groupIds.length == 1) {
-            return groupIds[0];
+        StringBuilder idsBuilder = new StringBuilder();
+        for (String id : groupIds) {
+            idsBuilder.append(idsBuilder.length() > 0 ? "," : "").append(id);
         }
-        StringBuilder sb = new StringBuilder();
-        for (String groupId : groupIds) {
-            sb.append(groupId).append(',');
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
-
-    private Group parseGroup(JsonObject groupJSONObject) {
-        int id = groupJSONObject.get("id").getAsInt();
-
-        String name = groupJSONObject.get("name").getAsString();
-        String screenName = groupJSONObject.get("screen_name").getAsString();
-        String type = groupJSONObject.get("type").getAsString();
-
-        String photo50 = groupJSONObject.has("photo_50") ? groupJSONObject.get("photo_50").getAsString() : null;
-        String photo100 = groupJSONObject.has("photo_100") ? groupJSONObject.get("photo_100").getAsString() : null;
-        String photo200 = groupJSONObject.has("photo_200") ? groupJSONObject.get("photo_200").getAsString() : null;
-
-        return new Group(id, name, screenName, type, photo50, photo100, photo200);
+        return idsBuilder.toString();
     }
 }

@@ -38,6 +38,9 @@ public interface RESTInterface {
      */
     CustomResponse loadSelectedDialogById(int dialogId, int offsetCount);
 
+
+    CustomResponse loadFriends();
+
     /**
      * @param message сообщение для отправления
      * @param peerId  id группы (2000000 + ID) или ID юзера

@@ -146,6 +146,11 @@ public class RESTVkSdkManager implements RESTInterface {
         return customResponseResult;
     }
 
+    @Override
+    public CustomResponse loadFriends() {
+        return new CustomResponse();
+    }
+
     public CustomResponse sendMessageTo(String message, int peerId) {
         return new CustomResponse();
     }
