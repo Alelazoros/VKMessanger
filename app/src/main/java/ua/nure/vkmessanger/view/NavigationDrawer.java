@@ -16,6 +16,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ua.nure.vkmessanger.R;
 import ua.nure.vkmessanger.activity.FriendsActivity;
+import ua.nure.vkmessanger.activity.SettingsActivity;
 
 /**
  * Created by Antony on 5/29/2016.
@@ -68,6 +69,7 @@ public class NavigationDrawer {
                                 FriendsActivity.newIntent(activity, ITEM_FRIENDS, FriendsActivity.GET_FRIENDS);
                                 break;
                             case ITEM_SETTINGS:
+                                SettingsActivity.newIntent(activity, ITEM_SETTINGS);
                                 break;
                             case ITEM_HELP:
                                 break;
