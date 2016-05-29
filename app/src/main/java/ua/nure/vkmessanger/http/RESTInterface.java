@@ -1,6 +1,8 @@
 package ua.nure.vkmessanger.http;
 
 import ua.nure.vkmessanger.http.model.CustomResponse;
+import ua.nure.vkmessanger.model.Message;
+import java.util.List;
 
 /**
  * Интерфейс, который должен быть реализован классом, который работает с Http-запросами.
@@ -58,8 +60,10 @@ public interface RESTInterface {
      */
     CustomResponse getGroupsInfoByIds(String[] groupIds);
 
-   CustomResponse setOnline(boolean voip);
-   CustomResponse setOffline();
+    CustomResponse setOnline(boolean voip);
+    CustomResponse setOffline();
+    CustomResponse markMessagesAsReaded(List<Message> input);
+
 
 
 

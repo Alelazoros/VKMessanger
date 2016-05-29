@@ -79,4 +79,11 @@ public interface RetrofitAPI {
     Call<JsonElement> setOffline(@Query("v") String vkApiVersion,
                                  @Query("access_token") String accessToken);
 
+    @GET("messages.markAsRead")
+    Call<JsonElement> markAsReaded(@Query("v") String vkApiVersion,
+                                 @Query("message_ids") String messageIds,
+                                 @Query("access_token") String accessToken);
+
+
+
 }

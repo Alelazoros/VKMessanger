@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,8 @@ public class SelectedDialogActivity extends AppCompatActivity
      */
     public static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
 
+    public static final String MESSAGES_LOADER_BUNDLE_ARGUMENT = "MESSAGES_LOADER_BUDNLE_ARGUMENT";
+
 
     /**
      * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE, UPDATE_DIALOG_MESSAGES - константы,
@@ -66,6 +69,8 @@ public class SelectedDialogActivity extends AppCompatActivity
     public static final int SEND_MESSAGE = 3;
 
     private static final int UPDATE_DIALOG_MESSAGES = 4;
+
+    private static final int MARK_AS_READED = 5;
 
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
@@ -99,6 +104,11 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private void getDataFromIntent(Intent intent) {
         dialog = (UserDialog) intent.getExtras().get(EXTRA_SELECTED_DIALOG);
+    }
+    private void markMessagesAsReader(List<Message> input) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(MESSAGES_LOADER_BUNDLE_ARGUMENT, (ArrayList)input);
+        getSupportLoaderManager().restartLoader(MARK_AS_READED, bundle, SelectedDialogActivity.this);
     }
 
     private void initToolbar() {
@@ -232,6 +242,8 @@ public class SelectedDialogActivity extends AppCompatActivity
                     case UPDATE_DIALOG_MESSAGES:
                         //По умолчанию я так получаю первые 50 сообщений.
                         return restInterface.loadSelectedDialogById(dialog.getDialogId(), 0);
+                    case MARK_AS_READED:
+                        return restInterface.markMessagesAsReaded((List<Message>)args.get(MESSAGES_LOADER_BUNDLE_ARGUMENT));
                     default:
                         return null;
                 }
@@ -290,6 +302,9 @@ public class SelectedDialogActivity extends AppCompatActivity
         }
         for (int i = 0; i < lastOldMessageIndex; i++) {
             oldMessages.add(i, updatedMessages.get(i));
+        }
+        if (updatedMessages.size() > 0 ) {
+            markMessagesAsReader(updatedMessages);
         }
     }
 
