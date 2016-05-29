@@ -49,5 +49,6 @@
     <string name="abous_us_app_version">VK Messenger 1.0</string>
     <string name="title_contacts_activity">О разработчиках</string>
     <string name="navigation_item_abous_devs">О разработчиках</string>
+    <string name="internet_connection_exception">Пожалуйста, проверьте Ваше интернет-соединение!</string>
 
 </resources>
