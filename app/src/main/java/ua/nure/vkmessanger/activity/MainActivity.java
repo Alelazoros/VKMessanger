@@ -147,6 +147,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         })) {
             super.onActivityResult(requestCode, resultCode, data);
             drawer.setSelection(NavigationDrawer.ITEM_DIALOGS);
+            if (SharedPreferencesUtils.isInvisibleModeOn(this)) {
+                setUserOffline();
+            } else {
+                setUserOnline();
+            }
         }
     }
 
@@ -208,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     adapter.setDialogs(copyDialogs);
                     adapter.notifyDataSetChanged();
                     break;
+                case SET_USER_ONLINE:
+                    getSupportLoaderManager().destroyLoader(SET_USER_ONLINE);
             }
         }
         //Затем запускаю обновление диалога с определенным интервалом.
