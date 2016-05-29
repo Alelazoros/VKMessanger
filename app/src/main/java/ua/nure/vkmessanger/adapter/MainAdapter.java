@@ -168,6 +168,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             if (dialog.isSingle()) {
                 User user = (User) dialog.getBody();
                 checkOnline(user);
+            } else {
+                circleIsUserOnline.setVisibility(View.GONE);
             }
         }
 
