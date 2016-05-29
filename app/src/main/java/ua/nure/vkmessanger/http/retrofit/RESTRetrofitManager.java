@@ -137,7 +137,7 @@ public class RESTRetrofitManager implements RESTInterface {
     public CustomResponse setOnline(boolean voip_enabled) {
         RetrofitAPI api = getRetrofit();
         CustomResponse customResponseResult = new CustomResponse();
-        Call<JsonElement> retrofitCall = api.setOnline(VK_API_VERSION, (voip_enabled) ? 1 : 0);
+        Call<JsonElement> retrofitCall = api.setOnline(VK_API_VERSION, (voip_enabled) ? 1 : 0,  AccessTokenManager.getAccessToken(mContext));
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
@@ -157,7 +157,7 @@ public class RESTRetrofitManager implements RESTInterface {
     public  CustomResponse setOffline(){
         RetrofitAPI api = getRetrofit();
         CustomResponse customResponseResult = new CustomResponse();
-        Call<JsonElement> retrofitCall = api.setOffline(VK_API_VERSION);
+        Call<JsonElement> retrofitCall = api.setOffline(VK_API_VERSION,  AccessTokenManager.getAccessToken(mContext));
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
