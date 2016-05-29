@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
         if (VKSdk.wakeUpSession(this)) {
             loadUserDialogs();
-            setUserOffline();
+            setUserOnline();
         } else {
             loginButton.setVisibility(View.VISIBLE);
         }
@@ -160,11 +159,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }, UPDATE_INTERVAL_MILLIS);
     }
 
-    private void setUserOnlne(){
-        getSupportLoaderManager().restartLoader(SET_USER_ONLINE,null,this);
+    private void setUserOnline() {
+        getSupportLoaderManager().restartLoader(SET_USER_ONLINE, null, this);
     }
+
     private void setUserOffline() {
-        getSupportLoaderManager().restartLoader(SET_USER_OFFLINE,null,this);
+        getSupportLoaderManager().restartLoader(SET_USER_OFFLINE, null, this);
     }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//

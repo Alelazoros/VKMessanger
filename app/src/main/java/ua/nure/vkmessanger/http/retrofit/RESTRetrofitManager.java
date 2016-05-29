@@ -133,44 +133,49 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
+
+    /**
+     * @param voipEnabled возможны ли видео звонки для данного устройства.
+     */
     @Override
-    public CustomResponse setOnline(boolean voip_enabled) {
+    public CustomResponse setOnline(boolean voipEnabled) {
         RetrofitAPI api = getRetrofit();
         CustomResponse customResponseResult = new CustomResponse();
-        Call<JsonElement> retrofitCall = api.setOnline(VK_API_VERSION, (voip_enabled) ? 1 : 0,  AccessTokenManager.getAccessToken(mContext));
+
+        Call<JsonElement> retrofitCall = api.setOnline(VK_API_VERSION, (voipEnabled) ? 1 : 0, AccessTokenManager.getAccessToken(mContext));
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
                 customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(true);
-            }
-            else {
+            } else {
                 customResponseResult.setRequestResult(RequestResult.ERROR);
             }
-            }
-        catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return customResponseResult;
     }
 
     @Override
-    public  CustomResponse setOffline(){
+    public  CustomResponse setOffline() {
         RetrofitAPI api = getRetrofit();
         CustomResponse customResponseResult = new CustomResponse();
-        Call<JsonElement> retrofitCall = api.setOffline(VK_API_VERSION,  AccessTokenManager.getAccessToken(mContext));
+
+        Call<JsonElement> retrofitCall = api.setOffline(VK_API_VERSION, AccessTokenManager.getAccessToken(mContext));
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
                 customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(true);
-            }else {
+            } else {
                 customResponseResult.setRequestResult(RequestResult.ERROR);
             }
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return customResponseResult;
     }
+
+
     private CustomResponse loadUsers(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
