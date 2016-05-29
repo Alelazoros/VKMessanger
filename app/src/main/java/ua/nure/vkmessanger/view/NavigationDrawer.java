@@ -1,6 +1,7 @@
 package ua.nure.vkmessanger.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ua.nure.vkmessanger.R;
+import ua.nure.vkmessanger.activity.FriendsActivity;
 
 /**
  * Created by Antony on 5/29/2016.
@@ -63,6 +65,8 @@ public class NavigationDrawer {
                             case ITEM_DIALOGS:
                                 break;
                             case ITEM_FRIENDS:
+                                Intent friends = new Intent(activity, FriendsActivity.class);
+                                activity.startActivityForResult(friends, ITEM_FRIENDS);
                                 break;
                             case ITEM_SETTINGS:
                                 break;

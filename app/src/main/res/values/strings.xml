@@ -36,5 +36,6 @@
     <string name="navigation_item_help_name">Помощь</string>
     <string name="navigation_view_open">open</string>
     <string name="navigation_view_close">close</string>
+    <string name="friends">Мои друзья</string>
 
 </resources>
