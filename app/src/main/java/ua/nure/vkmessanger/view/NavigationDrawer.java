@@ -38,7 +38,7 @@ public class NavigationDrawer {
     public Drawer getMaterialDrawer() {
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(activity)
-                //.withHeaderBackground(R.drawable.header_tourism)
+                .withHeaderBackground(R.drawable.header_background)
                 .withTranslucentStatusBar(false)
                 .build();
 

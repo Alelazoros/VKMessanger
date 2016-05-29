@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
+            drawer.setSelection(NavigationDrawer.ITEM_DIALOGS);
         }
     }
 
@@ -183,12 +184,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     List<UserDialog> copyDialogs = CollectionsUtils.copyOf(dialogs);
                     adapter.setDialogs(copyDialogs);
                     adapter.notifyDataSetChanged();
-
-                    //Затем запускаю обновление диалога с определенным интервалом.
-                    loadDialogsWithTimeout();
                     break;
             }
         }
+        //Затем запускаю обновление диалога с определенным интервалом.
+        loadDialogsWithTimeout();
     }
 
     @Override
