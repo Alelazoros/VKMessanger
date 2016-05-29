@@ -33,6 +33,7 @@ import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.util.CollectionsUtils;
+import ua.nure.vkmessanger.util.SharedPreferencesUtils;
 import ua.nure.vkmessanger.view.NavigationDrawer;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
@@ -117,7 +118,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
         if (VKSdk.wakeUpSession(this)) {
             loadUserDialogs();
-            setUserOnline();
+            //Проверка режима-невидимки.
+            if (!SharedPreferencesUtils.isInvisibleModeOn(this)) {
+                setUserOnline();
+            }
         } else {
             loginButton.setVisibility(View.VISIBLE);
         }
