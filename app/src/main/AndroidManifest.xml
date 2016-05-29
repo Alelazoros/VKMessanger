@@ -38,7 +38,8 @@
         <activity
             android:name=".activity.FriendsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.SettingsActivity"></activity>
+        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.ContactsActivity"></activity>
     </application>
 
 </manifest>
