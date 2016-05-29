@@ -274,6 +274,10 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void mergeUpdatedMessages(List<Message> oldMessages, List<Message> updatedMessages) {
+        if (oldMessages.size() == 0){
+            return;
+        }
+
         //Индекс и Id последнего сообщения, которое было самыс свежим для обновления.
         int lastOldMessageId = oldMessages.get(0).getMessageId();
         int lastOldMessageIndex = 0;
