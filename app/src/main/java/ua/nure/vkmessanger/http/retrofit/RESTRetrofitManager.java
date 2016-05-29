@@ -213,7 +213,7 @@ public class RESTRetrofitManager implements RESTInterface {
         }
         Call<JsonElement> retrofitCall = api.getUsers(VK_API_VERSION,
                 idsBuilder.toString(),
-                "photo_100,photo_200,photo_max_orig,bdate",
+                "photo_100,photo_200,photo_max_orig,bdate,online",
                 "Nom",
                 AccessTokenManager.getAccessToken(mContext));
         try {
@@ -302,7 +302,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         Call<JsonElement> retrofitCall = api.getUsers(VK_API_VERSION,
                 idsBuilder.toString(),
-                "photo_100,photo_200,photo_max_orig,bdate",
+                "photo_100,photo_200,photo_max_orig,bdate,online",
                 "Nom",
                 AccessTokenManager.getAccessToken(mContext));
         try {
@@ -359,7 +359,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
         Call<JsonElement> retrofitCall = api.getFriends(VK_API_VERSION,
                 "hints",
-                "photo_100,photo_200,photo_max_orig,bdate",
+                "photo_100,photo_200,photo_max_orig,bdate,online",
                 "Nom",
                 AccessTokenManager.getAccessToken((mContext)));
         try {

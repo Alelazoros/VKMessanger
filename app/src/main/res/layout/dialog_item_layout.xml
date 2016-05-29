@@ -19,6 +19,16 @@
             android:contentDescription="@string/dialog_avatar"
             />
 
+        <View android:id="@+id/circleIsUserOnline"
+            android:layout_toRightOf="@+id/dialogAvatarImageView"
+            android:layout_below="@+id/dialogTitleTV"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_green"
+            android:visibility="gone"
+            />
+
         <ImageView android:id="@+id/dialogLastMessageAuthorAvatarImageView"
             android:layout_toRightOf="@+id/dialogAvatarImageView"
             android:layout_toEndOf="@+id/dialogAvatarImageView"
@@ -58,7 +68,7 @@
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:layout_marginRight="16dp"
-            android:background="@drawable/circle"
+            android:background="@drawable/circle_blue"
             android:visibility="visible"
             />
 

@@ -86,8 +86,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         private OnDialogClickListener clickListener;
 
-        private Context context;
-
         private Picasso picasso;
 
         private Transformation circleImageTransformation;
@@ -106,6 +104,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
          */
         private View circleMessageNotRead;
 
+        /**
+         * Идентификатор того, онлайн ли собеседник.
+         */
+        private View circleIsUserOnline;
+
 
         public DialogHolder(Context context, View itemView, OnDialogClickListener listener) {
             super(itemView);
@@ -113,7 +116,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             clickListener = listener;
             itemView.setOnClickListener(this);
 
-            this.context = context;
             picasso = Picasso.with(context);
             circleImageTransformation = PicassoUtils.getCircleTransformation();
 
@@ -123,6 +125,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             lastMessageTV = (TextView) itemView.findViewById(R.id.dialogLastMessageTV);
 
             circleMessageNotRead = itemView.findViewById(R.id.circleMessageNotRead);
+            circleIsUserOnline = itemView.findViewById(R.id.circleIsUserOnline);
         }
 
         public void bind(UserDialog dialog) {
@@ -161,11 +164,26 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             lastMessageTV.setText(lastMessage.substring(0,
                     lastMessage.length() <= MAX_LAST_MESSAGE_LENGTH ? lastMessage.length() : MAX_LAST_MESSAGE_LENGTH));
 
+            checkMessageWasRead(dialog);
+            if (dialog.isSingle()) {
+                User user = (User) dialog.getBody();
+                checkOnline(user);
+            }
+        }
+
+        private void checkMessageWasRead(UserDialog dialog) {
             if (!dialog.isLastMessageWasRead()) {
-//                lastMessageTV.setBackgroundColor(Color.rgb(0xd3, 0xd3, 0xd3));
                 circleMessageNotRead.setVisibility(View.VISIBLE);
             } else {
                 circleMessageNotRead.setVisibility(View.GONE);
+            }
+        }
+
+        private void checkOnline(User user) {
+            if (user.isOnline()) {
+                circleIsUserOnline.setVisibility(View.VISIBLE);
+            } else {
+                circleIsUserOnline.setVisibility(View.GONE);
             }
         }
 
