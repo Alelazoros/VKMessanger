@@ -120,12 +120,14 @@ public class RESTRetrofitManager implements RESTInterface {
                     JsonElement chatIdJsonElement = dialogJSON.get("chat_id");
                     int chatId = chatIdJsonElement == null ? 0 : chatIdJsonElement.getAsInt();
                     boolean isLastMessageFromMe = dialogJSON.get("out").getAsInt() == MESSAGE_WAS_SEND_FROM_ME;
+                    boolean isLastMessageWasRead = dialogJSON.get("read_state").getAsInt() == MESSAGE_WAS_READ;
 
                     dialogs.add(new UserDialog(
                             chatId,
                             dialogJSON.get("user_id").getAsInt(),
                             dialogJSON.get("body").getAsString(),
-                            isLastMessageFromMe
+                            isLastMessageFromMe,
+                            isLastMessageWasRead
                     ));
                 }
                 Log.d(RETROFIT_MANAGER_LOG_TAG, String.format("Dialogs count == %d", dialogs.size()));
@@ -687,7 +689,7 @@ public class RESTRetrofitManager implements RESTInterface {
                 currentElement.has("photo_100") ? currentElement.get("photo_100").getAsString() : null,
                 currentElement.has("photo_200") ? currentElement.get("photo_200").getAsString() : null,
                 currentElement.has("photo_max_orig") ? currentElement.get("photo_max_orig").getAsString() : null,
-                currentElement.has("online") && currentElement.get("online").getAsBoolean());
+                currentElement.has("online") && currentElement.get("online").getAsInt() == USER_ONLINE);
     }
 
     private Chat parseChat(JsonObject currentChatJsonObject, Map<Integer, List<Integer>> chatsUsersIdsMap,

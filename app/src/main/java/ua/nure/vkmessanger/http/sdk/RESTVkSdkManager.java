@@ -55,7 +55,8 @@ public class RESTVkSdkManager implements RESTInterface {
                                 messageJSON.optInt("chat_id"),
                                 messageJSON.getInt("user_id"),
                                 messageJSON.getString("body"),
-                                messageJSON.optBoolean("out")));
+                                messageJSON.optBoolean("out"),
+                                messageJSON.optBoolean("read_state")));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

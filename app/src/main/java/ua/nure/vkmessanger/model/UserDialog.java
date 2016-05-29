@@ -23,6 +23,8 @@ public class UserDialog implements Serializable {
 
     private boolean isLastMessageFromMe;
 
+    private boolean isLastMessageWasRead;
+
     /**
      * Объект User или Chat.
      */
@@ -33,12 +35,14 @@ public class UserDialog implements Serializable {
      * @param userId id пользователя, с которым идет переписка в ЛС.
      *               В случае, если данный диалог - групповая беседа,
      *               то userId обозначает пользователя, который написал последнее сообщеие в беседе.
+     *
      */
-    public UserDialog(int chatId, int userId, String lastMessage, boolean isLastMessageFromMe) {
+    public UserDialog(int chatId, int userId, String lastMessage, boolean isLastMessageFromMe, boolean isLastMessageWasRead) {
         this.chatId = chatId;
         this.userId = userId;
         this.lastMessage = lastMessage;
         this.isLastMessageFromMe = isLastMessageFromMe;
+        this.isLastMessageWasRead = isLastMessageWasRead;
     }
 
     public void setBody(Object body) {
@@ -81,6 +85,10 @@ public class UserDialog implements Serializable {
 
     public boolean isLastMessageFromMe() {
         return isLastMessageFromMe;
+    }
+
+    public boolean isLastMessageWasRead() {
+        return isLastMessageWasRead;
     }
 
     @Override

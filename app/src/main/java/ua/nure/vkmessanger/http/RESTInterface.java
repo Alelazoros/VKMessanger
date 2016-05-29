@@ -33,6 +33,9 @@ public interface RESTInterface {
     int MESSAGE_WAS_READ = 1;
 
 
+    int USER_ONLINE = 1;
+
+
     CustomResponse loadUserDialogs();
 
     /**
