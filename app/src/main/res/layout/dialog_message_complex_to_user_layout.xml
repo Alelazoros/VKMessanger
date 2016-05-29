@@ -76,7 +76,16 @@
 
         </LinearLayout>
 
-
     </android.support.v7.widget.CardView>
+
+    <View android:id="@+id/circleMessageNotRead"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:background="@drawable/circle_blue"
+        android:visibility="visible"
+        />
 
 </LinearLayout>

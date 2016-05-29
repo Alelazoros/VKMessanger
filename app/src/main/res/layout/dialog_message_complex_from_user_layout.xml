@@ -2,70 +2,88 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="4dp"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView android:id="@+id/cardMessage"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        app:cardBackgroundColor="@color/message_from_user_background"
-        app:cardElevation="@dimen/messageCardElevation"
-        app:cardCornerRadius="@dimen/messageCardCornerRadius"
-        app:cardUseCompatPadding="true">
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_gravity="end">
 
-        <LinearLayout android:orientation="vertical"
+        <View android:id="@+id/circleMessageNotRead"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:background="@drawable/circle_blue"
+            android:visibility="visible"
+            />
+
+        <android.support.v7.widget.CardView android:id="@+id/cardMessage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/circleMessageNotRead"
+            app:cardBackgroundColor="@color/message_from_user_background"
+            app:cardElevation="@dimen/messageCardElevation"
+            app:cardCornerRadius="@dimen/messageCardCornerRadius"
+            app:cardUseCompatPadding="true">
 
-            <TextView android:id="@+id/messageTextView"
-                android:layout_gravity="end"
-                android:paddingStart="@dimen/messagePaddingLeftRight"
-                android:paddingEnd="@dimen/messagePaddingLeftRight"
-                android:paddingTop="@dimen/messagePaddingTopBottom"
-                android:paddingBottom="@dimen/messagePaddingTopBottom"
+            <LinearLayout android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoLink="web|email"
-                android:textColorLink="@color/links_color"
-                />
+                android:layout_height="wrap_content">
 
-            <!-- Next containers must fill by their views dynamically -->
-            <!-- Photo and Video-->
-            <LinearLayout android:id="@+id/messageAttachmentsPhotoVideoContainer"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-            <!-- Audio -->
-            <LinearLayout android:id="@+id/messageAttachmentsAudioContainer"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-            <!-- Docs -->
-            <LinearLayout android:id="@+id/messageAttachmentsDocContainer"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                <TextView android:id="@+id/messageTextView"
+                    android:layout_gravity="end"
+                    android:paddingStart="@dimen/messagePaddingLeftRight"
+                    android:paddingEnd="@dimen/messagePaddingLeftRight"
+                    android:paddingTop="@dimen/messagePaddingTopBottom"
+                    android:paddingBottom="@dimen/messagePaddingTopBottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web|email"
+                    android:textColorLink="@color/links_color"
+                    />
 
-            <!-- Message can have only one link -->
-            <FrameLayout android:id="@+id/messageAttachmentsLinkContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-            <!-- Message can have only one wall -->
-            <FrameLayout android:id="@+id/messageAttachmentsWallPostContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                <!-- Next containers must fill by their views dynamically -->
+                <!-- Photo and Video-->
+                <LinearLayout android:id="@+id/messageAttachmentsPhotoVideoContainer"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <!-- Audio -->
+                <LinearLayout android:id="@+id/messageAttachmentsAudioContainer"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <!-- Docs -->
+                <LinearLayout android:id="@+id/messageAttachmentsDocContainer"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
 
-        </LinearLayout>
+                <!-- Message can have only one link -->
+                <FrameLayout android:id="@+id/messageAttachmentsLinkContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <!-- Message can have only one wall -->
+                <FrameLayout android:id="@+id/messageAttachmentsWallPostContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
 
+            </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+        </android.support.v7.widget.CardView>
 
+    </RelativeLayout>
+    
 </FrameLayout>

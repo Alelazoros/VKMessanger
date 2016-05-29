@@ -287,7 +287,7 @@ public class SelectedDialogActivity extends AppCompatActivity
                     }
                     //Снова запускаю лоадер для обновления сообщений диалога.
                     updateMessages();
-                    break;
+                    return;
             }
 
             //В адаптер передаю только поверхностную копию списка сообщений.
@@ -306,7 +306,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         int lastOldMessageId = oldMessages.get(0).getMessageId();
         int lastOldMessageIndex = 0;
 
-        for (int i = 0; i < oldMessages.size(); i++) {
+        for (int i = 0; i < updatedMessages.size(); i++) {
             if (updatedMessages.get(i).getMessageId() == lastOldMessageId) {
                 lastOldMessageIndex = i;
                 break;
@@ -315,9 +315,12 @@ public class SelectedDialogActivity extends AppCompatActivity
         for (int i = 0; i < lastOldMessageIndex; i++) {
             oldMessages.add(i, updatedMessages.get(i));
         }
-        for (int i = lastOldMessageId; i < oldMessages.size(); i++) {
+        for (int i = lastOldMessageIndex; i < updatedMessages.size(); i++) {
             oldMessages.set(i, updatedMessages.get(i));
         }
+        List<Message> copy = CollectionsUtils.copyOf(oldMessages);
+        adapter.setMessages(copy);
+        adapter.notifyItemRangeChanged(0, lastOldMessageIndex + 1);
     }
 
     @Override

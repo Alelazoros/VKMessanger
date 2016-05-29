@@ -160,6 +160,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
         //Счечик количества добавленных View фото или видео в их общий контейнер.
         private int mPhotosAndVideosCounter = 0;
 
+        private View circleMessageWasReadView;
+
 
         public MessageViewHolder(Context context, View itemView, int viewType, OnMessageClickListener clickListener,
                                  UserDialog dialog) {
@@ -167,6 +169,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
             mContext = context;
             mInflater = LayoutInflater.from(context);
             mClickListener = clickListener;
+
+            circleMessageWasReadView = itemView.findViewById(R.id.circleMessageNotRead);
 
             this.mDialog = dialog;
             mChatUserAvatarImageView = (ImageView) itemView.findViewById(R.id.chatUserAvatarImageView);
@@ -201,7 +205,11 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.MessageVie
                 Chat chat = (Chat) mDialog.getBody();
                 bindChatUserAvatar(message, chat);
             }
-
+            if (!message.isRead()) {
+                circleMessageWasReadView.setVisibility(View.VISIBLE);
+            } else {
+                circleMessageWasReadView.setVisibility(View.GONE);
+            }
             if (message.hasAttachments()) {
                 bindMessageAttachments(message.getAttachments());
             }
