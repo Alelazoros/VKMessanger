@@ -137,7 +137,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loginButton.setVisibility(View.GONE);
 
                 loadUserDialogs();
-
+                if (!SharedPreferencesUtils.isInvisibleModeOn(MainActivity.this)) {
+                    setUserOnline();
+                }
             }
 
             @Override
