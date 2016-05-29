@@ -1,7 +1,6 @@
 package ua.nure.vkmessanger.view;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -15,6 +14,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ua.nure.vkmessanger.R;
+import ua.nure.vkmessanger.activity.ContactsActivity;
 import ua.nure.vkmessanger.activity.FriendsActivity;
 import ua.nure.vkmessanger.activity.SettingsActivity;
 
@@ -26,7 +26,7 @@ public class NavigationDrawer {
     public static final int ITEM_DIALOGS = 1;
     public static final int ITEM_FRIENDS = 2;
     public static final int ITEM_SETTINGS = 3;
-    public static final int ITEM_HELP = 4;
+    public static final int ITEM_ABOUT_DEVELOPERS = 4;
 
     private Activity activity;
     private Toolbar toolbar;
@@ -49,15 +49,19 @@ public class NavigationDrawer {
                 .withTranslucentStatusBar(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.navigation_item_dialogs)//.withIcon(R.drawable.ic_map)
+                        new PrimaryDrawerItem().withName(R.string.navigation_item_dialogs)
+                                .withIcon(R.drawable.ic_message_text)
                                 .withIdentifier(ITEM_DIALOGS),
-                        new PrimaryDrawerItem().withName(R.string.navigation_item_friends)//.withIcon(R.drawable.ic_magnify)
+                        new PrimaryDrawerItem().withName(R.string.navigation_item_friends)
+                                .withIcon(R.drawable.ic_account)
                                 .withIdentifier(ITEM_FRIENDS),
                         new DividerDrawerItem(),
-                        new PrimaryDrawerItem().withName(R.string.navigation_item_settings)//.withIcon(R.drawable.ic_settings)
+                        new PrimaryDrawerItem().withName(R.string.navigation_item_settings)
+                                .withIcon(R.drawable.ic_settings)
                                 .withIdentifier(ITEM_SETTINGS),
-                        new PrimaryDrawerItem().withName(R.string.navigation_item_help_name)//.withIcon(R.drawable.ic_help)
-                                .withIdentifier(ITEM_HELP)
+                        new PrimaryDrawerItem().withName(R.string.navigation_item_abous_devs)
+                                .withIcon(R.drawable.ic_contact_mail)
+                                .withIdentifier(ITEM_ABOUT_DEVELOPERS)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -71,7 +75,8 @@ public class NavigationDrawer {
                             case ITEM_SETTINGS:
                                 SettingsActivity.newIntent(activity, ITEM_SETTINGS);
                                 break;
-                            case ITEM_HELP:
+                            case ITEM_ABOUT_DEVELOPERS:
+                                ContactsActivity.newIntent(activity, ITEM_ABOUT_DEVELOPERS);
                                 break;
                         }
                         return false;

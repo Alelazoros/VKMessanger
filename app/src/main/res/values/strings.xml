@@ -3,10 +3,10 @@
     <integer name="com_vk_sdk_AppId">5379064</integer>
 
     <!-- App name-->
-    <string name="app_name">VKMessanger</string>
+    <string name="app_name">VKMessenger</string>
 
     <!-- Activities-->
-    <string name="title_activity_main">VKMessanger</string>
+    <string name="title_activity_main">VKMessenger</string>
     <string name="title_activity_selected_dialog">SelectedDialogActivity</string>
     <string name="title_activity_wall_post">WallPostActivity</string>
 
@@ -43,6 +43,11 @@
     <string name="title_activity_settings">Настройки</string>
     <string name="mode_on">Включен</string>
     <string name="mode_off">Выключен</string>
-    <string name="invisible_mode_summary">Данный режим позволяет оставаться оффлайн во время использования приложения</string>
+    <string name="about_us_email">anton.poltoratskii@gmail.com</string>
+    <string name="about_us_title">Обратная связь с нами</string>
+    <string name="about_us_text">Мы ценим Ваши отзывы и постараемся учитывать пожелания, которые Вы может написать на нашу электронную почту</string>
+    <string name="abous_us_app_version">VK Messenger 1.0</string>
+    <string name="title_contacts_activity">О разработчиках</string>
+    <string name="navigation_item_abous_devs">О разработчиках</string>
 
 </resources>
