@@ -65,8 +65,7 @@ public class NavigationDrawer {
                             case ITEM_DIALOGS:
                                 break;
                             case ITEM_FRIENDS:
-                                Intent friends = new Intent(activity, FriendsActivity.class);
-                                activity.startActivityForResult(friends, ITEM_FRIENDS);
+                                FriendsActivity.newIntent(activity, ITEM_FRIENDS, FriendsActivity.GET_FRIENDS);
                                 break;
                             case ITEM_SETTINGS:
                                 break;

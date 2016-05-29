@@ -56,6 +56,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private static final int LOAD_USER_DIALOGS = 1;
 
+    /**
+     * Константа, передаваемая как requestCode для перехода на FriendsActivity.
+     */
+    private static final int OPEN_DIALOG_BY_FAB = 1;
+
     private Drawer drawer;
 
 
@@ -82,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    FriendsActivity.newIntent(MainActivity.this, OPEN_DIALOG_BY_FAB, FriendsActivity.OPEN_DIALOG);
                 }
             });
         }

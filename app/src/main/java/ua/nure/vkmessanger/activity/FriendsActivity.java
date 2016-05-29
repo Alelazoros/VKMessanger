@@ -1,5 +1,9 @@
 package ua.nure.vkmessanger.activity;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.IntDef;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +29,16 @@ import ua.nure.vkmessanger.model.UserDialog;
 
 public class FriendsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
+    @IntDef({GET_FRIENDS, OPEN_DIALOG})
+    public @interface OpenMode{
+    }
+
+    public static final int GET_FRIENDS = 1;
+
+    public static final int OPEN_DIALOG = 2;
+
+    public static final String EXTRA_OPEN_MODE = "EXTRA_OPEN_MODE";
+
     private static final int LAYOUT = R.layout.activity_friends;
 
     private static final int LOADER_FRIENDS = 1;
@@ -46,9 +60,18 @@ public class FriendsActivity extends AppCompatActivity implements LoaderManager.
         loadFriends();
     }
 
+    public static void newIntent(Activity activity, int requestCode, @OpenMode int openMode) {
+        Intent intent = new Intent(activity, FriendsActivity.class);
+        intent.putExtra(EXTRA_OPEN_MODE, openMode);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     private void initToolbar() {
+        String title = getIntent().getIntExtra(EXTRA_OPEN_MODE, GET_FRIENDS) == GET_FRIENDS ?
+                getString(R.string.friends) : getString(R.string.choose_user);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.friends);
+        toolbar.setTitle(title);
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_backspace);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
