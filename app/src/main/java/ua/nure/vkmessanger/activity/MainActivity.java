@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
+import com.mikepenz.materialdrawer.Drawer;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
@@ -33,6 +34,7 @@ import ua.nure.vkmessanger.http.model.loader.BaseLoader;
 import ua.nure.vkmessanger.http.retrofit.RESTRetrofitManager;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.util.CollectionsUtils;
+import ua.nure.vkmessanger.view.NavigationDrawer;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<CustomResponse> {
 
@@ -54,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private static final int LOAD_USER_DIALOGS = 1;
 
+    private Drawer drawer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        drawer = new NavigationDrawer(this, toolbar).getMaterialDrawer();
     }
 
     private void initFAB() {

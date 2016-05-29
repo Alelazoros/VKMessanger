@@ -30,5 +30,11 @@
     <string name="dialog_avatar">Аватар диалога</string>
     <string name="dialog_last_message_author">Автор последнего сообщения</string>
     <string name="chat_user_avatar">Аватар пользователя</string>
+    <string name="navigation_item_dialogs">Диалоги</string>
+    <string name="navigation_item_friends">Друзья</string>
+    <string name="navigation_item_settings">Настройки</string>
+    <string name="navigation_item_help_name">Помощь</string>
+    <string name="navigation_view_open">open</string>
+    <string name="navigation_view_close">close</string>
 
 </resources>
