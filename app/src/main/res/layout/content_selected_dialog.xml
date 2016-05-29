@@ -25,12 +25,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText android:id="@+id/editTextSendMessage"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/sendMessageTextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/send_message_hint"
-            android:layout_margin="@dimen/send_message_edit_text_margin" />
+            android:layout_weight="1">
+
+            <EditText android:id="@+id/editTextSendMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/send_message_hint"
+                android:layout_margin="@dimen/send_message_edit_text_margin"
+                />
+
+        </android.support.design.widget.TextInputLayout>
 
         <Button android:id="@+id/btSendMessage"
             android:text="@string/button_send_message_text"
