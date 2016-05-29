@@ -1,6 +1,7 @@
 package ua.nure.vkmessanger.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
         mDialogs = dialogs;
     }
 
-    public UserDialog getItem(int position){
+    public UserDialog getItem(int position) {
         return mDialogs != null ? mDialogs.get(position) : null;
     }
 
@@ -85,6 +86,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         private OnDialogClickListener clickListener;
 
+        private Context context;
+
         private Picasso picasso;
 
         private Transformation circleImageTransformation;
@@ -98,6 +101,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
 
         private TextView lastMessageTV;
 
+        /**
+         * Идентификатор, прочитано ли сообщение.
+         */
+        private View circleMessageNotRead;
+
 
         public DialogHolder(Context context, View itemView, OnDialogClickListener listener) {
             super(itemView);
@@ -105,6 +113,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             clickListener = listener;
             itemView.setOnClickListener(this);
 
+            this.context = context;
             picasso = Picasso.with(context);
             circleImageTransformation = PicassoUtils.getCircleTransformation();
 
@@ -112,6 +121,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             lastMessageAuthorAvatarIV = (ImageView) itemView.findViewById(R.id.dialogLastMessageAuthorAvatarImageView);
             dialogTitleTV = (TextView) itemView.findViewById(R.id.dialogTitleTV);
             lastMessageTV = (TextView) itemView.findViewById(R.id.dialogLastMessageTV);
+
+            circleMessageNotRead = itemView.findViewById(R.id.circleMessageNotRead);
         }
 
         public void bind(UserDialog dialog) {
@@ -149,6 +160,13 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
             dialogTitleTV.setText(title.substring(0, title.length() <= MAX_TITLE_LENGTH ? title.length() : MAX_TITLE_LENGTH));
             lastMessageTV.setText(lastMessage.substring(0,
                     lastMessage.length() <= MAX_LAST_MESSAGE_LENGTH ? lastMessage.length() : MAX_LAST_MESSAGE_LENGTH));
+
+            if (!dialog.isLastMessageWasRead()) {
+//                lastMessageTV.setBackgroundColor(Color.rgb(0xd3, 0xd3, 0xd3));
+                circleMessageNotRead.setVisibility(View.VISIBLE);
+            } else {
+                circleMessageNotRead.setVisibility(View.GONE);
+            }
         }
 
         private String getLastMessageAuthorAvatar(UserDialog dialog) {
@@ -181,5 +199,4 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.DialogHolder> 
     public interface OnDialogClickListener {
         void onDialogClick(int position);
     }
-
 }

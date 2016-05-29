@@ -88,7 +88,7 @@ public class FriendsActivity extends AppCompatActivity implements LoaderManager.
             @Override
             public void onClick(int position) {
                 User friend = adapter.getItem(position);
-                UserDialog dialog = new UserDialog(0, friend.getId(), "", false);
+                UserDialog dialog = new UserDialog(0, friend.getId(), "", false, false);
                 dialog.setBody(friend);
 
                 //По клику на друга открывается диалог с ним.

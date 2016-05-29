@@ -46,10 +46,20 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/dialogTitleTV"
             android:maxLines="1"
+            />
+
+        <View android:id="@+id/circleMessageNotRead"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/dialogTitleTV"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/circle"
+            android:visibility="visible"
             />
 
     </RelativeLayout>

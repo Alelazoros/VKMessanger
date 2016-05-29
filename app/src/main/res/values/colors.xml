@@ -19,4 +19,6 @@
     <color name="about_us_title_color">#ff263238</color>
     <color name="about_us_link_color">#009688</color>
     <color name="about_us_horizontal_divider_color">#ff263238</color>
+    <color name="message_was_read">#F5F5F5</color>
+    <color name="message_not_read">#d3d3d3</color>
 </resources>
