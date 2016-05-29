@@ -40,10 +40,14 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <Button android:id="@+id/btSendMessage"
-            android:text="@string/button_send_message_text"
+        <ImageButton android:id="@+id/btSendMessage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/send_button_background"
+            android:src="@drawable/ic_send"
+            android:padding="8dp"
+            android:layout_marginRight="8dp"
+            />
 
     </LinearLayout>
 

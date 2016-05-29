@@ -13,4 +13,7 @@
 
     <!-- Video duration field-->
     <color name="video_duration_color">#88000000</color>
+
+    <color name="send_button_color">#4C9BBD</color>
+    <color name="send_button_color_pressed">#3f51b5</color>
 </resources>

@@ -12,8 +12,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -161,7 +161,7 @@ public class SelectedDialogActivity extends AppCompatActivity
             };
 
     private void initSendMessageButton() {
-        Button sendButton = (Button) findViewById(R.id.btSendMessage);
+        ImageButton sendButton = (ImageButton) findViewById(R.id.btSendMessage);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
