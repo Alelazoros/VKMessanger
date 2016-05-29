@@ -70,4 +70,13 @@ public interface RetrofitAPI {
                                  @Query("name_case") String name_case,
                                  @Query("access_token") String accessToken);
 
+    @GET("account.setOnline")
+    Call<JsonElement> setOnline(@Query("v") String vkApiVersion,
+                                @Query("voip") int voipEnabled);
+
+    @GET("account.setOffline")
+    Call<JsonElement> setOffline(@Query("v") String vkApiVersion);
+
+
+
 }

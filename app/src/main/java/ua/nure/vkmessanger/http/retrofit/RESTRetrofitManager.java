@@ -133,7 +133,44 @@ public class RESTRetrofitManager implements RESTInterface {
         return customResponseResult;
     }
 
+    @Override
+    public CustomResponse setOnline(boolean voip_enabled) {
+        RetrofitAPI api = getRetrofit();
+        CustomResponse customResponseResult = new CustomResponse();
+        Call<JsonElement> retrofitCall = api.setOnline(VK_API_VERSION, (voip_enabled) ? 1 : 0);
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+                customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(true);
+            }
+            else {
+                customResponseResult.setRequestResult(RequestResult.ERROR);
+            }
+            }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return customResponseResult;
+    }
 
+    @Override
+    public  CustomResponse setOffline(){
+        RetrofitAPI api = getRetrofit();
+        CustomResponse customResponseResult = new CustomResponse();
+        Call<JsonElement> retrofitCall = api.setOffline(VK_API_VERSION);
+        try {
+            Response<JsonElement> retrofitResponse = retrofitCall.execute();
+            if (retrofitResponse.isSuccessful()) {
+                customResponseResult.setRequestResult(RequestResult.SUCCESS).setAnswer(true);
+            }else {
+                customResponseResult.setRequestResult(RequestResult.ERROR);
+            }
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return customResponseResult;
+    }
     private CustomResponse loadUsers(List<UserDialog> input) {
 
         CustomResponse customResponseResult = new CustomResponse();
@@ -211,6 +248,7 @@ public class RESTRetrofitManager implements RESTInterface {
 
                 //Подгружаю всех пользователей-собеседников для всех чатов одним запросом.
                 CustomResponse chatUsersResponse = mapUsersToChats(api, chatUserIdsSet, chatsUsersTempMap);
+
                 if (chatUsersResponse.getRequestResult() == RequestResult.SUCCESS) {
 
                     //Получил список всех пользователей для каждого чата.

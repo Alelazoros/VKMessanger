@@ -160,4 +160,10 @@ public class RESTVkSdkManager implements RESTInterface {
         return new CustomResponse();
     }
 
+    @Override
+    public CustomResponse setOnline(boolean voip) { return new CustomResponse();}
+    @Override
+    public  CustomResponse setOffline() {return new CustomResponse(); }
+
+
 }

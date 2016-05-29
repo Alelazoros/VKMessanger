@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Константа, используемая в LoaderCallbacks для идентификации Loader-а.
      */
     private static final int LOAD_USER_DIALOGS = 1;
+    private static final int SET_USER_OFFLINE = 2;
+    private static final int SET_USER_ONLINE = 3;
 
     /**
      * Константа, передаваемая как requestCode для перехода на FriendsActivity.
@@ -116,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
         if (VKSdk.wakeUpSession(this)) {
             loadUserDialogs();
+            setUserOffline();
         } else {
             loginButton.setVisibility(View.VISIBLE);
         }
@@ -131,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loginButton.setVisibility(View.GONE);
 
                 loadUserDialogs();
+
             }
 
             @Override
@@ -156,6 +160,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }, UPDATE_INTERVAL_MILLIS);
     }
 
+    private void setUserOnlne(){
+        getSupportLoaderManager().restartLoader(SET_USER_ONLINE,null,this);
+    }
+    private void setUserOffline() {
+        getSupportLoaderManager().restartLoader(SET_USER_OFFLINE,null,this);
+    }
+
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
 
 
@@ -167,6 +178,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 switch (id) {
                     case LOAD_USER_DIALOGS:
                         return restInterface.loadUserDialogs();
+                    case SET_USER_OFFLINE:
+                        return restInterface.setOffline();
+                    case SET_USER_ONLINE:
+                        return restInterface.setOnline(false);
                     default:
                         return null;
                 }
