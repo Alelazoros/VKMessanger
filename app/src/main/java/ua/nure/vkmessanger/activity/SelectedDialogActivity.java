@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import ua.nure.vkmessanger.model.User;
 import ua.nure.vkmessanger.model.UserDialog;
 import ua.nure.vkmessanger.model.WallPost;
 import ua.nure.vkmessanger.util.CollectionsUtils;
+import ua.nure.vkmessanger.util.SharedPreferencesUtils;
 
 public class SelectedDialogActivity extends AppCompatActivity
         implements DialogAdapter.OnDialogEndListener, LoaderManager.LoaderCallbacks<CustomResponse> {
@@ -43,6 +43,7 @@ public class SelectedDialogActivity extends AppCompatActivity
      * Интервал, с которым производится обновление диалога.
      */
     private static final int UPDATE_MESSAGES_TIMEOUT_MILLISECONDS = 5000;
+
 
     private static final String EXTRA_SELECTED_DIALOG = "EXTRA_SELECTED_DIALOG";
 
@@ -53,24 +54,26 @@ public class SelectedDialogActivity extends AppCompatActivity
     /**
      * Константа, передаваемая в Bundle Loader-а при отправке сообщения.
      */
-    public static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
-
-    public static final String MESSAGES_LOADER_BUNDLE_ARGUMENT = "MESSAGES_LOADER_BUDNLE_ARGUMENT";
+    private static final String MESSAGE_LOADER_BUNDLE_ARGUMENT = "MESSAGE_LOADER_BUNDLE_ARGUMENT";
+    /**
+     * Константа, передаваемая в Bundle Loader-а при чтении сообщений.
+     */
+    private static final String MARK_READ_LOADER_BUNDLE_ARGUMENT = "MARK_READ_LOADER_BUNDLE_ARGUMENT";
 
 
     /**
-     * LOAD_FIRST_MESSAGES, LOAD_MORE_MESSAGES, SEND_MESSAGE, UPDATE_DIALOG_MESSAGES - константы,
+     * FIRST_MESSAGES_LOADER, MORE_MESSAGES_LOADER, SEND_MESSAGE_LOADER, UPDATE_DIALOG_MESSAGES_LOADER, MARK_AS_READ_LOADER - константы,
      * используемые в LoaderCallbacks для идентификации Loader-ов.
      */
-    public static final int LOAD_FIRST_MESSAGES = 1;
+    private static final int FIRST_MESSAGES_LOADER = 1;
 
-    public static final int LOAD_MORE_MESSAGES = 2;
+    private static final int MORE_MESSAGES_LOADER = 2;
 
-    public static final int SEND_MESSAGE = 3;
+    private static final int SEND_MESSAGE_LOADER = 3;
 
-    private static final int UPDATE_DIALOG_MESSAGES = 4;
+    private static final int UPDATE_DIALOG_MESSAGES_LOADER = 4;
 
-    private static final int MARK_AS_READED = 5;
+    private static final int MARK_AS_READ_LOADER = 5;
 
 
     private RESTInterface restInterface = new RESTRetrofitManager(this);
@@ -83,12 +86,15 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private Handler handler = new Handler();
 
+    private boolean isInvisibleMode;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_dialog);
 
+        isInvisibleMode = SharedPreferencesUtils.isInvisibleModeOn(this);
         getDataFromIntent(getIntent());
         initToolbar();
         initRecyclerView();
@@ -104,11 +110,6 @@ public class SelectedDialogActivity extends AppCompatActivity
 
     private void getDataFromIntent(Intent intent) {
         dialog = (UserDialog) intent.getExtras().get(EXTRA_SELECTED_DIALOG);
-    }
-    private void markMessagesAsReader(List<Message> input) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(MESSAGES_LOADER_BUNDLE_ARGUMENT, (ArrayList)input);
-        getSupportLoaderManager().restartLoader(MARK_AS_READED, bundle, SelectedDialogActivity.this);
     }
 
     private void initToolbar() {
@@ -181,7 +182,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void loadFirstMessages() {
-        getSupportLoaderManager().initLoader(LOAD_FIRST_MESSAGES, null, this);
+        getSupportLoaderManager().initLoader(FIRST_MESSAGES_LOADER, null, this);
     }
 
 
@@ -194,7 +195,7 @@ public class SelectedDialogActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         bundle.putInt(OFFSET_LOADER_BUNDLE_ARGUMENT, offsetCount);
 
-        getSupportLoaderManager().restartLoader(LOAD_MORE_MESSAGES, bundle, this);
+        getSupportLoaderManager().restartLoader(MORE_MESSAGES_LOADER, bundle, this);
     }
 
     public void sendMessage() {
@@ -204,7 +205,7 @@ public class SelectedDialogActivity extends AppCompatActivity
             Bundle args = new Bundle();
             args.putString(MESSAGE_LOADER_BUNDLE_ARGUMENT, messageText);
             editText.setText("");
-            getSupportLoaderManager().initLoader(SEND_MESSAGE, args, this);
+            getSupportLoaderManager().initLoader(SEND_MESSAGE_LOADER, args, this);
         }
     }
 
@@ -214,9 +215,15 @@ public class SelectedDialogActivity extends AppCompatActivity
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                getSupportLoaderManager().restartLoader(UPDATE_DIALOG_MESSAGES, null, SelectedDialogActivity.this);
+                getSupportLoaderManager().restartLoader(UPDATE_DIALOG_MESSAGES_LOADER, null, SelectedDialogActivity.this);
             }
         }, UPDATE_MESSAGES_TIMEOUT_MILLISECONDS);
+    }
+
+    private void markMessagesAsRead(int peerId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(MARK_READ_LOADER_BUNDLE_ARGUMENT, peerId);
+        getSupportLoaderManager().restartLoader(MARK_AS_READ_LOADER, bundle, this);
     }
 
     //---------------- Реализация LoaderManager.LoaderCallbacks<CustomResponse> ------------//
@@ -231,19 +238,20 @@ public class SelectedDialogActivity extends AppCompatActivity
             @Override
             public CustomResponse apiCall() throws IOException {
                 switch (id) {
-                    case LOAD_FIRST_MESSAGES:
+                    case FIRST_MESSAGES_LOADER:
                         return restInterface.loadSelectedDialogById(dialog.getDialogId(), 0);
-                    case LOAD_MORE_MESSAGES:
+                    case MORE_MESSAGES_LOADER:
                         int offset = args.getInt(OFFSET_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.loadSelectedDialogById(dialog.getDialogId(), offset);
-                    case SEND_MESSAGE:
+                    case SEND_MESSAGE_LOADER:
                         String Message = args.getString(MESSAGE_LOADER_BUNDLE_ARGUMENT);
                         return restInterface.sendMessageTo(Message, dialog.getDialogId());
-                    case UPDATE_DIALOG_MESSAGES:
+                    case UPDATE_DIALOG_MESSAGES_LOADER:
                         //По умолчанию я так получаю первые 50 сообщений.
                         return restInterface.loadSelectedDialogById(dialog.getDialogId(), 0);
-                    case MARK_AS_READED:
-                        return restInterface.markMessagesAsReaded((List<Message>)args.get(MESSAGES_LOADER_BUNDLE_ARGUMENT));
+                    case MARK_AS_READ_LOADER:
+                        int peerId = args.getInt(MARK_READ_LOADER_BUNDLE_ARGUMENT);
+                        return restInterface.markMessagesAsRead(peerId);
                     default:
                         return null;
                 }
@@ -256,23 +264,27 @@ public class SelectedDialogActivity extends AppCompatActivity
 
         if (data.getRequestResult() == RequestResult.SUCCESS) {
             switch (loader.getId()) {
-                case LOAD_FIRST_MESSAGES:
+                case FIRST_MESSAGES_LOADER:
                     messages.clear();
                     messages.addAll(data.<List<Message>>getTypedAnswer());
                     updateMessages();
                     break;
-                case LOAD_MORE_MESSAGES:
+                case MORE_MESSAGES_LOADER:
                     messages.addAll(data.<List<Message>>getTypedAnswer());
                     destroyLoader(loader.getId());
                     break;
-                case SEND_MESSAGE:
+                case SEND_MESSAGE_LOADER:
                     messages.add(0, data.<Message>getTypedAnswer());
                     destroyLoader(loader.getId());
                     break;
-                case UPDATE_DIALOG_MESSAGES:
+                case UPDATE_DIALOG_MESSAGES_LOADER:
                     List<Message> updatedMessages = data.getTypedAnswer();
                     mergeUpdatedMessages(messages, updatedMessages);
 
+                    //Посылаю запрос, чтоб диалог считался прочитанным, если отключен режим невидимки.
+                    if (!isInvisibleMode) {
+                        markMessagesAsRead(dialog.getDialogId());
+                    }
                     //Снова запускаю лоадер для обновления сообщений диалога.
                     updateMessages();
                     break;
@@ -286,7 +298,7 @@ public class SelectedDialogActivity extends AppCompatActivity
     }
 
     private void mergeUpdatedMessages(List<Message> oldMessages, List<Message> updatedMessages) {
-        if (oldMessages.size() == 0){
+        if (oldMessages.size() == 0) {
             return;
         }
 
@@ -303,8 +315,8 @@ public class SelectedDialogActivity extends AppCompatActivity
         for (int i = 0; i < lastOldMessageIndex; i++) {
             oldMessages.add(i, updatedMessages.get(i));
         }
-        if (updatedMessages.size() > 0 ) {
-            markMessagesAsReader(updatedMessages);
+        for (int i = lastOldMessageId; i < oldMessages.size(); i++) {
+            oldMessages.set(i, updatedMessages.get(i));
         }
     }
 

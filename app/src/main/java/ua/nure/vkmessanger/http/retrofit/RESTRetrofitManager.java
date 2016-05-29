@@ -3,7 +3,6 @@ package ua.nure.vkmessanger.http.retrofit;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -77,19 +76,12 @@ public class RESTRetrofitManager implements RESTInterface {
     }
 
 
-
     @Override
-    public CustomResponse markMessagesAsReaded(List<Message> input){
-
-        StringBuilder SB = new StringBuilder();
-        for (int i = 0; i < input.size()-1; i++){
-            SB.append(input.get(i).getMessageId() + ',');
-        }
+    public CustomResponse markMessagesAsRead(int peerId) {
         CustomResponse customResponseResult = new CustomResponse();
         RetrofitAPI api = getRetrofit();
-        Call<JsonElement> retrofitCall = api.markAsReaded(VK_API_VERSION,
-                SB.toString(),
-                AccessTokenManager.getAccessToken(mContext));
+
+        Call<JsonElement> retrofitCall = api.markAsRead(VK_API_VERSION, peerId, AccessTokenManager.getAccessToken(mContext));
         try {
             Response<JsonElement> retrofitResponse = retrofitCall.execute();
             if (retrofitResponse.isSuccessful()) {
@@ -102,6 +94,8 @@ public class RESTRetrofitManager implements RESTInterface {
         }
         return customResponseResult;
     }
+
+
     @Override
     public CustomResponse loadUserDialogs() {
         RetrofitAPI api = getRetrofit();

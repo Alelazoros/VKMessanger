@@ -61,11 +61,9 @@ public interface RESTInterface {
     CustomResponse getGroupsInfoByIds(String[] groupIds);
 
     CustomResponse setOnline(boolean voip);
+
     CustomResponse setOffline();
-    CustomResponse markMessagesAsReaded(List<Message> input);
 
-
-
-
+    CustomResponse markMessagesAsRead(int peerId);
 
 }

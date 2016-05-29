@@ -80,10 +80,7 @@ public interface RetrofitAPI {
                                  @Query("access_token") String accessToken);
 
     @GET("messages.markAsRead")
-    Call<JsonElement> markAsReaded(@Query("v") String vkApiVersion,
-                                 @Query("message_ids") String messageIds,
+    Call<JsonElement> markAsRead(@Query("v") String vkApiVersion,
+                                 @Query("peer_id") int peerId,
                                  @Query("access_token") String accessToken);
-
-
-
 }

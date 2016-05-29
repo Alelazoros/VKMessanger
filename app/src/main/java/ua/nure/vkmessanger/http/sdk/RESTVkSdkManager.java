@@ -161,11 +161,18 @@ public class RESTVkSdkManager implements RESTInterface {
     }
 
     @Override
-    public CustomResponse setOnline(boolean voip) { return new CustomResponse();}
-    @Override
-    public  CustomResponse setOffline() {return new CustomResponse(); }
-    @Override
-    public CustomResponse markMessagesAsReaded(List<Message> input) { return new CustomResponse(); }
+    public CustomResponse setOnline(boolean voip) {
+        return new CustomResponse();
+    }
 
+    @Override
+    public CustomResponse setOffline() {
+        return new CustomResponse();
+    }
+
+    @Override
+    public CustomResponse markMessagesAsRead(int peerId) {
+        return new CustomResponse();
+    }
 
 }
